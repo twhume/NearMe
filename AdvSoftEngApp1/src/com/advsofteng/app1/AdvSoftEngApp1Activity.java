@@ -2,12 +2,9 @@ package com.advsofteng.app1;
 
 import android.app.Activity;
 import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.location.*;
 import android.os.Bundle;
 import android.widget.TextView;
-//import android.location.*;
 
 /**
  * 
@@ -46,7 +43,12 @@ public class AdvSoftEngApp1Activity extends Activity {
 			@Override
 			public void onStatusChanged(String provider, int status, Bundle extras) {
 				// TODO Auto-generated method stub
-				
+				// bit of a hack. but - OUT_OF_SERVICE ==0 and TEMPORARILY_UNAVAILABLE ==1
+				if((status == 0 )||(status ==  1)) 
+				{
+					tvGPS.setText("GPS not available");
+				}
+		
 			}
 			
 			@Override
@@ -68,9 +70,8 @@ public class AdvSoftEngApp1Activity extends Activity {
 				strGPS = "Longitude = " + location.getLongitude() + "\n";
 				strGPS += "Latitude = " + location.getLatitude();
 				
-				//Double dbl = location.getLongitude();
-				//strGPS.
-				//tvGPS.setText():
+				// set the GPSTextView()
+				tvGPS.setText(strGPS);
 				
 				
 			}
