@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, AdvSoftEngApp1Activity!</string>
+    <string name="app_name">AdvSoftEngApp1</string>
+    <string name="no_gps_error">GPS not available</string>
+</resources>
