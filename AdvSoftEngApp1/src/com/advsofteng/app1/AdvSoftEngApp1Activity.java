@@ -13,7 +13,7 @@ import android.widget.TextView;
  * This App displays the current time and the device's current GPS co-ordinates.
  * if GPS data is unavailable, it displays "GPS not available".
  */
-public class AdvSoftEngApp1Activity extends Activity2 {
+public class AdvSoftEngApp1Activity extends Activity {
 	
 	// class members
 	private LocationManager manager;
