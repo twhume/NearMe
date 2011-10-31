@@ -54,7 +54,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 	            	Calendar cal = Calendar.getInstance();
 	        		cal.add(Calendar.SECOND,1);
 	        		Intent intent = new Intent(getApplicationContext(), LocationPoster.class);
-	        		intent.putExtra("alarm_message", "O'Doyle Rules!");
 	        		alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	        		am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), POLL_INTERVAL , alarmIntent);
 
@@ -133,13 +132,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 		tv.setText(strGPS);
     }
 
-	public void showConnectionFailure() {
-		
-		CharSequence text = "Report failed"; //TODO externalise
-		Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
-		toast.show();
-		// TODO reset button label to basic
-	}
 
 	
 }
