@@ -1,42 +1,44 @@
 package com.advsofteng.app1;
 
+import java.util.Calendar;
+
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.*;
 import android.os.Bundle;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * 
  * @author alandonohoe
+ * 
  * This App displays the current time and the device's current GPS co-ordinates.
  * if GPS data is unavailable, it displays "GPS not available".
+ * 
  */
 public class AdvSoftEngApp1Activity extends Activity {
+
+	public static final String TAG = "LocationPoster";	/* used for logging purposes */
+
+	/* Interval between deliveries of location data to the server */
 	
-	// class members
+	private static final int POLL_INTERVAL = (5 * 1000);
 	private LocationManager manager;
 	private LocationListener listener;
-	private LocationPoster poster;
 	private String strGPS;
+	private PendingIntent alarmIntent = null;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        final Handler mHandler = new Handler();
-        final Runnable mUpdateResults = new Runnable() {
-            public void run() {
-                showConnectionFailure();
-            }
-        };
-        
-        poster = new LocationPoster(mHandler, mUpdateResults);
         setContentView(R.layout.main);
         
         /* Set the on-screen button to start and stop the location provider */
@@ -44,12 +46,26 @@ public class AdvSoftEngApp1Activity extends Activity {
         final Button button = (Button) findViewById(R.id.postButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	if (poster.isRunning()) {
-            		poster.stop();
-            		button.setText("Start");
+        		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+            	if (alarmIntent==null) {
+	            	Log.i(TAG,"starting poll");
+
+	            	Calendar cal = Calendar.getInstance();
+	        		cal.add(Calendar.SECOND,1);
+	        		Intent intent = new Intent(getApplicationContext(), LocationPoster.class);
+	        		intent.putExtra("alarm_message", "O'Doyle Rules!");
+	        		alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	        		am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), POLL_INTERVAL , alarmIntent);
+
+	        		button.setText("Stop");
             	} else {
-            		poster.start();
-            		button.setText("Stop");
+	            	Log.i(TAG,"finishing poll");
+	            	
+            		am.cancel(alarmIntent);
+            		alarmIntent = null;
+
+            		button.setText("Start");
             	}
             }
         });
@@ -125,10 +141,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 		// TODO reset button label to basic
 	}
 
-	protected void onPause() {
-		super.onPause();
-		poster.stop();   
-	}
 	
 }
 
