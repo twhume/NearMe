@@ -13,8 +13,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.content.Context;
-import android.widget.Toast;
+import android.os.Handler;
+import android.util.Log;
 
 /**
  * Class which actions delivery of a location and timestamp to a server
@@ -22,60 +22,81 @@ import android.widget.Toast;
  * @author twhume
  *
  */
-public class LocationPoster extends Thread {
+public class LocationPoster implements Runnable {
 
 	/* Endpoint to which HTTP POSTs should go */
 	private static final String ENDPOINT = "http://localhost:8080/";
 	
 	/* How long to wait between sending locations to the server */
-	private static final int DELAY = (5 * 60 * 1000); // every 5 minutes
+	private static final int DELAY = (5 /* * 60 */ * 1000); // every 5 minutes
 	
 	/* Fields which must be present in order for a POST to be triggered */
 	private static final String[] REQUIRED_FIELDS = {"id","time","latitude","longitude"};
+
+	private static final String TAG = "LocationPoster";
 	
-	private FailureHandler failCallback = null;
+	private Handler failCallback = null;
+	private Runnable failThread = null;
+	private Thread theThread = null;
 	private HttpClient client = null;
 	private List<NameValuePair> payload = null;
 	private boolean finishSignalled = false;
 	
-	public LocationPoster(FailureHandler f) {
+	public LocationPoster(Handler f, Runnable r) {
+		Log.i(TAG, "new");
 		failCallback = f;
+		failThread = r;
 		
 		client = new DefaultHttpClient();
 		reset();
 	}
 	
 	private void reset() {
+		Log.i(TAG, "reset");
 		payload = new ArrayList<NameValuePair>(); 
 		finishSignalled = false;
+		theThread = null;
 	}
 	
-	public void finish() {
+	public void stop() {
 		this.finishSignalled = true;
 	}
 	
-	private void fail() {
-		finish();
-		failCallback.fail();
-	}
+	public void start() {
+		Log.i(TAG, "start");
+		if (!isRunning()) {
+			theThread = new Thread(this);
+			theThread.start();
+		} else Log.i(TAG, "not spawning thread");
+	}	
 
+	public boolean isRunning() {
+		Log.i(TAG, "isRunning="+ ((theThread!=null) && (!finishSignalled)));
+		return ((theThread!=null) && (!finishSignalled));
+	}
+	
 	public void set(String name, String value) {
 		payload.add(new BasicNameValuePair(name, value));
 	}
 	
-	public void post() {
+	public boolean post() {
+	    Log.i(TAG,"post");
 	    HttpPost post = new HttpPost(ENDPOINT);
+	    if (2==2) return true;
 
 	    try {
 	        post.setEntity(new UrlEncodedFormEntity(payload));
 	        HttpResponse response = client.execute(post);
-	        reset(); /* clear out data after a poll */
+			payload.clear(); /* clear out data after a poll - we just sent it */
+			//FIXME Thread-unsafe!
 	    } catch (ClientProtocolException e) {
-	        // TODO Auto-generated catch block
+	    	/* In the event of any problems, stop polling */
+	    	return false;
 	    } catch (IOException e) {
 	    	/* In the event of any problems, stop polling */
-	    	fail();
+	    	return false;
 	    }
+	    return true;
 	}
 	
 	private boolean validPayload() {
@@ -88,11 +109,15 @@ public class LocationPoster extends Thread {
 	}
 	
 	public void run() {
+		Log.i(TAG, "run");
 		while (!finishSignalled) {
 			/* Post up data to the server, but only if we have a time, latitude and longitude */
-			if (validPayload()) post(); 
+			/*if (validPayload())*/ if (!post()) break; 
 			try { Thread.sleep(DELAY); } catch (InterruptedException e) {}
 		}
+		Log.i(TAG, "run over, dereferencing thread");
+		failCallback.post(failThread);
+		reset();
 	}
 	
 }

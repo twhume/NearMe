@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.location.*;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,7 +16,7 @@ import android.widget.Toast;
  * This App displays the current time and the device's current GPS co-ordinates.
  * if GPS data is unavailable, it displays "GPS not available".
  */
-public class AdvSoftEngApp1Activity extends Activity implements FailureHandler {
+public class AdvSoftEngApp1Activity extends Activity {
 	
 	// class members
 	private LocationManager manager;
@@ -26,8 +29,30 @@ public class AdvSoftEngApp1Activity extends Activity implements FailureHandler {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        poster = new LocationPoster(this);
+        final Handler mHandler = new Handler();
+        final Runnable mUpdateResults = new Runnable() {
+            public void run() {
+                showConnectionFailure();
+            }
+        };
+        
+        poster = new LocationPoster(mHandler, mUpdateResults);
         setContentView(R.layout.main);
+        
+        /* Set the on-screen button to start and stop the location provider */
+        
+        final Button button = (Button) findViewById(R.id.postButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	if (poster.isRunning()) {
+            		poster.stop();
+            		button.setText("Start");
+            	} else {
+            		poster.start();
+            		button.setText("Stop");
+            	}
+            }
+        });
         
         // get handle to the GPS TextView
         final TextView tvGPS = (TextView) findViewById(R.id.textViewGPS);
@@ -92,14 +117,19 @@ public class AdvSoftEngApp1Activity extends Activity implements FailureHandler {
 		tv.setText(strGPS);
     }
 
-	public void fail() {
+	public void showConnectionFailure() {
+		
 		CharSequence text = "Report failed"; //TODO externalise
 		Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
 		toast.show();
 		// TODO reset button label to basic
 	}
-    
-    
+
+	protected void onPause() {
+		super.onPause();
+		poster.stop();   
+	}
+	
 }
 
 
