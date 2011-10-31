@@ -13,6 +13,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.content.Context;
+import android.widget.Toast;
+
 /**
  * Class which actions delivery of a location and timestamp to a server
  * 
@@ -27,11 +30,17 @@ public class LocationPoster extends Thread {
 	/* How long to wait between sending locations to the server */
 	private static final int DELAY = (5 * 60 * 1000); // every 5 minutes
 	
+	/* Fields which must be present in order for a POST to be triggered */
+	private static final String[] REQUIRED_FIELDS = {"id","time","latitude","longitude"};
+	
+	private FailureHandler failCallback = null;
 	private HttpClient client = null;
 	private List<NameValuePair> payload = null;
 	private boolean finishSignalled = false;
 	
-	public LocationPoster() {
+	public LocationPoster(FailureHandler f) {
+		failCallback = f;
+		
 		client = new DefaultHttpClient();
 		reset();
 	}
@@ -43,6 +52,11 @@ public class LocationPoster extends Thread {
 	
 	public void finish() {
 		this.finishSignalled = true;
+	}
+	
+	private void fail() {
+		finish();
+		failCallback.fail();
 	}
 
 	public void set(String name, String value) {
@@ -60,13 +74,13 @@ public class LocationPoster extends Thread {
 	        // TODO Auto-generated catch block
 	    } catch (IOException e) {
 	    	/* In the event of any problems, stop polling */
-	    	finish();
+	    	fail();
 	    }
 	}
 	
 	private boolean validPayload() {
 		if (payload==null) return false;
-		if (payload.size()!=3) return false;
+		if (payload.size()!=REQUIRED_FIELDS.length) return false;
 
 		//TODO: add routine to check valid names in payload
 		

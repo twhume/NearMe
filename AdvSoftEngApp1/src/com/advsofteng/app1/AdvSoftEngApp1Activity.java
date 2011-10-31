@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.*;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * 
@@ -12,17 +13,21 @@ import android.widget.TextView;
  * This App displays the current time and the device's current GPS co-ordinates.
  * if GPS data is unavailable, it displays "GPS not available".
  */
-public class AdvSoftEngApp1Activity extends Activity {
+public class AdvSoftEngApp1Activity extends Activity implements FailureHandler {
 	
 	// class members
 	private LocationManager manager;
 	private LocationListener listener;
+	private LocationPoster poster;
 	private String strGPS;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        poster = new LocationPoster(this);
+        
         setContentView(R.layout.main);
         
         ////////////////////////////////////////////////////
@@ -122,6 +127,13 @@ public class AdvSoftEngApp1Activity extends Activity {
 		// set the GPSTextView
 		tv.setText(strGPS);
     }
+
+	public void fail() {
+		CharSequence text = "Report failed"; //TODO externalise
+		Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
+		toast.show();
+		// TODO reset button label to basic
+	}
     
     
 }
