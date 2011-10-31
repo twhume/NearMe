@@ -1,6 +1,3 @@
-import javax.servlet.*;
-import javax.servlet.http.*;
-
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
