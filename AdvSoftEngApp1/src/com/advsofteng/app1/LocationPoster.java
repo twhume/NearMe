@@ -16,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.provider.Settings.Secure;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -57,9 +58,9 @@ public class LocationPoster extends BroadcastReceiver {
 			/* Set the payload for this POST */
 
 			ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-			params.add(new BasicNameValuePair("id", "1"));
+			params.add(new BasicNameValuePair("id", Secure.getString(context.getContentResolver(),Secure.ANDROID_ID)));
 			params.add(new BasicNameValuePair("longitude", prefs.getString("longitude", "")));
-			params.add(new BasicNameValuePair("longitude", prefs.getString("latitude", "")));
+			params.add(new BasicNameValuePair("latitude", prefs.getString("latitude", "")));
 			params.add(new BasicNameValuePair("time", prefs.getString("time", "")));
 
 			// FIXME race condition above, where the SharedPreferences are updated in the middle of this block of code

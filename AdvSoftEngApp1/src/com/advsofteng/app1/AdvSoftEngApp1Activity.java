@@ -1,6 +1,7 @@
 package com.advsofteng.app1;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -36,6 +37,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
 	private DigitalClock clock = null;			/* on-screen clock */
 	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
+	private Button button = null;				/* start/stop button */
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +45,7 @@ public class AdvSoftEngApp1Activity extends Activity {
         
         /* Set the on-screen button to start and stop the location provider */
         
-        final Button button = (Button) findViewById(R.id.postButton);
+        button = (Button) findViewById(R.id.postButton);
         button.setOnClickListener(new View.OnClickListener() {
 
         	public void onClick(View v) {
@@ -83,7 +85,7 @@ public class AdvSoftEngApp1Activity extends Activity {
         prefs = getSharedPreferences(TAG, Context.MODE_PRIVATE);
         manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Location loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        setGPSText(loc);
+        setLocation(loc);
       
 		/* connect the listener object to receive GPS updates */
 
@@ -100,13 +102,14 @@ public class AdvSoftEngApp1Activity extends Activity {
 	 * @param tv
 	 */
     
-    public void setGPSText(Location location)
+    public void setLocation(Location location)
     {
     	/* If we get a null location, clear out the preferences
     	 * and pop up the error message
     	 */
     	
     	if (null == location) {
+    		Log.i(TAG, "null location, clearing out");
     		emptyPrefs();
     		tvGPS.setText(getString(R.string.no_gps_error));
     		return;
@@ -118,16 +121,38 @@ public class AdvSoftEngApp1Activity extends Activity {
 		
 		// then slap it into those shared preferences so it gets sent up in a poll
 
-		prefs.edit().putString("time", clock.getText().toString());
-		prefs.edit().putString("latitude", Double.toString(location.getLatitude()));
-		prefs.edit().putString("longitude", Double.toString(location.getLongitude()));
+		Log.i(TAG, "set time to "+ clock.getText());
+		
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putString("time", new Date().toString());
+		edit.putString("latitude", Double.toString(location.getLatitude()));
+		edit.putString("longitude", Double.toString(location.getLongitude()));
+		edit.commit();
+		Log.i(TAG, "saved location OK");
+		Log.i(TAG, "new time="+prefs.getString("time", "notset"));
     }
     
     private void emptyPrefs() {
-		prefs.edit().remove("time");
-		prefs.edit().remove("latitude");
-		prefs.edit().remove("longitude");
+		Log.i(TAG, "emptyPrefs");
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.remove("time");
+		edit.remove("latitude");
+		edit.remove("longitude");
+		edit.commit();
+		
     }
+
+	protected void onPause() {
+		super.onPause();
+
+		/* Leaving the app, even briefly? Cancel any subsequent polls and reset button to start */
+
+		Context ctx = getApplicationContext();
+		AlarmManager am = (AlarmManager) ctx.getSystemService(Activity.ALARM_SERVICE);
+		am.cancel(alarmIntent);
+		alarmIntent = null;
+		button.setText(R.string.start_button_label);
+	}
 
 }
 

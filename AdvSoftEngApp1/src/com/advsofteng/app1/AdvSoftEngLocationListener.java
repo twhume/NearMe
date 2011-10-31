@@ -15,7 +15,7 @@ public class AdvSoftEngLocationListener implements LocationListener {
 		if((LocationProvider.OUT_OF_SERVICE == status)||(LocationProvider.TEMPORARILY_UNAVAILABLE == status)) 
 		{	
 			Log.i(AdvSoftEngApp1Activity.TAG,"onStatusChanged out of service");
-			locationActivity.setGPSText(null);
+			locationActivity.setLocation(null);
 		}
 	}
 
@@ -24,8 +24,8 @@ public class AdvSoftEngLocationListener implements LocationListener {
 	 */
 	
 	public void onLocationChanged(Location location) {
-		Log.i(AdvSoftEngApp1Activity.TAG,"onLocationChanged");
-		locationActivity.setGPSText(location);		
+		Log.i(AdvSoftEngApp1Activity.TAG,"onLocationChanged location="+location);
+		locationActivity.setLocation(location);		
 	}
 
 	public void onProviderEnabled(String provider) {
