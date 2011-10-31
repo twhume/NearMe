@@ -12,8 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DigitalClock;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * @author alandonohoe
@@ -27,90 +27,68 @@ public class AdvSoftEngApp1Activity extends Activity {
 	public static final String TAG = "LocationPoster";	/* used for logging purposes */
 
 	/* Interval between deliveries of location data to the server */
-	
 	private static final int POLL_INTERVAL = (5 * 1000);
 	private LocationManager manager;
-	private LocationListener listener;
-	private String strGPS;
-	private PendingIntent alarmIntent = null;
+	public static AdvSoftEngLocationListener listener;
 	
-    /** Called when the activity is first created. */
-    @Override
+	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
+	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
+	private DigitalClock clock = null;			/* on-screen clock */
+	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
         setContentView(R.layout.main);
         
+        listener = new AdvSoftEngLocationListener();
+        listener.setLocationActivity(this);
+
         /* Set the on-screen button to start and stop the location provider */
         
         final Button button = (Button) findViewById(R.id.postButton);
         button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-        		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        	public void onClick(View v) {
+
+            	AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
 
             	if (alarmIntent==null) {
+            		
+            		/* Start a regular process to poll the server */
+            		
 	            	Log.i(TAG,"starting poll");
-
 	            	Calendar cal = Calendar.getInstance();
-	        		cal.add(Calendar.SECOND,1);
+	        		cal.add(Calendar.SECOND,0);
 	        		Intent intent = new Intent(getApplicationContext(), LocationPoster.class);
 	        		alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	        		am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), POLL_INTERVAL , alarmIntent);
-
-	        		button.setText("Stop");
+	        		button.setText(getString(R.string.stop_button_label));
             	} else {
 	            	Log.i(TAG,"finishing poll");
+
+	            	/* Cancel the polling process */
 	            	
             		am.cancel(alarmIntent);
             		alarmIntent = null;
-
-            		button.setText("Start");
+            		button.setText(getString(R.string.start_button_label));
             	}
             }
         });
         
-        // get handle to the GPS TextView
-        final TextView tvGPS = (TextView) findViewById(R.id.textViewGPS);
+        /* get handles to the TextView where GPS position is displayed, and the on-screen clock */
         
+        tvGPS = (TextView) findViewById(R.id.textViewGPS);
+        clock = (DigitalClock) findViewById(R.id.digitalClock1);
+      
         manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         
-        // We may know a location even before we start; if so, use it.
+        /* We may know a location even before we start; if so, use it. */
+
         Location loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        
-        if(loc != null) setGPSText(loc, tvGPS);
-        else tvGPS.setText(getString(R.string.no_gps_error));
+        if(loc != null) setGPSText(loc);
+        else setGPSText(R.string.no_gps_error);
       
-		// create the listener object to receive GPS updates...
-		listener = new LocationListener() {
-			
-			@Override
-			public void onStatusChanged(String provider, int status, Bundle extras) {
-				if((LocationProvider.OUT_OF_SERVICE == status)||(LocationProvider.TEMPORARILY_UNAVAILABLE == status)) 
-				{	// if there's no service, print error string found in resources...
-					tvGPS.setText(getString(R.string.no_gps_error));
-				}
-			}
-
-			@Override
-			public void onLocationChanged(Location location) {
-				// update GPS TextView's data
-				//TODO - TAKE THIS OUT...
-				setGPSText(location, tvGPS);
-				
-			}
-
-			@Override
-			public void onProviderEnabled(String provider) {
-				// TODO put code here to deal with GPS being down...
-			}
-			
-			@Override
-			public void onProviderDisabled(String provider) {
-				// TODO Auto-generated method stub
-			}
-			
-		};
-		
+		/* connect the listener object to receive GPS updates */
+        
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
            
     }
@@ -122,16 +100,23 @@ public class AdvSoftEngApp1Activity extends Activity {
 	 * @param tv
 	 */
     
-    private void setGPSText(Location location, TextView tv)
+    public void setGPSText(Location location)
     {
-    	// check for valid TextView and Location objects....
-    	if((null == tv) || (null == location)) return;
+    	/* If we get a null location, don't do anything */
+    	if (null == location) return;
     	
-		strGPS = "Longitude = " + location.getLongitude() + "\n";
+		String strGPS = "Longitude = " + location.getLongitude() + "\n";
 		strGPS += "Latitude = " + location.getLatitude();
-		tv.setText(strGPS);
+		tvGPS.setText(strGPS);
     }
 
+    public void setGPSText(int s) {
+    	tvGPS.setText(getString(s));
+    }
+    
+    public String getTime() {
+    	return clock.getText().toString();
+    }
 
 	
 }
