@@ -9,36 +9,23 @@ import android.util.Log;
 public class AdvSoftEngLocationListener implements LocationListener {
 
 	private AdvSoftEngApp1Activity locationActivity = null;
-	
-	/* Keep track of the last Location we received, and the last date and time it was received at */
-	private Location lastLocation = null;
-	private String lastTime = null;
-	
-	/* It's a singleton. Sorry - this isn't considered great practice nowadays, I should
-	 * spend more time looking into ways of sharing active objects between bits of an 
-	 * Android app. TODO
-	 */
-		
+			
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		Log.i(AdvSoftEngApp1Activity.TAG,"onStatusChanged");
-
 		if((LocationProvider.OUT_OF_SERVICE == status)||(LocationProvider.TEMPORARILY_UNAVAILABLE == status)) 
-		{	// if there's no service, print error string found in resources...
-			locationActivity.setGPSText(R.string.no_gps_error);
-			lastLocation = null;
-			lastTime = null;
+		{	
+			Log.i(AdvSoftEngApp1Activity.TAG,"onStatusChanged out of service");
+			locationActivity.setGPSText(null);
 		}
 	}
 
 	/**
-	 * When we receive a location, put it on-screen and save it as the last-known-good
+	 * When we receive a location, pass it to the activity for display and saving
 	 */
 	
 	public void onLocationChanged(Location location) {
 		Log.i(AdvSoftEngApp1Activity.TAG,"onLocationChanged");
-		locationActivity.setGPSText(location);
-		lastLocation = location;
-		lastTime = locationActivity.getTime();
+		locationActivity.setGPSText(location);		
 	}
 
 	public void onProviderEnabled(String provider) {
@@ -59,13 +46,6 @@ public class AdvSoftEngLocationListener implements LocationListener {
 		this.locationActivity = locationActivity;
 	}
 
-	public Location getLastLocation() {
-		return lastLocation;
-	}
-
-	public String getLastTime() {
-		return lastTime;
-	}
 
 
 }

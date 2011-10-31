@@ -7,6 +7,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.*;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,14 +35,12 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
 	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
 	private DigitalClock clock = null;			/* on-screen clock */
+	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        listener = new AdvSoftEngLocationListener();
-        listener.setLocationActivity(this);
-
         /* Set the on-screen button to start and stop the location provider */
         
         final Button button = (Button) findViewById(R.id.postButton);
@@ -78,17 +77,18 @@ public class AdvSoftEngApp1Activity extends Activity {
         
         tvGPS = (TextView) findViewById(R.id.textViewGPS);
         clock = (DigitalClock) findViewById(R.id.digitalClock1);
-      
-        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         
         /* We may know a location even before we start; if so, use it. */
 
+        prefs = getSharedPreferences(TAG, Context.MODE_PRIVATE);
+        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Location loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(loc != null) setGPSText(loc);
-        else setGPSText(R.string.no_gps_error);
+        setGPSText(loc);
       
 		/* connect the listener object to receive GPS updates */
-        
+
+        listener = new AdvSoftEngLocationListener();
+        listener.setLocationActivity(this);
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
            
     }
@@ -102,23 +102,33 @@ public class AdvSoftEngApp1Activity extends Activity {
     
     public void setGPSText(Location location)
     {
-    	/* If we get a null location, don't do anything */
-    	if (null == location) return;
+    	/* If we get a null location, clear out the preferences
+    	 * and pop up the error message
+    	 */
+    	
+    	if (null == location) {
+    		emptyPrefs();
+    		tvGPS.setText(getString(R.string.no_gps_error));
+    		return;
+    	}
     	
 		String strGPS = "Longitude = " + location.getLongitude() + "\n";
 		strGPS += "Latitude = " + location.getLatitude();
 		tvGPS.setText(strGPS);
-    }
+		
+		// then slap it into those shared preferences so it gets sent up in a poll
 
-    public void setGPSText(int s) {
-    	tvGPS.setText(getString(s));
+		prefs.edit().putString("time", clock.getText().toString());
+		prefs.edit().putString("latitude", Double.toString(location.getLatitude()));
+		prefs.edit().putString("longitude", Double.toString(location.getLongitude()));
     }
     
-    public String getTime() {
-    	return clock.getText().toString();
+    private void emptyPrefs() {
+		prefs.edit().remove("time");
+		prefs.edit().remove("latitude");
+		prefs.edit().remove("longitude");
     }
 
-	
 }
 
 
