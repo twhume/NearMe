@@ -1,130 +1,158 @@
 package com.advsofteng.app1;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.*;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DigitalClock;
 import android.widget.TextView;
 
 /**
- * 
  * @author alandonohoe
  * 
  * This App displays the current time and the device's current GPS co-ordinates.
  * if GPS data is unavailable, it displays "GPS not available".
+ * 
  */
 public class AdvSoftEngApp1Activity extends Activity {
-	
-	// class members
+
+	public static final String TAG = "LocationPoster";	/* used for logging purposes */
+	public static final int MAGIC_NUMBER = 12345;		/* used as a reference to an Alarm */
+
+	/* Interval between deliveries of location data to the server */
+	private static final int POLL_INTERVAL = (5 * 60 * 1000);
 	private LocationManager manager;
-	private LocationListener listener;
-	private String strGPS;
 	
-    /** Called when the activity is first created. */
-    @Override
+	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
+	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
+	private DigitalClock clock = null;			/* on-screen clock */
+	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
+	private Button button = null;				/* start/stop button */
+	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        ////////////////////////////////////////////////////
-        // Digital Clock has been handled by a self-contained 
-        // widget in the layout/main.xml file
+        /* Set the on-screen button to start and stop the location provider */
         
-        /////////////////////////
-        // Below is the GPS code
-        
-        // get handle to the GPS TextView
-        final TextView tvGPS = (TextView) findViewById(R.id.textViewGPS);
-        
-        // check to see if view found
-        //  if(tvGPS == null)
-        // 		finish(); // ??? - not too sure what to do here... quit activity??
-       
-        ////////////////////////////////////////////////////////////////////////
-        // set up LocationManager services
-        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        
-        // if(manager == null)
-        // 	finish(); // ??? - not too sure what to do here... quit activity??
-        ////////////////////////////////////////////////////////////////////////
-        
-        ////////////////////////////////////////////////////////////////////////
-        // get initial location before any updates, from the last known location
-        Location loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        
-        //TODO- TAKE THIS OUT....
-        setGPSText(loc, tvGPS);
-        
-        if(loc != null)
-        {
-        	// print initial location data to TextView
-        	//TODO - TAKE THIS OUT
-        	setGPSText(loc, tvGPS);
-        }
-        else
-        	tvGPS.setText(getString(R.string.no_gps_error));
-      
-		
-		//
-		/////////////////////////////////////////////////////////////////////////
-		
-		// create the listener object to receive GPS updates...
-		listener = new LocationListener() {
-			
-			@Override
-			public void onStatusChanged(String provider, int status, Bundle extras) {
-				if((LocationProvider.OUT_OF_SERVICE == status)||(LocationProvider.TEMPORARILY_UNAVAILABLE == status)) 
-				{	// if there's no service, print error string found in resources...
-					tvGPS.setText(getString(R.string.no_gps_error));
-				}
-			}
+        button = (Button) findViewById(R.id.postButton);
+        button.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onLocationChanged(Location location) {
-				// update GPS TextView's data
-				//TODO - TAKE THIS OUT...
-				setGPSText(location, tvGPS);
-				
-			}
-			////////////////////////////////////////////////////
-			// - these overriden functions, as yet undefined...
-			@Override
-			public void onProviderEnabled(String provider) {
-				// TODO Auto-generated method stub
-				// put code here to deal with GPS being down...
-			}
-			
-			@Override
-			public void onProviderDisabled(String provider) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		}; // end of ListenerLocation constructor....
-            
-		// final location initialization. 
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+        	public void onClick(View v) {
+
+            	AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+            	if (alarmIntent==null) {
+            		
+            		/* Start a regular process to poll the server */
+            		
+	            	Log.i(TAG,"starting poll");
+	            	Calendar cal = Calendar.getInstance();
+	        		Intent intent = new Intent(getApplicationContext(), LocationPoster.class);
+	        		alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), MAGIC_NUMBER, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	        		am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), POLL_INTERVAL , alarmIntent);
+	        		button.setText(getString(R.string.stop_button_label));
+            	} else {
+	            	Log.i(TAG,"finishing poll");
+
+	            	/* Cancel the polling process */
+	            	
+            		am.cancel(alarmIntent);
+            		alarmIntent = null;
+            		button.setText(getString(R.string.start_button_label));
+            	}
+            }
+        });
+        
+        /* get handles to the TextView where GPS position is displayed, and the on-screen clock */
+        
+        tvGPS = (TextView) findViewById(R.id.textViewGPS);
+        clock = (DigitalClock) findViewById(R.id.digitalClock1);
+        
+        /* We may know a location even before we start; if so, use it. */
+
+        prefs = getSharedPreferences(TAG, Context.MODE_PRIVATE);
+        manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Location loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        setLocation(loc);
+      
+		/* connect the listener object to receive GPS updates */
+
+		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new AdvSoftEngLocationListener(this));
            
-        }
-    
-    // updates TextView tv text with location's longitude and latitude data.
-    // 
-    
-    private void setGPSText(Location location, TextView tv)
-    {
-    	// check for valid TextView and Location objects....
-    	if((null == tv) || (null == location))
-    		return;
-    	
-    	// else.. continue...
-		strGPS = "Longitude = " + location.getLongitude() + "\n";
-		strGPS += "Latitude = " + location.getLatitude();
-		
-		// set the GPSTextView
-		tv.setText(strGPS);
     }
     
+	/**
+	 * updates TextView tv text with location's longitude and latitude data.
+	 * 
+	 * @param location
+	 * @param tv
+	 */
     
+    public void setLocation(Location location)
+    {
+    	/* If we get a null location, clear out the preferences
+    	 * and pop up the error message
+    	 */
+    	
+    	if (null == location) {
+    		Log.i(TAG, "null location, clearing out");
+    		emptyPrefs();
+    		tvGPS.setText(getString(R.string.no_gps_error));
+    		return;
+    	}
+    	
+		String strGPS = "Longitude = " + location.getLongitude() + "\n";
+		strGPS += "Latitude = " + location.getLatitude();
+		tvGPS.setText(strGPS);
+		
+		// then slap it into those shared preferences so it gets sent up in a poll
+
+		Log.i(TAG, "set time to "+ clock.getText());
+		
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putString("time", new Date().toString());
+		edit.putString("latitude", Double.toString(location.getLatitude()));
+		edit.putString("longitude", Double.toString(location.getLongitude()));
+		edit.commit();
+		Log.i(TAG, "saved location OK");
+		Log.i(TAG, "new time="+prefs.getString("time", "notset"));
+    }
+    
+    private void emptyPrefs() {
+		Log.i(TAG, "emptyPrefs");
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.remove("time");
+		edit.remove("latitude");
+		edit.remove("longitude");
+		edit.commit();
+		
+    }
+
+	protected void onPause() {
+		super.onPause();
+
+		/* Leaving the app, even briefly? Cancel any subsequent polls and reset button to start */
+
+		if (alarmIntent!=null) {
+			Context ctx = getApplicationContext();
+			AlarmManager am = (AlarmManager) ctx.getSystemService(Activity.ALARM_SERVICE);
+			am.cancel(alarmIntent);
+			alarmIntent = null;
+			button.setText(R.string.start_button_label);
+		}
+	}
+
 }
 
 
