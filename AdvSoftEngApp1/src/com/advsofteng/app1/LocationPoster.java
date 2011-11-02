@@ -30,7 +30,7 @@ import android.widget.Toast;
 public class LocationPoster extends BroadcastReceiver {
 
 	/* Endpoint to which HTTP POSTs should go */
-	private static final String ENDPOINT = "http://192.168.1.77:8080/location";
+	private static final String ENDPOINT = "http://107.22.213.41:8080/Task3Server/ServletTask3";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
