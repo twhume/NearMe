@@ -77,7 +77,7 @@ public class LocationPoster extends BroadcastReceiver {
 			/* In the event of a failure, cancel any subsequent polls */
 
 			AlarmManager am = (AlarmManager) context.getSystemService(Activity.ALARM_SERVICE);
-			PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			PendingIntent alarmIntent = PendingIntent.getBroadcast(context, AdvSoftEngApp1Activity.MAGIC_NUMBER, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			am.cancel(alarmIntent);
 		}
 

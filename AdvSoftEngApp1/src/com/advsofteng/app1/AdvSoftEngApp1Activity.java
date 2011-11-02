@@ -27,11 +27,11 @@ import android.widget.TextView;
 public class AdvSoftEngApp1Activity extends Activity {
 
 	public static final String TAG = "LocationPoster";	/* used for logging purposes */
+	public static final int MAGIC_NUMBER = 12345;		/* used as a reference to an Alarm */
 
 	/* Interval between deliveries of location data to the server */
-	private static final int POLL_INTERVAL = (5 * 1000);
+	private static final int POLL_INTERVAL = (5 * 60 * 1000);
 	private LocationManager manager;
-	public static AdvSoftEngLocationListener listener;
 	
 	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
 	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
@@ -58,9 +58,8 @@ public class AdvSoftEngApp1Activity extends Activity {
             		
 	            	Log.i(TAG,"starting poll");
 	            	Calendar cal = Calendar.getInstance();
-	        		cal.add(Calendar.SECOND,0);
 	        		Intent intent = new Intent(getApplicationContext(), LocationPoster.class);
-	        		alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	        		alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), MAGIC_NUMBER, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	        		am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), POLL_INTERVAL , alarmIntent);
 	        		button.setText(getString(R.string.stop_button_label));
             	} else {
@@ -89,9 +88,7 @@ public class AdvSoftEngApp1Activity extends Activity {
       
 		/* connect the listener object to receive GPS updates */
 
-        listener = new AdvSoftEngLocationListener();
-        listener.setLocationActivity(this);
-		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new AdvSoftEngLocationListener(this));
            
     }
     
@@ -147,11 +144,13 @@ public class AdvSoftEngApp1Activity extends Activity {
 
 		/* Leaving the app, even briefly? Cancel any subsequent polls and reset button to start */
 
-		Context ctx = getApplicationContext();
-		AlarmManager am = (AlarmManager) ctx.getSystemService(Activity.ALARM_SERVICE);
-		am.cancel(alarmIntent);
-		alarmIntent = null;
-		button.setText(R.string.start_button_label);
+		if (alarmIntent!=null) {
+			Context ctx = getApplicationContext();
+			AlarmManager am = (AlarmManager) ctx.getSystemService(Activity.ALARM_SERVICE);
+			am.cancel(alarmIntent);
+			alarmIntent = null;
+			button.setText(R.string.start_button_label);
+		}
 	}
 
 }

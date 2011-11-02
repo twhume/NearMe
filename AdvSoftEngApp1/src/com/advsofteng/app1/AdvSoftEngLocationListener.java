@@ -10,6 +10,10 @@ public class AdvSoftEngLocationListener implements LocationListener {
 
 	private AdvSoftEngApp1Activity locationActivity = null;
 			
+	public AdvSoftEngLocationListener(AdvSoftEngApp1Activity locationActivity) {
+		this.locationActivity = locationActivity;
+	}
+
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		Log.i(AdvSoftEngApp1Activity.TAG,"onStatusChanged");
 		if((LocationProvider.OUT_OF_SERVICE == status)||(LocationProvider.TEMPORARILY_UNAVAILABLE == status)) 
@@ -36,15 +40,6 @@ public class AdvSoftEngLocationListener implements LocationListener {
 		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * Set the Activity which should be updated when changes to GPS state occur
-	 * 
-	 * @param locationActivity
-	 */
-
-	public void setLocationActivity(AdvSoftEngApp1Activity locationActivity) {
-		this.locationActivity = locationActivity;
-	}
 
 
 
