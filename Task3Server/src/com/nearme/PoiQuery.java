@@ -1,5 +1,6 @@
 package com.nearme;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -13,16 +14,34 @@ import java.util.StringTokenizer;
  */
 public class PoiQuery {
 
-	private double latitude;	/* Latitude of the position to search from */
-	private double longitude;	/* Longitude of the position to search from */
-	private int radius;			/* Metres from the current position to search within */
+	private double latitude;			/* Latitude of the position to search from */
+	private double longitude;			/* Longitude of the position to search from */
+	private int radius;					/* Metres from the current position to search within */
+	private ArrayList<Integer> types;	/* List of Integers corresponding to the type IDs we are interested in */
 	
 	public PoiQuery(String path) {
+		System.err.println(path);
 		try {
-			StringTokenizer st = new StringTokenizer(path, "/");
+			StringTokenizer st = new StringTokenizer(path, "/?=");
 			this.latitude = Double.parseDouble(st.nextToken());
 			this.longitude = Double.parseDouble(st.nextToken());
 			this.radius = Integer.parseInt(st.nextToken());
+			this.types = new ArrayList<Integer>();
+
+			/**
+			 * Now parse any ?t= suffix at the end of the URL to extract a list of requested types
+			 */
+			
+			if (st.hasMoreTokens()) {
+				String nextTok = st.nextToken();
+				if (nextTok.equals("t")) {
+					StringTokenizer typeTok = new StringTokenizer(st.nextToken(), ",");
+					while (typeTok.hasMoreTokens()) {
+						nextTok = typeTok.nextToken();
+						types.add(new Integer(Integer.parseInt(nextTok)));
+					}
+				} else System.err.println(nextTok);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException("parsing " + path + " threw " + e);
@@ -46,6 +65,13 @@ public class PoiQuery {
 	}
 	public void setRadius(int radius) {
 		this.radius = radius;
+	}
+	public ArrayList<Integer> getTypes() {
+		return types;
+	}
+
+	public void setTypes(ArrayList<Integer> types) {
+		this.types = types;
 	}
 	
 	

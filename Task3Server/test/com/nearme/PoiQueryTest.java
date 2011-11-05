@@ -16,6 +16,7 @@ public class PoiQueryTest {
 		assertEquals(101.123245, pq.getLatitude(), 0);
 		assertEquals(-56.12, pq.getLongitude(), 0);
 		assertEquals(10, pq.getRadius());
+		assertEquals(0, pq.getTypes().size());
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -42,5 +43,28 @@ public class PoiQueryTest {
 	public void testNewPoiFailsBadRadius() {
 		new PoiQuery("/101.123245/-56.12/fred");
 	}
+
+	@Test
+	public void testWithOneType() {
+		PoiQuery pq = new PoiQuery("/101.123245/-56.12/10?t=1");
+		assertEquals(101.123245, pq.getLatitude(), 0);
+		assertEquals(-56.12, pq.getLongitude(), 0);
+		assertEquals(10, pq.getRadius());
+		assertEquals(1, pq.getTypes().size());
+		assertEquals(1, ((Integer) pq.getTypes().get(0)).intValue());
+	}
+
+	@Test
+	public void testWithTwoTypes() {
+		PoiQuery pq = new PoiQuery("/101.123245/-56.12/10?t=1,2");
+		assertEquals(101.123245, pq.getLatitude(), 0);
+		assertEquals(-56.12, pq.getLongitude(), 0);
+		assertEquals(10, pq.getRadius());
+		assertEquals(2, pq.getTypes().size());
+		assertEquals(1, ((Integer) pq.getTypes().get(0)).intValue());
+		assertEquals(2, ((Integer) pq.getTypes().get(1)).intValue());
+	}
+
+	
 
 }
