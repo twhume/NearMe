@@ -1,7 +1,7 @@
 package com.nearme;
 
 import java.io.IOException;
-
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,8 +32,8 @@ public class NearbyPoiServlet extends HttpServlet {
 		res.setContentType("application/json");
 		
 		PoiQuery pq = new PoiQuery(req.getPathInfo());
-//		PoiFinder pf = new PoiFinder();
-//		ArrayList<Poi> points = pf.find(pq);
+		PoiFinder pf = new DatabasePoiFinder(null);
+		List<Poi> points = pf.find(pq);
 		
 	}
 	
