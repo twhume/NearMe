@@ -1,5 +1,7 @@
 package com.nearme;
 
+import java.util.StringTokenizer;
+
 /**
  * Encapsulates a query for points of interest.
  * Initially this'll just be lat, long and radius.
@@ -16,7 +18,15 @@ public class PoiQuery {
 	private int radius;			/* Metres from the current position to search within */
 	
 	public PoiQuery(String path) {
-		
+		try {
+			StringTokenizer st = new StringTokenizer(path, "/");
+			this.latitude = Double.parseDouble(st.nextToken());
+			this.longitude = Double.parseDouble(st.nextToken());
+			this.radius = Integer.parseInt(st.nextToken());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException("parsing " + path + " threw " + e);
+		}
 	}
 	
 	public double getLatitude() {
