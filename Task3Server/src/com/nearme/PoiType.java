@@ -10,6 +10,10 @@ public class PoiType {
 	private int id;
 	private String name;
 	
+	public PoiType(String n, int i) {
+		this.name = n;
+		this.id = i;
+	}
 	public int getId() {
 		return id;
 	}
