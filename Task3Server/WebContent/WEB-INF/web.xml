@@ -9,6 +9,19 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+
+  <servlet>
+    <description></description>
+    <display-name>NearbyPoi</display-name>
+    <servlet-name>NearbyPoiServlet</servlet-name>
+    <servlet-class>com.nearme.NearbyPoiServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>NearbyPoiServlet</servlet-name>
+    <url-pattern>/nearme/*</url-pattern>
+  </servlet-mapping>
+
+
   <servlet>
     <description></description>
     <display-name>ServletTask3</display-name>
@@ -19,4 +32,5 @@
     <servlet-name>ServletTask3</servlet-name>
     <url-pattern>/ServletTask3</url-pattern>
   </servlet-mapping>
+
 </web-app>
