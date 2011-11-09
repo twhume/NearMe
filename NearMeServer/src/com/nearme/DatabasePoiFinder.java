@@ -87,7 +87,7 @@ public class DatabasePoiFinder implements PoiFinder {
 			locationSearch.setDouble(1, pq.getLatitude());
 			locationSearch.setDouble(2, pq.getLongitude());
 			locationSearch.setDouble(3, pq.getLatitude());
-			locationSearch.setDouble(4, (pq.getRadius()/1000));	
+			locationSearch.setDouble(4, pq.getRadius());	
 			ResultSet rs = locationSearch.executeQuery();
 			
 			while (rs.next()) //Return false when there is not more data in the table
