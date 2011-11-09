@@ -3,9 +3,11 @@ package com.nearme;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 
@@ -59,20 +61,40 @@ public class DatabasePoiFinder implements PoiFinder {
 		String value= "Pubs"; //the option in the android
 		String var=" ";
 		
+		ArrayList<Poi> ret = new ArrayList<Poi>();
+
 		try {
 			
+			Connection conn = dataSource.getConnection();
 			
-		    Statement st = conn.createStatement(); //use statement to send command to SQL
+		    PoiType type = null;
+//			ResultSet rtype = st.executeQuery("SELECT id FROM type where name='"+value+"';"); //consult(type)
+//			while (rtype.next()) { 
+//				type = new PoiType(value, rtype.getInt(1));
+//				var= rtype.getString(1); //get the id of the type
+//	     	}
 			
-			ResultSet rtype = st.executeQuery("SELECT id FROM type where name='"+value+"';"); //consult(type)
-			while (rtype.next()) { 
-				var= rtype.getString(1); //get the id of the type
-	     	}
-			
-			ResultSet rs = st.executeQuery("SELECT * FROM poi where type='"+var+"';"); //consult database (poi)
+//			ResultSet rs = st.executeQuery("SELECT * FROM poi"); // where type='"+var+"';"); //consult database (poi)
+
+		    /**
+		     * Algorithm taken from
+		     * 
+		     * http://stackoverflow.com/questions/574691/mysql-great-circle-distance-haversine-formula
+		     * 
+		     */
+		    
+			PreparedStatement locationSearch = conn.prepareStatement("SELECT *, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance  FROM poi HAVING distance < ? ORDER BY distance");
+			locationSearch.setDouble(1, pq.getLatitude());
+			locationSearch.setDouble(2, pq.getLongitude());
+			locationSearch.setDouble(3, pq.getLatitude());
+			locationSearch.setDouble(4, (pq.getRadius()/1000));	
+			ResultSet rs = locationSearch.executeQuery();
 			
 			while (rs.next()) //Return false when there is not more data in the table
 			{
+				Poi newPoi = new Poi(rs.getString("name"), rs.getDouble("latitude"), rs.getDouble("longitude"), type, rs.getInt("Id"));
+				ret.add(newPoi);
+				
 			   System.out.println(rs.getObject("name")+
 			      ", Longitude: "+rs.getObject("longitude")+
 			      ", Latitude: "+rs.getObject("latitude")); 
@@ -85,7 +107,7 @@ public class DatabasePoiFinder implements PoiFinder {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return ret;
 	}
 
 }
