@@ -267,14 +267,14 @@
 
     <!-- Compile Java classes as necessary -->
     <mkdir    dir="${build.home}/WEB-INF/classes"/>
-    <javac srcdir="${test.home}"
+    <javac srcdir="${src.home}"
           destdir="${build.home}/WEB-INF/classes"
             debug="${compile.debug}"
       deprecation="${compile.deprecation}"
          optimize="${compile.optimize}">
         <classpath refid="compile.classpath"/>
     </javac>
-    <javac srcdir="${src.home}"
+    <javac srcdir="${test.home}"
           destdir="${build.home}/WEB-INF/classes"
             debug="${compile.debug}"
       deprecation="${compile.deprecation}"
