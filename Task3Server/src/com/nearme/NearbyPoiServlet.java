@@ -65,6 +65,7 @@ public class NearbyPoiServlet extends HttpServlet {
   		Later we'll plug the database in and get real ones out.
  
 */		PoiFinder pf = new DatabasePoiFinder(db);
+System.err.println("Database="+db);
 		List<Poi> points = pf.find(pq);
 
 		/* Use GSon to serialise this list onto a JSON structure, and send it to the client.
