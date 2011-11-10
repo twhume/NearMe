@@ -47,8 +47,12 @@ public class UserFinderTest {
 
 	@Test
 	public void testReadAddressBookFull() {
+		User u = uf.read(1);
 		List<AddressBookEntry> book = uf.getAddressBook(1); // existing user, with book
 		assertEquals(3, book.size());
+		assertEquals(new AddressBookEntry(1, u, "Tom", AddressBookEntry.PERM_HIDDEN, null), book.get(0));
+		assertEquals(new AddressBookEntry(2, u, "Dick", AddressBookEntry.PERM_HIDDEN, null), book.get(1));
+		assertEquals(new AddressBookEntry(3, u, "Harry", AddressBookEntry.PERM_HIDDEN, null), book.get(2));
 	}
 
 }
