@@ -27,23 +27,28 @@ public class DatabaseUserFinder implements UserFinder {
 		this.dataSource = d;
 	}
 
+	/**
+	 * Read a User from the database, identified by their unique ID
+	 */
 	
 	public User read(int i) throws SQLException {
 		Connection c = null;
 		PreparedStatement pst = null;
+		ResultSet rs = null;
 		try {
 			c = dataSource.getConnection();
 			pst = c.prepareStatement(READ_ID_SQL);
 			pst.setInt(1, i);
-			ResultSet rs = pst.executeQuery();
+			rs = pst.executeQuery();
 			if (rs.next()) return userFrom(rs);
 			else return null;
 		} finally {
+			if (rs!=null) rs.close();
 			if (pst!=null) pst.close();
 			if (c!=null) c.close();
 		}
 	}
-
+	
 	/**
 	 * Helper method, takes a ResultSet and returns the first User from it
 	 * 
@@ -60,22 +65,31 @@ public class DatabaseUserFinder implements UserFinder {
 				);
 	}
 
-	@Override
+	/**
+	 * Read a User from the database, identified by the Hash of their MSISDN
+	 */
+
 	public User readByHash(String string) throws SQLException {
 		Connection c = null;
 		PreparedStatement pst = null;
+		ResultSet rs = null;
 		try {
 			c = dataSource.getConnection();
 			pst = c.prepareStatement(READ_HASH_SQL);
 			pst.setString(1, string);
-			ResultSet rs = pst.executeQuery();
+			rs = pst.executeQuery();
 			if (rs.next()) return userFrom(rs);
 			else return null;
 		} finally {
+			if (rs!=null) rs.close();
 			if (pst!=null) pst.close();
 			if (c!=null) c.close();
 		}
 	}
+
+	/**
+	 * Read a User from the database, identified by their unique device ID
+	 */
 
 	@Override
 	public Object readByDeviceId(String string) throws SQLException {
@@ -93,6 +107,10 @@ public class DatabaseUserFinder implements UserFinder {
 			if (c!=null) c.close();
 		}
 	}
+
+	/**
+	 * Read the address book for a user from the database, identified by their unique ID
+	 */
 
 	@Override
 	public List<AddressBookEntry> getAddressBook(int i) throws SQLException {
