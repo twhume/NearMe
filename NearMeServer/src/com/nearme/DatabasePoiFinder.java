@@ -55,11 +55,7 @@ public class DatabasePoiFinder implements PoiFinder {
 	 */
 	
 	public List<Poi> find (PoiQuery pq) {
-		//TODO this is where the database magic happens
-		
-		String value= "Pubs"; //the option in the android
-		String var=" ";
-		
+
 		ArrayList<Poi> ret = new ArrayList<Poi>();
 
 		try {
@@ -67,13 +63,6 @@ public class DatabasePoiFinder implements PoiFinder {
 			Connection conn = dataSource.getConnection();
 			
 		    PoiType type = null;
-//			ResultSet rtype = st.executeQuery("SELECT id FROM type where name='"+value+"';"); //consult(type)
-//			while (rtype.next()) { 
-//				type = new PoiType(value, rtype.getInt(1));
-//				var= rtype.getString(1); //get the id of the type
-//	     	}
-			
-//			ResultSet rs = st.executeQuery("SELECT * FROM poi"); // where type='"+var+"';"); //consult database (poi)
 
 		    /**
 		     * Algorithm taken from
