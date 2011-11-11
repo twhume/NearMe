@@ -5,6 +5,7 @@ package com.nearme;
  * with an address-book of 3 friends.
  * 
  */
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,12 @@ public class DummyUserFinder implements UserFinder {
 			case 2: return new ArrayList<AddressBookEntry>();
 			default:	return null;
 		}
+	}
+
+	@Override
+	public List<Poi> getNearestUsers(User u, int radius) throws SQLException {
+		ArrayList<Poi> ret = new ArrayList<Poi>();
+		return ret;
 	}
 
 }

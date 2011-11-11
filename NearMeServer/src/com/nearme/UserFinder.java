@@ -23,5 +23,9 @@ public interface UserFinder {
 	
 	/* Look up the address book for a given user */
 	public List<AddressBookEntry> getAddressBook(int i) throws SQLException;
+	
+	/* Look up the nearest other Users for a given User */
+	
+	public List<Poi> getNearestUsers(User u, int radius) throws SQLException;
 		
 }
