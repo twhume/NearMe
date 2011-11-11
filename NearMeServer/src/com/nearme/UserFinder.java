@@ -3,6 +3,13 @@ package com.nearme;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Interface for methods that read user data from a database
+ * 
+ * @author twhume
+ *
+ */
+
 public interface UserFinder {
 
 	/* Look up a user by ID number */
@@ -16,5 +23,5 @@ public interface UserFinder {
 	
 	/* Look up the address book for a given user */
 	public List<AddressBookEntry> getAddressBook(int i) throws SQLException;
-
+		
 }
