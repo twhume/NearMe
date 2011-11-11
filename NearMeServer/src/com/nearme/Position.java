@@ -1,5 +1,6 @@
 package com.nearme;
 
+import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -74,8 +75,8 @@ public class Position {
 		if (when == null) {
 			if (other.when != null)
 				return false;
-		} else if (!when.equals(other.when))
+		} else if (!when.equals(other.when)) {
 			return false;
-		return true;
+		} return true;
 	}
 }

@@ -1,5 +1,6 @@
 package com.nearme;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class User {
@@ -16,8 +17,13 @@ public class User {
 		this.msisdnHash = m;
 		this.lastPosition = p;
 	}
+
+	public User(int i, String d, String m, Position p, UserFinder f) {
+		new User(i,d,m,p);
+		this.finder = f;
+	}
 	
-	public List<AddressBookEntry> getAddressBook() {
+	public List<AddressBookEntry> getAddressBook() throws SQLException {
 		if (finder==null) return null;
 		return finder.getAddressBook(this.id);
 	}
