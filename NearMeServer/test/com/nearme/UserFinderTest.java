@@ -72,7 +72,7 @@ public class UserFinderTest {
 		assertEquals(3, book.size());
 		
 		IdentityHash hash3 = new IdentityHash(3, "hash-aaaaaaaaaa");
-		IdentityHash hash4 = new IdentityHash(4, "hash-bbbbbbbbbb");
+		IdentityHash hash4 = new IdentityHash(2, "hash-0987654321");
 		IdentityHash hash5 = new IdentityHash(5, "hash-cccccccccc");
 
 		ArrayList<IdentityHash> list3 = new ArrayList<IdentityHash>();
@@ -84,9 +84,9 @@ public class UserFinderTest {
 		ArrayList<IdentityHash> list5 = new ArrayList<IdentityHash>();
 		list5.add(hash5);
 		
-		assertEquals(new AddressBookEntry(1, u, "Tom", AddressBookEntry.PERM_HIDDEN, list3), book.get(0));
-		assertEquals(new AddressBookEntry(2, u, "Dick", AddressBookEntry.PERM_HIDDEN, list4), book.get(1));
-		assertEquals(new AddressBookEntry(3, u, "Harry", AddressBookEntry.PERM_HIDDEN, list5), book.get(2));
+		assertEquals(new AddressBookEntry(2, u, "Dick", AddressBookEntry.PERM_HIDDEN, list4), book.get(0));
+		assertEquals(new AddressBookEntry(3, u, "Harry", AddressBookEntry.PERM_HIDDEN, list5), book.get(1));
+		assertEquals(new AddressBookEntry(1, u, "Tom", AddressBookEntry.PERM_HIDDEN, list3), book.get(2));
 	}
 
 }
