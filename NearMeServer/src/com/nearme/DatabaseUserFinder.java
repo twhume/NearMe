@@ -168,7 +168,7 @@ public class DatabaseUserFinder implements UserFinder {
 
 			rs = pst.executeQuery();
 			while (rs.next()) {
-				Poi p = new Poi(rs.getString("ab.name"), rs.getDouble("u2.latitude"), rs.getDouble("u2.longitude"), null, 0);
+				Poi p = new Poi(rs.getString("ab.name"), rs.getDouble("u2.latitude"), rs.getDouble("u2.longitude"), PoiType.FRIEND, 0);
 				ret.add(p);
 			}
 		} finally {

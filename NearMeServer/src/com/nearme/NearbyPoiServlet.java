@@ -2,6 +2,7 @@ package com.nearme;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.naming.Context;
@@ -54,27 +55,33 @@ public class NearbyPoiServlet extends HttpServlet {
 	}
 
 
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
 		res.setContentType("application/json");
 		PoiQuery pq = new PoiQuery(req.getPathInfo());
 
-/*
-  		For now, spit out a list of dummy points, always the same.
-  		Later we'll plug the database in and get real ones out.
- 
-*/		PoiFinder pf = new DatabasePoiFinder(datasource);
-//		PoiFinder pf = new DummyPoiFinder();
-		List<Poi> points = pf.find(pq);
+		try {
+			PoiFinder pf = new DatabasePoiFinder(datasource);
+			UserFinder uf = new DatabaseUserFinder(datasource);
 
-		/* Use GSon to serialise this list onto a JSON structure, and send it to the client.
-		 * This is a little bit complicated because we're asking it to serialise a list of stuff;
-		 * see the manual at https://sites.google.com/site/gson/gson-user-guide#TOC-Collections-Examples
-		 * if you /really/ want to find out why...
-		 */
-		
-		Gson gson = new Gson();
-		Type listOfPois = (Type) (new TypeToken<List<Poi>>(){}).getType();
-		res.getOutputStream().print(gson.toJson(points, listOfPois));
+			/* Get a list of all nearby points of interest and add in nearby friends */
+			
+			User u = uf.read(1); //TODO fix grotty hardcoding, take device-ID from URL
+			List<Poi> points = pf.find(pq);
+			points.addAll(uf.getNearestUsers(u, pq.getRadius()));
+			
+			/* Use GSon to serialise this list onto a JSON structure, and send it to the client.
+			 * This is a little bit complicated because we're asking it to serialise a list of stuff;
+			 * see the manual at https://sites.google.com/site/gson/gson-user-guide#TOC-Collections-Examples
+			 * if you /really/ want to find out why...
+			 */
+			
+			Gson gson = new Gson();
+			Type listOfPois = (Type) (new TypeToken<List<Poi>>(){}).getType();
+			res.getOutputStream().print(gson.toJson(points, listOfPois));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	
