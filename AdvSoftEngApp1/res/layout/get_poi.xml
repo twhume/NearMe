@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <CheckBox
+        android:id="@+id/CheckBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="27dp"
+        android:layout_marginTop="39dp"
+        android:text="poi_radio_btn1" />
+
+    <CheckBox
+        android:id="@+id/CheckBox2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/CheckBox1"
+        android:layout_below="@+id/CheckBox1"
+        android:text="poi_radio_btn2" />
+
+    <CheckBox
+        android:id="@+id/CheckBox3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/CheckBox2"
+        android:layout_below="@+id/CheckBox2"
+        android:text="poi_radio_btn3" />
+
+    <CheckBox
+        android:id="@+id/CheckBox4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/CheckBox3"
+        android:layout_below="@+id/CheckBox3"
+        android:text="poi_radio_btn4" />
+
+    <CheckBox
+        android:id="@+id/CheckBox5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/CheckBox4"
+        android:layout_below="@+id/CheckBox4"
+        android:text="poi_radio_btn5" />
+
+    <SeekBar
+        android:id="@+id/seekBarRadius"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/CheckBox5"
+        android:layout_marginTop="80dp" />
+
+    <Button
+        android:id="@+id/getPOIDataButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Get POI Data" />
+
+    <TextView
+        android:id="@+id/tvRadius"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/seekBarRadius"
+        android:layout_below="@+id/CheckBox5"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="29dp"
+        android:gravity="center"
+        android:text="TextView" />
+
+</RelativeLayout>
