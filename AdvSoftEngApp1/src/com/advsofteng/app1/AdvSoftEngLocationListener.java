@@ -28,7 +28,8 @@ public class AdvSoftEngLocationListener implements LocationListener {
 	 */
 	
 	public void onLocationChanged(Location location) {
-		Log.i(AdvSoftEngApp1Activity.TAG,"onLocationChanged location="+location);
+		
+		Log.i(AdvSoftEngApp1Activity.TAG,"onLocationChanged location=" +location);
 		locationActivity.setLocation(location);		
 	}
 

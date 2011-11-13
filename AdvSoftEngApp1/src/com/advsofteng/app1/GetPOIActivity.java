@@ -4,8 +4,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -13,7 +15,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 
 // handles user set POI data
@@ -21,7 +25,7 @@ public class GetPOIActivity extends Activity {
 	
 	////// Member variables /////////
 	// CheckBoxes that user selects to get data on from server
-	private CheckBox checkBox1, checkBox2, checkBox3, checkBox4, checkBox5;
+	private CheckBox checkBox1, checkBox2, checkBox3, checkBox4;
 	private SeekBar seekBarRadius; // seekBar that user sets the radius of POIs nearby.
 	private TextView tvRadius; // displays the radius data
 	private Integer intRadius; // user set radius
@@ -35,7 +39,7 @@ public class GetPOIActivity extends Activity {
 	private Boolean isSavedInstanceState= false; 
 	
 	// string holding the server address
-	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/nearme/50.258/-14.752/1000000";
+	private static  String ENDPOINT =null; 
 	private static final String tagPOI = "GetPOIActivity"; // used for debugging
 	//
 	///////////////////////////////////
@@ -51,6 +55,9 @@ public class GetPOIActivity extends Activity {
 	// initialise class member data
 	resources1 = getResources();
 	prefs = getPreferences(MODE_PRIVATE);
+	
+	// set server address.
+	ENDPOINT = getResources().getString(R.string.serverAddress);
 
 	
 	//
@@ -100,68 +107,73 @@ public class GetPOIActivity extends Activity {
     	   // intRadius;
     	    */
    			try {
-   				//TODO: find out a way of getting the current Long and lat data... 
-   				//        3 attempts so far and all i get is null returned...
-   				
-   				/*
-   				//Attempt 1: // have tried with and WITHOUT the ctx context - no luck...
-   				//Context ctx = getApplicationContext();
+   				//Attempt 1: have tried with and WITHOUT the ctx context - 
+   				//TODO: need to add a check that we actually have received GPS data
+   				//
+   				Context ctx = getApplicationContext();
    				SharedPreferences prefMainApp = ctx.getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE); 
    	   			
-   	   			HttpGet get = new HttpGet(ENDPOINT + "/" + prefMainApp.getString("latitude", "") 
+   				if(null != prefMainApp.getString("latitude", null)) // if we actually get a latitude value back.. then 
+   				{												 //  the GPS is working proceed... else....
+   					
+   				
+   					HttpGet get = new HttpGet(ENDPOINT + "/" + prefMainApp.getString("latitude", "") 
    	   												+ "/" + prefMainApp.getString("longitude", "")
    	   												+ "/" + intRadius.toString()
    	   												+ "/" + "one");
    	   												
   	   			
-   				//testing to see if we are getting long and lat data... we are not... 
-   				Log.i(tagPOI, "Long from prefs = "+ prefMainApp.getString("longitude", ""));
-   				Log.i(tagPOI, "lat from prefs = " + prefMainApp.getString("latitude", ""));
-   				Log.i(tagPOI, "Mainprefs = " + prefMainApp.toString());
-   				*/
-   			
-  	   			// Attempt 2:
-  	   			// tried making the AdvSoftEngApp1Activity member data "prefs" public and static - didn't work....
-	   			//String strLat = AdvSoftEngApp1Activity.prefs.getString("latitude", "defaultlatitudeString");
-	   			//String strLong = AdvSoftEngApp1Activity.prefs.getString("longitude", "defaultlongitudeString");
-  	   			
-   				// Attempt 3: when this activity is called from AdvSoftEngApp1Activity - 
-   				// load up intent object with latitude and longitude data... and access it here...
- 	   			String strLat =  getIntent().getStringExtra("latitude"); //prefMainApp.getString("latitude", "defaultlatitudeString");
-  	   			String strLong = getIntent().getStringExtra("longitude");  //prefMainApp.getString("longitude", "defaultlongitudeString");
-  	
-  	   			Log.i(tagPOI, "strLat = " + strLat);
-  	   			Log.i(tagPOI, "strLong = " + strLong);
-  	   				
-  	   			// log not working!!! - so have to display the data on the checkbox text for now...
-  	   			checkBox2.setText("strLat = " + strLat);
-  	   			checkBox3.setText("strLong = " + strLong);
-  	   			
-								
-   	   			//
-  	   			////////////////////
-   	   			
-   				////////////
-   	   			// TESTING BLOCK -REPLACE "49.56" AND "-12.257" WITH correct values for long and lat
-   				// when ACCESSING APPWIDE PREFS IS SORTED...
-   				// just using these data here to get some request back from the server...
-   				
-   				/* Create a new HTTPClient to do our POST for us */
-   				HttpClient client = new DefaultHttpClient();
-   				
+   					//testing to see if we are getting long and lat data... we are not... 
+   					Log.i(tagPOI, "Long from prefs = "+ prefMainApp.getString("longitude", ""));
+   					Log.i(tagPOI, "lat from prefs = " + prefMainApp.getString("latitude", ""));
+   					Log.i(tagPOI, "Mainprefs = " + prefMainApp.toString());
+
+
+   					// log not working!!! - so have to display the data on the checkbox text for now...
+   					//checkBox2.setText("strLat = " + strLat);
+   					//checkBox3.setText("strLong = " + strLong);
+   					//checkBox2.setText("strLat = " );//+ String.valueOf(AdvSoftEngApp1Activity.currentLatitude));
+   					//checkBox3.setText("strLong = " ); //+ String.valueOf(AdvSoftEngApp1Activity.currentLongitude));
+
+   					//
+   					////////////////////
+
+   					////////////
+   					// TESTING BLOCK -REPLACE "49.56" AND "-12.257" WITH correct values for long and lat
+   					// when ACCESSING APPWIDE PREFS IS SORTED...
+   					// just using these data here to get some request back from the server...
+
+   					/* Create a new HTTPClient to do our POST for us */
+   					HttpClient client = new DefaultHttpClient();
+
+   					/*
   	   			HttpGet get = new HttpGet(ENDPOINT + "/" + "49.56"
 								+ "/" + "-12.257"
 								+ "/" + intRadius.toString()
 								+ "/" + "1");
-   				
-   				HttpResponse response = client.execute(get);
-   				
-   				//TODO: remove this testing code once we know we are getting the correct data back from the HTTP request.
-   				//Log.i(tagPOI, "get done, response="+response.getStatusLine().getStatusCode());
-   				//Log.i(tagPOI, "HTTP response = " + response.toString());
-   				
-   				// Log not working!! - use the text boxes again temp. to display data...
-   				checkBox4.setText("HTTP response = " + response.toString());
+   					 */
+
+   					HttpResponse response = client.execute(get);
+
+   					// need to get params out of the response... how???
+   					// 1) ??
+   					HttpParams params = response.getParams();
+   					// Log not working!! - use the text boxes again temp. to display data...
+   					// checkBox4.setText("HTTP response = " + params.toString());
+
+   					//TODO: remove this testing code once we know we are getting the correct data back from the HTTP request.
+   					// 2) ??
+   					//Log.i(tagPOI, "get done, response="+response.getStatusLine().getStatusCode());
+   					// 3) ??
+   					//Log.i(tagPOI, "HTTP response = " + response.toString());
+   				} // end of if(null!= prefMainApp.getString("latitude", "")) 
+   				else { // we have NOT got GPS data.....
+   					//btnGetPOIdata.setText(resources1.getString( R.string.no_gps_error));
+   					//CharSequence strMsg1 = resources1.getStringArray( R.string.no_gps_error);
+   					Toast toast=Toast.makeText(ctx, "No GPS At Present", 2000);
+   					toast.setGravity(Gravity.TOP, -30, 50);
+   					toast.show();
+   				}
    				
    			} catch (Exception e) {
    				Log.i(AdvSoftEngApp1Activity.TAG, "get to getPOI failed, " + e.getMessage());
@@ -174,7 +186,7 @@ public class GetPOIActivity extends Activity {
     	
    			//TODO: uncomment "finish()" method call after testing is done... 
    			// for the moment - press return on phone/emulator to return to main screen...
-      // finish(); // return to previous screen...
+       finish(); // return to previous screen...
    			
        } } );
 	//
@@ -230,14 +242,14 @@ public class GetPOIActivity extends Activity {
 		checkBox2 = (CheckBox) findViewById(R.id.CheckBox2);
 		checkBox3 = (CheckBox) findViewById(R.id.CheckBox3);
 		checkBox4 = (CheckBox) findViewById(R.id.CheckBox4);
-		checkBox5 = (CheckBox) findViewById(R.id.CheckBox5);
+		
 		
 		// set text....
 		checkBox1.setText(resources1.getText(R.string.poi_checkbox1));
 		checkBox2.setText(resources1.getText(R.string.poi_checkbox2));
 		checkBox3.setText(resources1.getText(R.string.poi_checkbox3));
 		checkBox4.setText(resources1.getText(R.string.poi_checkbox4));
-		checkBox5.setText(resources1.getText(R.string.poi_checkbox5));
+		
 		
 		/////////////////
 		//seekBar and corresponding label set up
@@ -267,10 +279,6 @@ public class GetPOIActivity extends Activity {
 			//get checkbox4's last state from saved prefs....
 			booleanFlag = prefs.getBoolean((String)resources1.getText((R.string.poi_checkbox4)), booleanFlag);
 			checkBox4.setChecked(booleanFlag);
-			
-			//get checkbox5's last state from saved prefs....
-			booleanFlag = prefs.getBoolean((String)resources1.getText((R.string.poi_checkbox5)), booleanFlag);
-			checkBox5.setChecked(booleanFlag);
 			
 			// get radius value...
 			intRadius = prefs.getInt((String)resources1.getText(R.string.tvRadiusText), 0);
@@ -302,7 +310,6 @@ public class GetPOIActivity extends Activity {
 		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox2)), checkBox2.isChecked());
 		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox3)), checkBox3.isChecked());
 		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox4)), checkBox4.isChecked());
-		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox5)), checkBox5.isChecked());
 		
 		savedInstanceState.putInt((String)resources1.getText(R.string.tvRadiusText), intRadius);
 		
@@ -331,7 +338,6 @@ public class GetPOIActivity extends Activity {
             editor.putBoolean((String)resources1.getText(R.string.poi_checkbox2), checkBox2.isChecked());
             editor.putBoolean((String)resources1.getText(R.string.poi_checkbox3), checkBox3.isChecked());
             editor.putBoolean((String)resources1.getText(R.string.poi_checkbox4), checkBox4.isChecked());
-            editor.putBoolean((String)resources1.getText(R.string.poi_checkbox5), checkBox5.isChecked());
             editor.putInt((String)resources1.getText(R.string.tvRadiusText), intRadius);
             
             editor.commit();

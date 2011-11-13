@@ -37,21 +37,6 @@
         android:layout_below="@+id/CheckBox3"
         android:text="poi_radio_btn4" />
 
-    <CheckBox
-        android:id="@+id/CheckBox5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/CheckBox4"
-        android:layout_below="@+id/CheckBox4"
-        android:text="poi_radio_btn5" />
-
-    <SeekBar
-        android:id="@+id/seekBarRadius"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/CheckBox5"
-        android:layout_marginTop="80dp" />
-
     <Button
         android:id="@+id/getPOIDataButton"
         android:layout_width="wrap_content"
@@ -60,14 +45,21 @@
         android:layout_centerHorizontal="true"
         android:text="Get POI Data" />
 
+    <SeekBar
+        android:id="@+id/seekBarRadius"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/getPOIDataButton"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="46dp" />
+
     <TextView
         android:id="@+id/tvRadius"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/seekBarRadius"
-        android:layout_below="@+id/CheckBox5"
+        android:layout_above="@+id/seekBarRadius"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="29dp"
+        android:layout_marginBottom="22dp"
         android:gravity="center"
         android:text="TextView" />
 

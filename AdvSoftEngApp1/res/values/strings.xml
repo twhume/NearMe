@@ -6,12 +6,11 @@
     <string name="no_gps_error">GPS not available</string>
     <string name="start_button_label">Start</string>
     <string name="stop_button_label">Stop</string>
-    <string name="poi_checkbox1">Bars</string>
-    <string name="poi_checkbox2">Clubs</string>
-    <string name="poi_checkbox3">Ice Rinks</string>
-    <string name="poi_checkbox4">Restaurants</string>
-    <string name="poi_checkbox5">Friends</string>
+    <string name="poi_checkbox1">Restaurants</string>
+    <string name="poi_checkbox2">Pubs</string>
+    <string name="poi_checkbox3">Clubs</string>
+    <string name="poi_checkbox4">Museum</string>
     <string name="get_poi_label">Get POIs</string>
-    
     <string name="tvRadiusText">Radius = </string>
+    <string name="serverAddress">http://nearme.tomhume.org:8080/NearMeServer/nearme/50.258/-14.752/1000000</string>
 </resources>

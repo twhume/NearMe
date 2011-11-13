@@ -38,14 +38,23 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private DigitalClock clock = null;			/* on-screen clock */
 	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
 	private Button button = null;				/* start/stop button */
-	private Button buttonGetPOI = null;			/* get POIs button*/
-	
-	private double currentLongitude, currentLatitude; // added member variables to communicate current long &lat to GetPOIActivity
-	
+	private Button buttonGetPOI = null;			/* get POIs button*/	
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        //////////////////////////////
+        //TODO: TEMP TESTING BLOCK OF GetPOIActivity Class.....
+        
+        SharedPreferences prefs123 = getSharedPreferences(TAG, Context.MODE_PRIVATE);
+		SharedPreferences.Editor edit123 = prefs123.edit();
+		edit123.putString("latitude", "49.56");
+		edit123.putString("longitude", "-12.257");
+		edit123.commit();
+		// Should now see these values - which are actually the correct GPS values for Warung Tujuh restaurant in getPOIActvity class
+		// END - TEMP TESTING BLOCK OF GetPOIActivity Class.....
+		/////////////////////////
         
         /* Set the on-screen button to start and stop the location provider */
    
@@ -98,30 +107,20 @@ public class AdvSoftEngApp1Activity extends Activity {
 		
      
         //////////////////////////////////////////
-		// 
-        // TODO: added this code 7-11-11 -deals with getPOI button.
+        // deals with getPOI button.
         buttonGetPOI = (Button) findViewById(R.id.getPOIButton);
-         // setOnClickListener - takes arg new View.On
         buttonGetPOI.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				// want to have all the code your want executed when btn is clicked here
-				
+
 				Intent intentPOI = new Intent(AdvSoftEngApp1Activity.this, GetPOIActivity.class);
 				
-				// add data about lat and long for POI activity...
-				 intentPOI.putExtra("latitude", currentLatitude);
-				 intentPOI.putExtra("longitude", currentLongitude);
-				 
 				startActivity(intentPOI);
 				
 			} // end of onClickView(View v)
 			}//  end of View.OnClickListener
         ); // end of setOnClickListener
-        
-        
-        // TODO: end of new code....
+        // 
         /////////////////////////////
            
     }
@@ -149,11 +148,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 		String strGPS = "Longitude = " + location.getLongitude() + "\n";
 		strGPS += "Latitude = " + location.getLatitude();
 		tvGPS.setText(strGPS);
-		
-		// update member variables on every call to setLocation
-		// .....added to access Long and Lat data in GetPOI Activity: getprefs not working....
-        currentLatitude = location.getLatitude();
-        currentLongitude = location.getLongitude();
 		
 		// then slap it into those shared preferences so it gets sent up in a poll
 
