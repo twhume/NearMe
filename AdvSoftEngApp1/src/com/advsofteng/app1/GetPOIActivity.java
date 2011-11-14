@@ -54,7 +54,7 @@ public class GetPOIActivity extends Activity {
 	
 	// initialise class member data
 	resources1 = getResources();
-	prefs = getPreferences(MODE_PRIVATE);
+	prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
 	
 	// set server address.
 	ENDPOINT = getResources().getString(R.string.serverAddress);
@@ -107,26 +107,21 @@ public class GetPOIActivity extends Activity {
     	   // intRadius;
     	    */
    			try {
-   				//Attempt 1: have tried with and WITHOUT the ctx context - 
-   				//TODO: need to add a check that we actually have received GPS data
-   				//
-   				Context ctx = getApplicationContext();
-   				SharedPreferences prefMainApp = ctx.getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE); 
+
    	   			
-   				if(null != prefMainApp.getString("latitude", null)) // if we actually get a latitude value back.. then 
+   				if(null != prefs.getString("time", null)) // if we actually get a latitude value back.. then 
    				{												 //  the GPS is working proceed... else....
    					
-   				
-   					HttpGet get = new HttpGet(ENDPOINT + "/" + prefMainApp.getString("latitude", "") 
-   	   												+ "/" + prefMainApp.getString("longitude", "")
+   					HttpGet get = new HttpGet(ENDPOINT + "/" + prefs.getString("latitude", "") 
+   	   												+ "/" + prefs.getString("longitude", "")
    	   												+ "/" + intRadius.toString()
    	   												+ "/" + "one");
    	   												
   	   			
    					//testing to see if we are getting long and lat data... we are not... 
-   					Log.i(tagPOI, "Long from prefs = "+ prefMainApp.getString("longitude", ""));
-   					Log.i(tagPOI, "lat from prefs = " + prefMainApp.getString("latitude", ""));
-   					Log.i(tagPOI, "Mainprefs = " + prefMainApp.toString());
+   					Log.i(tagPOI, "Long from prefs = "+ prefs.getString("longitude", ""));
+   					Log.i(tagPOI, "lat from prefs = " + prefs.getString("latitude", ""));
+   					Log.i(tagPOI, "Mainprefs = " + prefs.toString());
 
 
    					// log not working!!! - so have to display the data on the checkbox text for now...
@@ -170,7 +165,7 @@ public class GetPOIActivity extends Activity {
    				else { // we have NOT got GPS data.....
    					//btnGetPOIdata.setText(resources1.getString( R.string.no_gps_error));
    					//CharSequence strMsg1 = resources1.getStringArray( R.string.no_gps_error);
-   					Toast toast=Toast.makeText(ctx, "No GPS At Present", 2000);
+   					Toast toast=Toast.makeText(getApplicationContext(), "No GPS At Present", 2000);
    					toast.setGravity(Gravity.TOP, -30, 50);
    					toast.show();
    				}
