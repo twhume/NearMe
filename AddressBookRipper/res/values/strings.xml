@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, AddressBookRipperActivity!</string>
+    <string name="app_name">AddressBookRipper</string>
+
+</resources>
