@@ -44,18 +44,6 @@ public class AdvSoftEngApp1Activity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        //////////////////////////////
-        //TODO: TEMP TESTING BLOCK OF GetPOIActivity Class.....
-        
-        SharedPreferences prefs123 = getSharedPreferences(TAG, Context.MODE_PRIVATE);
-		SharedPreferences.Editor edit123 = prefs123.edit();
-		edit123.putString("latitude", "49.56");
-		edit123.putString("longitude", "-12.257");
-		edit123.commit();
-		// Should now see these values - which are actually the correct GPS values for Warung Tujuh restaurant in getPOIActvity class
-		// END - TEMP TESTING BLOCK OF GetPOIActivity Class.....
-		/////////////////////////
-        
         /* Set the on-screen button to start and stop the location provider */
    
         button = (Button) findViewById(R.id.postButton);

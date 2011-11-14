@@ -40,7 +40,7 @@ public class GetPOIActivity extends Activity {
 	
 	// string holding the server address
 	private static  String ENDPOINT =null; 
-	private static final String tagPOI = "GetPOIActivity"; // used for debugging
+	private static final String tagPOI = "GetPOIActivity"; // used for logging
 	//
 	///////////////////////////////////
 	
@@ -123,48 +123,19 @@ public class GetPOIActivity extends Activity {
    					Log.i(tagPOI, "lat from prefs = " + prefs.getString("latitude", ""));
    					Log.i(tagPOI, "Mainprefs = " + prefs.toString());
 
-
-   					// log not working!!! - so have to display the data on the checkbox text for now...
-   					//checkBox2.setText("strLat = " + strLat);
-   					//checkBox3.setText("strLong = " + strLong);
-   					//checkBox2.setText("strLat = " );//+ String.valueOf(AdvSoftEngApp1Activity.currentLatitude));
-   					//checkBox3.setText("strLong = " ); //+ String.valueOf(AdvSoftEngApp1Activity.currentLongitude));
-
-   					//
-   					////////////////////
-
-   					////////////
-   					// TESTING BLOCK -REPLACE "49.56" AND "-12.257" WITH correct values for long and lat
-   					// when ACCESSING APPWIDE PREFS IS SORTED...
-   					// just using these data here to get some request back from the server...
-
    					/* Create a new HTTPClient to do our POST for us */
    					HttpClient client = new DefaultHttpClient();
-
-   					/*
-  	   			HttpGet get = new HttpGet(ENDPOINT + "/" + "49.56"
-								+ "/" + "-12.257"
-								+ "/" + intRadius.toString()
-								+ "/" + "1");
-   					 */
-
    					HttpResponse response = client.execute(get);
-
-   					// need to get params out of the response... how???
-   					// 1) ??
    					HttpParams params = response.getParams();
-   					// Log not working!! - use the text boxes again temp. to display data...
-   					// checkBox4.setText("HTTP response = " + params.toString());
+   					
+   					//TODO: finalise this code once we know we are getting the correct data back from the HTTP request.
+   					// need to get params out of the response... where does the JSon data come into this????
+   					params.getParameter("latitude");
+   					params.getParameter("longitude");
 
-   					//TODO: remove this testing code once we know we are getting the correct data back from the HTTP request.
-   					// 2) ??
-   					//Log.i(tagPOI, "get done, response="+response.getStatusLine().getStatusCode());
-   					// 3) ??
-   					//Log.i(tagPOI, "HTTP response = " + response.toString());
-   				} // end of if(null!= prefMainApp.getString("latitude", "")) 
-   				else { // we have NOT got GPS data.....
-   					//btnGetPOIdata.setText(resources1.getString( R.string.no_gps_error));
-   					//CharSequence strMsg1 = resources1.getStringArray( R.string.no_gps_error);
+   				} 
+   				else { 
+   					// we have NOT got GPS data.....
    					Toast toast=Toast.makeText(getApplicationContext(), "No GPS At Present", 2000);
    					toast.setGravity(Gravity.TOP, -30, 50);
    					toast.show();
@@ -175,17 +146,10 @@ public class GetPOIActivity extends Activity {
    				
    			}
    			
-   			
-   			///
-   			////////////////
-    	
-   			//TODO: uncomment "finish()" method call after testing is done... 
-   			// for the moment - press return on phone/emulator to return to main screen...
        finish(); // return to previous screen...
    			
        } } );
-	//
-	/////////////
+
 	}
 	
 	// create and instantiate and override implemented seekbar methods...
@@ -206,7 +170,6 @@ public class GetPOIActivity extends Activity {
 			
 			// update member variable and textview with new radius data...
 			intRadius = progress;
-			
 			tvRadius = (TextView) findViewById(R.id.tvRadius);
 			tvRadius.setText(resources1.getText((R.string.tvRadiusText)) + Integer.toString(intRadius) + " m");
 			
@@ -216,16 +179,16 @@ public class GetPOIActivity extends Activity {
 	// Called after onCreate has finished, use to restore UI state 
 	@Override 
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		
-	super.onRestoreInstanceState(savedInstanceState); 
-	// Restore UI state from the savedInstanceState.
-	// This bundle has also been passed to onCreate.
-	
-	if(savedInstanceState != null){
-		
-		intRadius = savedInstanceState.getInt((String)resources1.getText(R.string.tvRadiusText), 0);
-	}
-	
+
+		super.onRestoreInstanceState(savedInstanceState); 
+		// Restore UI state from the savedInstanceState.
+		// This bundle has also been passed to onCreate.
+
+		if(savedInstanceState != null){
+
+			intRadius = savedInstanceState.getInt((String)resources1.getText(R.string.tvRadiusText), 0);
+		}
+
 	}
 	
 	 
@@ -237,15 +200,13 @@ public class GetPOIActivity extends Activity {
 		checkBox2 = (CheckBox) findViewById(R.id.CheckBox2);
 		checkBox3 = (CheckBox) findViewById(R.id.CheckBox3);
 		checkBox4 = (CheckBox) findViewById(R.id.CheckBox4);
-		
-		
+
 		// set text....
 		checkBox1.setText(resources1.getText(R.string.poi_checkbox1));
 		checkBox2.setText(resources1.getText(R.string.poi_checkbox2));
 		checkBox3.setText(resources1.getText(R.string.poi_checkbox3));
 		checkBox4.setText(resources1.getText(R.string.poi_checkbox4));
-		
-		
+	
 		/////////////////
 		//seekBar and corresponding label set up
 		seekBarRadius = (SeekBar) findViewById(R.id.seekBarRadius);
@@ -290,8 +251,7 @@ public class GetPOIActivity extends Activity {
 		tvRadius = (TextView) findViewById(R.id.tvRadius);
 		tvRadius.setText(resources1.getText((R.string.tvRadiusText)) + Integer.toString(intRadius) + " m");
 		
-		//seekBar and corresponding label set up
-		/////////////////////////////////////////
+
 		
 	}
 
