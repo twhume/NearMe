@@ -63,7 +63,6 @@ public class PoiQueryTest {
 		assertEquals(2, pq.getTypes().size());
 		assertEquals(1, ((Integer) pq.getTypes().get(0)).intValue());
 		assertEquals(2, ((Integer) pq.getTypes().get(1)).intValue());
-		fail("test fail to check jenkins");
 	}
 
 	
