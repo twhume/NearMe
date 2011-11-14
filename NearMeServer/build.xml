@@ -131,8 +131,8 @@
   <property name="app.path"      value="/${app.name}"/>
   <property name="app.version"   value="Build ${env.BUILD_NUMBER}"/>
   <property name="build.home"    value="${basedir}/build"/>
-	 <!--	  <property name="catalina.home" value="/home/ec2-user/tomcat"/> EC2 location -->
-	  <property name="catalina.home" value="/Users/twhume/Documents/lib/apache-tomcat-6.0.33"/> <!-- UPDATE THIS! -->
+  <property name="catalina.home" value="/home/ec2-user/tomcat"/> <!-- Location of Tomcat on the EC2 instance running Jenkins -->
+<!--  <property name="catalina.home" value="/Users/twhume/Documents/lib/apache-tomcat-6.0.33"/> Location on Tom's machine -->
   <property name="dist.home"     value="${basedir}/dist"/>
   <property name="docs.home"     value="${basedir}/docs"/>
   <property name="manager.url"   value="http://localhost:8080/manager"/>
