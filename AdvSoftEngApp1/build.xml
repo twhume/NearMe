@@ -51,7 +51,7 @@
      in between standard targets -->
 
     <target name="-pre-build">
-    	<replace file="AndroidManifest.xml" token="android:versionName=&quot;1.0&quot;" value="Build ${env.BUILD_NUMBER}"/>
+    	<replace file="AndroidManifest.xml" token="Version 1.0" value="Build ${env.BUILD_NUMBER}"/>
     </target>
 <!--    <target name="-pre-compile">
     </target>
