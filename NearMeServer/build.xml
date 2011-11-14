@@ -131,13 +131,15 @@
   <property name="app.path"      value="/${app.name}"/>
   <property name="app.version"   value="Build ${env.BUILD_NUMBER}"/>
   <property name="build.home"    value="${basedir}/build"/>
-  <property name="catalina.home" value="/home/ec2-user/tomcat"/> <!-- UPDATE THIS! -->
+	 <!--	  <property name="catalina.home" value="/home/ec2-user/tomcat"/> EC2 location -->
+	  <property name="catalina.home" value="/Users/twhume/Documents/lib/apache-tomcat-6.0.33"/> <!-- UPDATE THIS! -->
   <property name="dist.home"     value="${basedir}/dist"/>
   <property name="docs.home"     value="${basedir}/docs"/>
   <property name="manager.url"   value="http://localhost:8080/manager"/>
   <property name="src.home"      value="${basedir}/src"/>
   <property name="test.home"     value="${basedir}/test"/>
   <property name="web.home"      value="${basedir}/WebContent"/>
+  <property name="test.reports" value="${basedir}/junit-reports" />
 
 <!--  ==================== Compilation Control Options ==================== -->
 
@@ -218,7 +220,22 @@
     </fileset>
   </path>
 
+	  <path id="test.classpath">
 
+	    <!-- Include all JAR files that will be included in /WEB-INF/lib -->
+	    <!-- *** CUSTOMIZE HERE AS REQUIRED BY YOUR APPLICATION *** -->
+	    <pathelement location="build/WEB-INF/classes/"/>
+	    <!-- Include all elements that Tomcat exposes to applications -->
+	    <fileset dir="${catalina.home}/lib">
+	      <include name="*.jar"/>
+	    </fileset>
+	    <fileset dir="${build.home}/WEB-INF/lib">
+	      <include name="*.jar"/>
+	    </fileset>
+	    <fileset dir="./lib">
+	      <include name="*.jar"/>
+	    </fileset>
+	  </path>
 
 <!-- ==================== All Target ====================================== -->
 
@@ -229,7 +246,7 @@
 
 -->
 
-  <target name="all" depends="clean,compile"
+  <target name="all" depends="clean,compile,test"
    description="Clean build and dist directories, then compile"/>
 
 
@@ -247,6 +264,7 @@
    description="Delete old build and dist directories">
     <delete dir="${build.home}"/>
     <delete dir="${dist.home}"/>
+    <delete dir="${test.reports}"/>
   </target>
 
 
@@ -264,6 +282,8 @@
 
   <target name="compile" depends="prepare"
    description="Compile Java sources">
+  	
+    <mkdir dir="${test.reports}"/>
 
     <!-- Compile Java classes as necessary -->
     <mkdir    dir="${build.home}/WEB-INF/classes"/>
@@ -309,7 +329,7 @@
 
 -->
 
-  <target name="dist" depends="compile"
+  <target name="dist" depends="compile,test"
    description="Create binary distribution">
 
     <!-- Create application JAR file -->
@@ -487,6 +507,19 @@
            path="${app.path}"/>
 
   </target>
+	
+	<target name="test" description="Run unit and integration tests" depends="compile">
+		
+		<junit fork="no" printsummary="yes" haltonfailure="true">
+		    <formatter type="xml" />
+		    <classpath refid="test.classpath" />
+			<batchtest fork="yes" todir="${test.reports}" >
+				<fileset dir="build/WEB-INF/classes/">
+					<include name="**/*Test.class" />
+		      </fileset>
+		    </batchtest>
+		  </junit>
+	</target>
 
 
 </project>
