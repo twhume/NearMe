@@ -35,7 +35,7 @@ public class AddressBookServlet extends HttpServlet {
 	 * @param is
 	 * @return
 	 */
-	public String convertStreamToString(InputStream is) { 
+	public static String convertStreamToString(InputStream is) { 
 	    return new Scanner(is).useDelimiter("\\A").next();
 	}
 

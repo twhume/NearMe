@@ -23,6 +23,10 @@ public class User {
 		this.finder = f;
 	}
 	
+	public User() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public List<AddressBookEntry> getAddressBook() throws SQLException {
 		if (finder==null) return null;
 		return finder.getAddressBook(this.id);
@@ -102,6 +106,5 @@ public class User {
 			return false;
 		return true;
 	}
-
 
 }

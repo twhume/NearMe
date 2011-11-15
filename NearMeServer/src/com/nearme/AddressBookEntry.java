@@ -31,6 +31,9 @@ public class AddressBookEntry {
 		this.hashes = h;
 	}
 	
+	public AddressBookEntry() {
+	}
+
 	public int getId() {
 		return id;
 	}

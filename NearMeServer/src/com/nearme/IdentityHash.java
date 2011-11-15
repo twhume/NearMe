@@ -18,6 +18,10 @@ public class IdentityHash {
 		this.hash = s;
 	}
 	
+	public IdentityHash(String s) {
+		this.hash = s;
+	}
+
 	public String getHash() {
 		return hash;
 	}
