@@ -1,10 +1,20 @@
 package org.tomhume.ase.ripper;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import com.google.gson.Gson;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,6 +22,8 @@ import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,8 +32,12 @@ import android.widget.Button;
 public class AddressBookRipperActivity extends Activity {
 
 	private static final String TAG = "Ripper";
+	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
 	private GatherContactsTask gatherer = null;
-
+	
+	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
+	private String ownNumber; /* Users own phone number */
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -30,7 +46,11 @@ public class AddressBookRipperActivity extends Activity {
 
 		Button ripButton = (Button) this.findViewById(R.id.btnRip);
 		gatherer = new GatherContactsTask();
-
+		
+		TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+		countryCode = tm.getSimCountryIso();
+		ownNumber = tm.getLine1Number();
+		
 		ripButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -50,6 +70,56 @@ public class AddressBookRipperActivity extends Activity {
     	UploadContactsTask uploader = new UploadContactsTask();
     	uploader.execute(a);
     }
+	
+	/**
+	 * Turns a given MSISDN into a usable hash to identify the number. Does this by
+	 * rendering the number into a canonical international MSISDN, then putting
+	 * it through SHA-1
+	 * 
+	 * @param s input MSISDN
+	 * @return
+	 */
+	private String hashMsisdn(String s) {
+		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+		String input = null;
+		PhoneNumber pn = null;
+		
+		try {
+			pn = phoneUtil.parse(s, countryCode.toUpperCase());
+			input = phoneUtil.format(pn,PhoneNumberFormat.E164);
+			return sha1(input, KEY);
+		} catch (Exception e) {
+			// This is either a NumberFormatException or an error finding the crypto stuffs.
+			// Either way ignore, we'll use the number as given if we can't format it
+			return input;
+		}
+	}
+	
+	/**
+	 * Hash function, taken from http://stackoverflow.com/questions/4534370/how-to-hash-string-using-sha-1-with-key
+	 * 
+	 * @param s
+	 * @param keyString
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeyException
+	 */
+
+	private String sha1(String s, String keyString)
+			throws UnsupportedEncodingException, NoSuchAlgorithmException,
+			InvalidKeyException {
+
+		SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"),
+				"HmacSHA1");
+		Mac mac = Mac.getInstance("HmacSHA1");
+		mac.init(key);
+
+		byte[] bytes = mac.doFinal(s.getBytes("UTF-8"));
+
+		return new String(Base64.encode(bytes, 0));
+
+	}
 
 	private class UploadContactsTask extends AsyncTask<AddressBook, Integer, Boolean> {
 
@@ -58,11 +128,10 @@ public class AddressBookRipperActivity extends Activity {
 			Gson gson = new Gson();
 			Log.i(TAG, "Got entries " + abe[0].getEntries().size());
 			System.err.println(gson.toJson(abe[0]));
-
+			//TODO now POST it to an endpoint
 			return true;
 		}
 	}
-
 	
 	/**
 	 * Private class to gather contacts from the on-phone address book and use
@@ -73,16 +142,6 @@ public class AddressBookRipperActivity extends Activity {
 	 */
 
 	private class GatherContactsTask extends AsyncTask<Void, Integer, AddressBook> {
-
-		protected void onProgressUpdate(Integer... progress) {
-			Log.i(TAG, System.currentTimeMillis() + " progress, current= "
-					+ progress[0].intValue());
-			// TODO implement a callback into a progress bar, if this task takes  any time on slow phones
-		}
-
-		/**
-		 * Once we're done, trigger the uploading process
-		 */
 
 		protected void onPostExecute(AddressBook result) {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
@@ -110,6 +169,7 @@ public class AddressBookRipperActivity extends Activity {
 
 			AddressBook a = new AddressBook();
 			a.setDeviceId(Secure.getString(getApplicationContext().getContentResolver(), Secure.ANDROID_ID));
+			a.setOwnerHash(hashMsisdn(ownNumber));
 			ArrayList<AddressBookEntry> entries = new ArrayList<AddressBookEntry>();
 			ArrayList<String> hashes = new ArrayList<String>();
 			String lastId = null;
@@ -129,8 +189,8 @@ public class AddressBookRipperActivity extends Activity {
 						abe.setName(managedCursor.getString(1));
 						hashes = new ArrayList<String>();
 					}
-					//TODO actually hash this so that we're not delivering numbers to the server
-					hashes.add(managedCursor.getString(2)); 
+
+					hashes.add(hashMsisdn(managedCursor.getString(2))); 
 					lastId = managedCursor.getString(3);
 
 				} while (managedCursor.moveToNext());
