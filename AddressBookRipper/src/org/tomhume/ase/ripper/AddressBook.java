@@ -4,7 +4,7 @@ import java.util.List;
 
 public class AddressBook {
 	private String deviceId;
-	private String ownerHash;
+	private String msisdnHash;
 	private List<AddressBookEntry> entries;
 	
 	public String getDeviceId() {
@@ -14,10 +14,10 @@ public class AddressBook {
 		this.deviceId = deviceId;
 	}
 	public String getOwnerHash() {
-		return ownerHash;
+		return msisdnHash;
 	}
 	public void setOwnerHash(String ownerHash) {
-		this.ownerHash = ownerHash;
+		this.msisdnHash = ownerHash;
 	}
 	public List<AddressBookEntry> getEntries() {
 		return entries;
