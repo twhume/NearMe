@@ -21,6 +21,17 @@
     <url-pattern>/nearme/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <description></description>
+    <display-name>AddressBook</display-name>
+    <servlet-name>AddressBookServlet</servlet-name>
+    <servlet-class>com.nearme.AddressBookServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddressBookServlet</servlet-name>
+    <url-pattern>/addressBook/*</url-pattern>
+  </servlet-mapping>
+
 
   <servlet>
     <description></description>
