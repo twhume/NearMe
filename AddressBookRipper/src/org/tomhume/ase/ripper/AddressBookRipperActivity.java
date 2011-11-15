@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import com.google.gson.Gson;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
@@ -127,8 +134,23 @@ public class AddressBookRipperActivity extends Activity {
 		protected Boolean doInBackground(AddressBook... abe) {
 			Gson gson = new Gson();
 			Log.i(TAG, "Got entries " + abe[0].getEntries().size());
-			System.err.println(gson.toJson(abe[0]));
-			//TODO now POST it to an endpoint
+			
+			
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost("http://nearme.tomhume.org:8080/NearMeServer/addressBook");
+
+			try {
+				HttpEntity ent = new StringEntity(gson.toJson(abe[0]));
+				post.setEntity(ent);
+				HttpResponse response = client.execute(post);
+				Log.i(TAG, "post done, response="+response.getStatusLine().getStatusCode());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				Log.i(TAG, "post threw " + e);
+				e.printStackTrace();
+				return false;
+			}
+			
 			return true;
 		}
 	}
