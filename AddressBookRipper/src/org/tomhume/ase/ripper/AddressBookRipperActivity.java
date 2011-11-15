@@ -137,7 +137,7 @@ public class AddressBookRipperActivity extends Activity {
 			
 			
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("http://nearme.tomhume.org:8080/NearMeServer/addressBook");
+			HttpPost post = new HttpPost("http://192.168.1.93:8080/NearMeServer/addressBook");
 
 			try {
 				HttpEntity ent = new StringEntity(gson.toJson(abe[0]));
