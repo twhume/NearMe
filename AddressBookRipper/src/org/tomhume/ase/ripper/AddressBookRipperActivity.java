@@ -1,5 +1,7 @@
 package org.tomhume.ase.ripper;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,6 +11,7 @@ import android.os.Bundle;
 import android.provider.Contacts.People;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -68,15 +71,38 @@ public class AddressBookRipperActivity extends Activity {
                   null,       // Selection arguments (none)
                   // Put the results in ascending order by name
                   Phone.DISPLAY_NAME + " ASC");
+    	  
+    	  AddressBook a = new AddressBook();
+    	  a.setDeviceId(Secure.getString(getApplicationContext().getContentResolver(),Secure.ANDROID_ID));
+    	  ArrayList<AddressBookEntry> entries = new ArrayList<AddressBookEntry>();
+    	  ArrayList<String> hashes = new ArrayList<String>();
+    	  String lastId = null;
+    	  
     	  try {
     		  managedCursor.moveToFirst();
+    		  lastId = managedCursor.getString(0);
     		  do {
         		  Log.i(TAG, managedCursor.getString(3) + ": "+ managedCursor.getString(1) + "=>" + managedCursor.getString(2));
+
+        		  hashes.add(managedCursor.getString(2));
+        		  
+        		  if (!managedCursor.getString(3).equals(lastId)) {
+	        		  AddressBookEntry abe = new AddressBookEntry();
+	        		  abe.setName(managedCursor.getString(1));
+	        		  abe.setHashes(hashes);
+	        		  entries.add(abe);
+	        		  hashes = new ArrayList<String>();
+        		  }
+        		  
     		  } while (managedCursor.moveToNext());
     	  } finally {
     		  managedCursor.close();
     	  }
 			
+    	  a.setEntries(entries);
+    	  Log.i(TAG, "First="+ entries.get(0).getName());
+    	  Log.i(TAG, "Last="+ entries.get(entries.size()-1).getName());
+    	  
 			return true;
 		}
     }
