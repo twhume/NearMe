@@ -16,17 +16,20 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 
-public class AddressBookServlet extends HttpServlet {
+public class AddressBookServlet extends NearMeServlet {
 
 	private static final long serialVersionUID = -1593856664522697355L;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		
+		UserDAO uDao = new UserDAOImpl(datasource);
+
 		String s = convertStreamToString(req.getInputStream());
 		POSTedAddressBookParser pabp = new POSTedAddressBookParser();
 		pabp.parse(s);
-		
+				
 		//TODO take the User and address book we have received and add them into the database
 		// then return a 200 code
 		// otherwise return a 500 and log an error

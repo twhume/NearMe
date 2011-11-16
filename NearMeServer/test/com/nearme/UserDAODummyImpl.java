@@ -55,7 +55,18 @@ public class UserDAODummyImpl implements UserDAO {
 	@Override
 	public List<Poi> getNearestUsers(User u, int radius) throws SQLException {
 		ArrayList<Poi> ret = new ArrayList<Poi>();
+		// Dummy method, we don't do much to test this
 		return ret;
 	}
 
+	public boolean write(User u) throws SQLException {
+		// Again, the dummy implementation isn't tested much here
+		return false;
+	}
+
+	@Override
+	public boolean setAddressBook(int id, List<AddressBookEntry> book) {
+		return false;
+	}
+	
 }

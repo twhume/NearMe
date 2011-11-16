@@ -25,7 +25,11 @@ public interface UserDAO {
 	public List<AddressBookEntry> getAddressBook(int i) throws SQLException;
 	
 	/* Look up the nearest other Users for a given User */
-	
 	public List<Poi> getNearestUsers(User u, int radius) throws SQLException;
-		
+
+	/* Write the User out into storage */
+	public boolean write(User u) throws SQLException;
+	
+	/* Set the AddressBook for the given User, removing old entries */
+	public boolean setAddressBook(int id, List<AddressBookEntry> book);
 }

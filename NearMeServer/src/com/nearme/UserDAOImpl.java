@@ -179,4 +179,16 @@ public class UserDAOImpl implements UserDAO {
 		return ret;
 	}
 
+	@Override
+	public boolean write(User u) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean setAddressBook(int id, List<AddressBookEntry> book) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
