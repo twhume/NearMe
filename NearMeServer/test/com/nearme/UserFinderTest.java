@@ -12,18 +12,18 @@ import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 public class UserFinderTest {
 	
-	private UserFinder uf = null;
+	private UserDAO uf = null;
 	
 	@Before
 	public void setUp() {
-		uf = new DummyUserFinder();
+		uf = new UserDAODummyImpl();
 
 		MysqlConnectionPoolDataSource d = new MysqlConnectionPoolDataSource();
 		d.setUser("nearme");
 		d.setPassword("nearme");
 		d.setUrl("jdbc:mysql://localhost/nearme");
 		
-		uf = new DatabaseUserFinder(d);
+		uf = new UserDAOImpl(d);
 	}
 
 	@Test

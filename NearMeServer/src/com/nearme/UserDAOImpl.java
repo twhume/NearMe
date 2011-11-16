@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-public class DatabaseUserFinder implements UserFinder {
+public class UserDAOImpl implements UserDAO {
 
 	/* In the real world I'd be using an ORM here, but that feels like one too many things
 	 * to shove at the team during this project. 
@@ -24,7 +24,7 @@ public class DatabaseUserFinder implements UserFinder {
 	
 	private DataSource dataSource = null;
 	
-	public DatabaseUserFinder(DataSource d) {
+	public UserDAOImpl(DataSource d) {
 		this.dataSource = d;
 	}
 

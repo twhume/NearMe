@@ -61,7 +61,7 @@ public class NearbyPoiServlet extends HttpServlet {
 
 		try {
 			PoiFinder pf = new DatabasePoiFinder(datasource);
-			UserFinder uf = new DatabaseUserFinder(datasource);
+			UserDAO uf = new UserDAOImpl(datasource);
 
 			/* Get a list of all nearby points of interest and add in nearby friends */
 			

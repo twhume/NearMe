@@ -9,12 +9,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DummyUserFinder implements UserFinder {
+public class UserDAODummyImpl implements UserDAO {
 	private User testUserWithBook = null;
 	private User testUserWithoutBook = null;
 	private List<AddressBookEntry> addressBook = null;
 	
-	public DummyUserFinder() {
+	public UserDAODummyImpl() {
 		testUserWithBook = new User(1, "android-123456", "hash-1234567890", new Position(-123.45, 67.89));
 		testUserWithoutBook = new User(2, "android-7890", "hash-0987654321", new Position(-123.45, 67.89));
 		addressBook = new ArrayList<AddressBookEntry>();

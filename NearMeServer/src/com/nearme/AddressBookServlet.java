@@ -24,6 +24,13 @@ public class AddressBookServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		String s = convertStreamToString(req.getInputStream());
+		POSTedAddressBookParser pabp = new POSTedAddressBookParser();
+		pabp.parse(s);
+		
+		//TODO take the User and address book we have received and add them into the database
+		// then return a 200 code
+		// otherwise return a 500 and log an error
+		
 		System.err.println(s);
 		resp.setContentType("text/plain");
 		resp.getOutputStream().println("<h1>Thanks</h1>");

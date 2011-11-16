@@ -10,7 +10,7 @@ import java.util.List;
  *
  */
 
-public interface UserFinder {
+public interface UserDAO {
 
 	/* Look up a user by ID number */
 	public User read(int i) throws SQLException;

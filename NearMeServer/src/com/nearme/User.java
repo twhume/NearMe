@@ -9,7 +9,7 @@ public class User {
 	private String msisdnHash;		/* Hash of their MSISDN, used for identity purposes */
 	
 	private Position lastPosition;	/* Last reported position */
-	private UserFinder finder;		/* The UserFinder that found this user */
+	private UserDAO finder;		/* The UserFinder that found this user */
 
 	public User(int i, String d, String m, Position p) {
 		this.id = i;
@@ -18,7 +18,7 @@ public class User {
 		this.lastPosition = p;
 	}
 
-	public User(int i, String d, String m, Position p, UserFinder f) {
+	public User(int i, String d, String m, Position p, UserDAO f) {
 		new User(i,d,m,p);
 		this.finder = f;
 	}
