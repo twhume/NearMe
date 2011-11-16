@@ -4,13 +4,15 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class User {
-	private int id;					/* Unique ID for this record, used as database key */
+	private int id = NO_ID;			/* Unique ID for this record, used as database key */
 	private String deviceId;		/* Unique ID of their Android device */
 	private String msisdnHash;		/* Hash of their MSISDN, used for identity purposes */
 	
 	private Position lastPosition;	/* Last reported position */
-	private UserDAO finder;		/* The UserFinder that found this user */
+	private UserDAO finder;			/* The UserFinder that found this user */
 
+	public static final int NO_ID = -1;
+	
 	public User(int i, String d, String m, Position p) {
 		this.id = i;
 		this.deviceId = d;
