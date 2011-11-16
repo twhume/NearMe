@@ -238,7 +238,6 @@ public class UserDAOImpl implements UserDAO {
 				
 				u.setId(exists.getId());
 			} else {
-				
 				/* Otherwise, this is a new user, so
 				 * 
 				 * 1. Add their idHash if necessary, getting its ID

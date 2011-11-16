@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -119,7 +120,7 @@ public class UserDaoTest {
 	}
 
 	@Test
-	public void testUpdateExistingUser() throws SQLException {
+	public void testUpdateHashForExistingUser() throws SQLException {
 		String userCountSQL = "SELECT COUNT(id) FROM user";
 		ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
 		int numUsersBefore = asr.runQuery(userCountSQL);
@@ -132,6 +133,26 @@ public class UserDaoTest {
 		
 		User u2 = uf.read(2);
 		assertEquals(newHash, u2.getMsisdnHash());
+		assertEquals(u, u2);
+		
+		/* Check there are no new users */
+		
+		int numUsersAfter = asr.runQuery(userCountSQL);
+		assertEquals(numUsersAfter, numUsersBefore);
+	}
+
+	@Test
+	public void testUpdatePositionForExistingUser() throws SQLException {
+		String userCountSQL = "SELECT COUNT(id) FROM user";
+		ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
+		int numUsersBefore = asr.runQuery(userCountSQL);
+		User u = uf.read(2);
+		u.setLastPosition(new Position(1,1,new Date(1410969600000L)));
+		uf.write(u);
+		
+		/* Check we have read the same user out */
+		
+		User u2 = uf.read(2);
 		assertEquals(u, u2);
 		
 		/* Check there are no new users */
