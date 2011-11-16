@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,21 +33,17 @@ public class AddressBookServlet extends NearMeServlet {
 		try {
 			User u = uDao.write(pabp.getUser());
 			uDao.setAddressBook(u.getId(), pabp.getBook());
+			resp.sendError(HttpServletResponse.SC_OK);
 		} catch (SQLException e) {
-			
+			e.printStackTrace();
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 			
-		//TODO take the User and address book we have received and add them into the database
-		// then return a 200 code
-		// otherwise return a 500 and log an error
-		
-		System.err.println(s);
-		resp.setContentType("text/plain");
-		resp.getOutputStream().println("<h1>Thanks</h1>");
 	}
 	
 	/**
 	 * Method cribbed from http://stackoverflow.com/questions/309424/in-java-how-do-a-read-convert-an-inputstream-in-to-a-string
+	 * TODO: move into a proper utility class
 	 * 
 	 * @param is
 	 * @return
