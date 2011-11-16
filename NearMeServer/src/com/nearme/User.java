@@ -20,12 +20,12 @@ public class User {
 	}
 	
 	public User(int i, String d, String m, Position p) {
-		new User(i,d,m);
+		this(i,d,m);
 		this.lastPosition = p;
 	}
 
 	public User(int i, String d, String m, Position p, UserDAO f) {
-		new User(i,d,m,p);
+		this(i,d,m,p);
 		this.finder = f;
 	}
 	
