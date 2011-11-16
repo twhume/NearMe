@@ -5,10 +5,6 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,25 +31,9 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 
-public class NearbyPoiServlet extends HttpServlet {
+public class NearbyPoiServlet extends NearMeServlet {
 
 	private static final long serialVersionUID = 4851880984536596503L; // Having this stops Eclipse moaning at us
-
-	private DataSource datasource = null;
-	
-	
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		try {
-			Context initContext = new InitialContext();
-			Context envContext  = (Context)initContext.lookup("java:/comp/env");
-			datasource = (DataSource)envContext.lookup("jdbc/database");
-		} catch (NamingException ne) {
-			ne.printStackTrace();
-			throw new ServletException(ne);
-		}
-	}
-
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
 		res.setContentType("application/json");
@@ -83,9 +63,5 @@ public class NearbyPoiServlet extends HttpServlet {
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
-
-	
-	
+		
 }
