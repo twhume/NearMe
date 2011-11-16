@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
@@ -13,17 +14,28 @@ import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 public class UserDaoTest {
 	
 	private UserDAO uf = null;
+	private MysqlConnectionPoolDataSource dataSource = null;
 	
 	@Before
 	public void setUp() {
 		uf = new UserDAODummyImpl();
 
-		MysqlConnectionPoolDataSource d = new MysqlConnectionPoolDataSource();
-		d.setUser("nearme");
-		d.setPassword("nearme");
-		d.setUrl("jdbc:mysql://localhost/nearme");
+		dataSource = new MysqlConnectionPoolDataSource();
+		dataSource.setUser("nearme");
+		dataSource.setPassword("nearme");
+		dataSource.setUrl("jdbc:mysql://localhost/nearme");
 		
-		uf = new UserDAOImpl(d);
+		/* Reset the database to a known good state before each test */
+
+		try {
+			ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
+			asr.runSQL(getClass().getResourceAsStream("/Schema.sql"));
+	
+			uf = new UserDAOImpl(dataSource);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Test
@@ -72,7 +84,7 @@ public class UserDaoTest {
 		assertEquals(3, book.size());
 		
 		IdentityHash hash3 = new IdentityHash(3, "hash-aaaaaaaaaa");
-		IdentityHash hash4 = new IdentityHash(2, "hash-0987654321");
+		IdentityHash hash4 = new IdentityHash(4, "hash-bbbbbbbbbb");
 		IdentityHash hash5 = new IdentityHash(5, "hash-cccccccccc");
 
 		ArrayList<IdentityHash> list3 = new ArrayList<IdentityHash>();
@@ -87,6 +99,46 @@ public class UserDaoTest {
 		assertEquals(new AddressBookEntry(2, u, "Dick", AddressBookEntry.PERM_HIDDEN, list4), book.get(0));
 		assertEquals(new AddressBookEntry(3, u, "Harry", AddressBookEntry.PERM_HIDDEN, list5), book.get(1));
 		assertEquals(new AddressBookEntry(1, u, "Tom", AddressBookEntry.PERM_HIDDEN, list3), book.get(2));
+	}
+
+	@Test
+	public void testAddNewUser() throws SQLException {
+		User u = new User();
+		u.setDeviceId("device-id");
+		u.setMsisdnHash("msisdn-hash");
+		assertEquals(User.NO_ID, u.getId());
+		u = uf.write(u);
+		
+		// check the returned User has been allocated a new ID
+		assertEquals(3, u.getId());
+		
+		// check we can read the user from the database, and it's the same one
+		
+		User u2 = uf.read(u.getId());
+		assertEquals (u2, u);
+	}
+
+	@Test
+	public void testUpdateExistingUser() throws SQLException {
+		String userCountSQL = "SELECT COUNT(id) FROM user";
+		ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
+		int numUsersBefore = asr.runQuery(userCountSQL);
+		String newHash = "updated-hash";
+		User u = uf.read(2);
+		u.setMsisdnHash(newHash);
+		uf.write(u);
+		
+		/* Check we have read the same user out */
+		
+		User u2 = uf.read(2);
+		assertEquals(newHash, u2.getMsisdnHash());
+		assertEquals(u, u2);
+		
+		/* Check there are no new users */
+		
+		int numUsersAfter = asr.runQuery(userCountSQL);
+		assertEquals(numUsersAfter, numUsersBefore);
+		fail("new user created");
 	}
 
 }

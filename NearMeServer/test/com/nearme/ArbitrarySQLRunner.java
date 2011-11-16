@@ -34,11 +34,14 @@ public class ArbitrarySQLRunner {
 	 */
 	
 	public void runSQL(InputStream is) throws SQLException {
-		String sql = new Scanner(is).useDelimiter("\\A").next();
+		Scanner scanner = new Scanner(is).useDelimiter(";");
 		Connection conn = dataSource.getConnection();
-		PreparedStatement pst = conn.prepareStatement(sql);
-		pst.execute();
-		pst.close();
+		while (scanner.hasNext()) {
+			String sql = scanner.next();
+			PreparedStatement pst = conn.prepareStatement(sql);
+			pst.executeUpdate();
+			pst.close();
+		}
 		conn.close();
 	}
 	
