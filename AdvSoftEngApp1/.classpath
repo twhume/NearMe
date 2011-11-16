@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" path="/Applications/eclipse/plugins/google-gson-stream-2.0.jar" sourcepath="/Applications/eclipse/plugins/google-gson-stream-2.0.jar"/>
 	<classpathentry kind="lib" path="/Applications/eclipse/plugins/google-gson-2.0/gson-2.0.jar"/>
 	<classpathentry kind="lib" path="/Applications/eclipse/plugins/google-gson-2.0/gson-2.0-sources.jar"/>
 	<classpathentry kind="lib" path="/Applications/eclipse/plugins/google-gson-2.0/gson-2.0-javadoc.jar"/>

@@ -1,14 +1,20 @@
 package com.advsofteng.app1;
 
+import java.util.ArrayList;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
+import org.json.JSONArray;
+//import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -45,6 +51,9 @@ public class GetPOIActivity extends Activity {
 	// string holding the server address
 	private static  String ENDPOINT =null; 
 	private static final String tagPOI = "GetPOIActivity"; // used for logging
+	//TODO: delete these variables when we are done testing GPS and JSON.
+	private double testLongitude = -12.257; // longitude value of "Warung Tujuh" restaurant 
+	private double testLatitude = 49.56;    // latitude value of "Warung Tujuh" restaurant 
 	//
 	///////////////////////////////////
 	
@@ -99,13 +108,6 @@ public class GetPOIActivity extends Activity {
     	   checkBox3.isChecked();
     	   checkBox4.isChecked();
     	   checkBox5.isChecked();
-    	  
-    	   // and each checkBox's text... pub, park, etc...
-    	   resources1.getText((R.string.poi_checkbox1));
-    	   resources1.getText((R.string.poi_checkbox2));
-    	   resources1.getText((R.string.poi_checkbox3));
-    	   resources1.getText((R.string.poi_checkbox4));
-    	   resources1.getText((R.string.poi_checkbox5));
     	   
     	   // and user set radius data...
     	   // intRadius;
@@ -114,47 +116,80 @@ public class GetPOIActivity extends Activity {
 
    	   			
    				if(null != prefs.getString("time", null)) // if we actually get a latitude value back.. then 
-   				{												 //  the GPS is working proceed... else....
+   				{												 //  the GPS is working proceed...
    					
+   					/*TODO: (1)
+   					I have temp overriden this function call to HttpGet to plug in GPS co-ords that will get us a result from the server
+   					 UNCOMMENT this block and delete following block when finished testing....
+   					 
    					HttpGet get = new HttpGet(ENDPOINT + "/" + prefs.getString("latitude", "") 
    	   												+ "/" + prefs.getString("longitude", "")
    	   												+ "/" + intRadius.toString()
    	   												+ "/" + "1");
-   	   												
-   					//TODO: remove this testing block once we know we are getting data from the prefs
+   	   				
+   	   				//TODO: (2) 
+   	   				 * remove this testing block once we know we are getting data from the prefs
    					//testing to see if we are getting long and lat data...  
    					Log.i(tagPOI, "Long from prefs = "+ prefs.getString("longitude", ""));
    					Log.i(tagPOI, "lat from prefs = " + prefs.getString("latitude", ""));
-   					Log.i(tagPOI, "Mainprefs = " + prefs.toString());
+   					 * 
+   	   				*/
+   					
+   					
+   					// At this point WE KNOW that prefs have phone's current GPS co-ords - thats all working...
+   					// Testing block - to delete.... see above notes... 
+  					HttpGet get = new HttpGet(ENDPOINT + "/" + String.valueOf(testLatitude) 
+									+ "/" + String.valueOf(testLongitude)
+									+ "/" + intRadius.toString()
+									+ "/" + "1");   					
+   	   												
+  					// end of testing block to delete...
 
    					/* Create a new HTTPClient to do our POST for us */
    					HttpClient client = new DefaultHttpClient();
    					HttpResponse response = client.execute(get);
-
-   					//TODO: finalise this code once we know we are getting the correct data back from the HTTP request.
-
-   					//1.a: get text out of body of response....
+   					
+   					//get text out of body of response....
    					String responseBody = HttpHelper.getResponseBody(response);
    					
-   					// 1.b: get the Poi objects out of the string....
+   					// get the Poi objects out of the string....
    					// ref: http://benjii.me/2010/04/deserializing-json-in-android-using-gson/
    					
-   					//GsonBuilder gsonb = new GsonBuilder();
-   					Gson gson = new Gson();// gsonb.create();
-   					
-   					JSONObject j;
-   					Poi poiTest = null;
-   					
+   					JSONArray j; 
+   					// object deserialises json objects
+   					Gson gson = new Gson();
+   					//ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
+
    					try
    					{
-   						j = new JSONObject(responseBody);
-   						poiTest = gson.fromJson(j.toString(), Poi.class);
+   	   					
+   	   				    JsonParser parser = new JsonParser();
+   	   				    JsonArray array = parser.parse(responseBody).getAsJsonArray();
+   	   				    
+   	   				    int iCounter = 0;
+   	   				    for(JsonElement counter : array)
+   	   				    {	
+   	   				    	// run through the JsonArray converting each entry into an actual Poi object in the Poi ArrayList
+   	   				    	AdvSoftEngApp1Activity.poiArray.add( gson.fromJson(array.get(iCounter), Poi.class));
+   	   				    	
+   	   				    	//TODO: delete this block when finished testing....
+   	   				    	Log.i(tagPOI, String.valueOf(iCounter) + " - - - - - - - - - - -");
+   	   				    	Log.i(tagPOI, "Current POI name = " + AdvSoftEngApp1Activity.poiArray.get(iCounter).getName());
+   	   				    	Log.i(tagPOI, "Current POI Latitude = " + String.valueOf(AdvSoftEngApp1Activity.poiArray.get(iCounter).getLatitude()));
+   	   				    	Log.i(tagPOI, "Current POI Longitude = " + String.valueOf(AdvSoftEngApp1Activity.poiArray.get(iCounter).getLongitude()));
+   	   				    	Log.i(tagPOI, "Current POI ID = " + String.valueOf(AdvSoftEngApp1Activity.poiArray.get(iCounter).getId()));
+   	   				    	//
+   	   				    	
+   	   				    	iCounter++;
+   	   				    }
+   	   				    
    					}
    					catch(Exception e)
    					{
    						e.printStackTrace();
+   						Log.i(tagPOI, "Error in parsing Json data from sever, " + e.getMessage());
    					}
-
+   					
    				} 
    				else { 
    					// we have NOT got GPS data.....
@@ -164,7 +199,7 @@ public class GetPOIActivity extends Activity {
    				}
    				
    			} catch (Exception e) {
-   				Log.i(AdvSoftEngApp1Activity.TAG, "get to getPOI failed, " + e.getMessage());
+   				Log.i(tagPOI, "get to getPOI failed, " + e.getMessage());
    				
    			}
    			
@@ -295,13 +330,13 @@ public class GetPOIActivity extends Activity {
 	}
 
     protected void onStart() {
-        Log.i(tagPOI,"onStart");
+       // Log.i(tagPOI,"onStart");
         
         InitialiseCheckBoxsAndBtns(null);
         super.onStart();
     }
     protected void onResume() {
-        Log.i(tagPOI,"onResume");
+       // Log.i(tagPOI,"onResume");
     	isSavedInstanceState= false;
         super.onResume();
     }
@@ -318,11 +353,8 @@ public class GetPOIActivity extends Activity {
             editor.putInt((String)resources1.getText(R.string.tvRadiusText), intRadius);
             
             editor.commit();
-            Log.i(tagPOI,"savedPrefs");
+           // Log.i(tagPOI,"savedPrefs");
             
-        }
-        else {
-            Log.i(tagPOI,"DidNotSavePrefs");
         }
         super.onStop();
     }

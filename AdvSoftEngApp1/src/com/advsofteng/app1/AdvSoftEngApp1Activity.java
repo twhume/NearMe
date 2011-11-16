@@ -1,5 +1,6 @@
 	package com.advsofteng.app1;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -38,7 +39,9 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private DigitalClock clock = null;			/* on-screen clock */
 	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
 	private Button button = null;				/* start/stop button */
-	private Button buttonGetPOI = null;			/* get POIs button*/	
+	private Button buttonGetPOI = null;			/* get POIs button*/
+	
+	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,15 +142,17 @@ public class AdvSoftEngApp1Activity extends Activity {
 		
 		// then slap it into those shared preferences so it gets sent up in a poll
 
-		Log.i(TAG, "set time to "+ clock.getText());
+		//TODO: temp commented this out, as it was sending too much to the log - AD.
+		//Log.i(TAG, "set time to "+ clock.getText());
 		
 		SharedPreferences.Editor edit = prefs.edit();
 		edit.putString("time", new Date().toString());
 		edit.putString("latitude", Double.toString(location.getLatitude()));
 		edit.putString("longitude", Double.toString(location.getLongitude()));
 		edit.commit();
-		Log.i(TAG, "saved location OK");
-		Log.i(TAG, "new time="+prefs.getString("time", "notset"));
+		//TODO: temp commented out this line - it was sending too much data to the log - AD
+		//Log.i(TAG, "saved location OK");
+		//Log.i(TAG, "new time="+prefs.getString("time", "notset"));
     }
     
     private void emptyPrefs() {
