@@ -59,7 +59,7 @@ public class ArbitrarySQLRunner {
 		Connection conn = dataSource.getConnection();
 		PreparedStatement pst = conn.prepareStatement(sql);
 		ResultSet rs = pst.executeQuery();
-		if (rs.next()) i = rs.getInt(0);
+		if (rs.next()) i = rs.getInt(1);
 		rs.close();
 		pst.close();
 		conn.close();

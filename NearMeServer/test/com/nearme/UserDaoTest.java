@@ -138,7 +138,6 @@ public class UserDaoTest {
 		
 		int numUsersAfter = asr.runQuery(userCountSQL);
 		assertEquals(numUsersAfter, numUsersBefore);
-		fail("new user created");
 	}
 
 }
