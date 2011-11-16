@@ -1,10 +1,14 @@
 package com.advsofteng.app1;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpParams;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -115,10 +119,10 @@ public class GetPOIActivity extends Activity {
    					HttpGet get = new HttpGet(ENDPOINT + "/" + prefs.getString("latitude", "") 
    	   												+ "/" + prefs.getString("longitude", "")
    	   												+ "/" + intRadius.toString()
-   	   												+ "/" + "one");
+   	   												+ "/" + "1");
    	   												
-  	   			
-   					//testing to see if we are getting long and lat data... we are not... 
+   					//TODO: remove this testing block once we know we are getting data from the prefs
+   					//testing to see if we are getting long and lat data...  
    					Log.i(tagPOI, "Long from prefs = "+ prefs.getString("longitude", ""));
    					Log.i(tagPOI, "lat from prefs = " + prefs.getString("latitude", ""));
    					Log.i(tagPOI, "Mainprefs = " + prefs.toString());
@@ -126,17 +130,35 @@ public class GetPOIActivity extends Activity {
    					/* Create a new HTTPClient to do our POST for us */
    					HttpClient client = new DefaultHttpClient();
    					HttpResponse response = client.execute(get);
-   					HttpParams params = response.getParams();
-   					
+
    					//TODO: finalise this code once we know we are getting the correct data back from the HTTP request.
-   					// need to get params out of the response... where does the JSon data come into this????
-   					params.getParameter("latitude");
-   					params.getParameter("longitude");
+
+   					//1.a: get text out of body of response....
+   					String responseBody = HttpHelper.getResponseBody(response);
+   					
+   					// 1.b: get the Poi objects out of the string....
+   					// ref: http://benjii.me/2010/04/deserializing-json-in-android-using-gson/
+   					
+   					//GsonBuilder gsonb = new GsonBuilder();
+   					Gson gson = new Gson();// gsonb.create();
+   					
+   					JSONObject j;
+   					Poi poiTest = null;
+   					
+   					try
+   					{
+   						j = new JSONObject(responseBody);
+   						poiTest = gson.fromJson(j.toString(), Poi.class);
+   					}
+   					catch(Exception e)
+   					{
+   						e.printStackTrace();
+   					}
 
    				} 
    				else { 
    					// we have NOT got GPS data.....
-   					Toast toast=Toast.makeText(getApplicationContext(), "No GPS At Present", 2000);
+   					Toast toast=Toast.makeText(getApplicationContext(), resources1.getString(R.string.no_gps_error), 2000);
    					toast.setGravity(Gravity.TOP, -30, 50);
    					toast.show();
    				}
