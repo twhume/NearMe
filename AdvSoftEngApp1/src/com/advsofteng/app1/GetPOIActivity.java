@@ -158,7 +158,8 @@ public class GetPOIActivity extends Activity {
    					JSONArray j; 
    					// object deserialises json objects
    					Gson gson = new Gson();
-   					//ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
+   					
+   					AdvSoftEngApp1Activity.poiArray.clear(); // get rid of any old Pois from last request...
 
    					try
    					{

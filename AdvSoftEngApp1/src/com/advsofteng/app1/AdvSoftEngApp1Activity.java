@@ -179,7 +179,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 		}
 	}
 	
-	
 }
 
 
