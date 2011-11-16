@@ -5,7 +5,7 @@ USE `nearme`;
 CREATE TABLE `user` (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	hashId	INTEGER NOT NULL,
-	deviceId	VARCHAR(64) NOT NULL,
+	deviceId	VARCHAR(64) UNIQUE NOT NULL,
 	latitude	DOUBLE,
 	longitude	DOUBLE,
 	lastReport DATETIME

@@ -110,7 +110,7 @@ public class UserDaoTest {
 		u = uf.write(u);
 		
 		// check the returned User has been allocated a new ID
-		assertEquals(3, u.getId());
+		assert(User.NO_ID!=u.getId());
 		
 		// check we can read the user from the database, and it's the same one
 		

@@ -12,11 +12,15 @@ public class User {
 	private UserDAO finder;			/* The UserFinder that found this user */
 
 	public static final int NO_ID = -1;
-	
-	public User(int i, String d, String m, Position p) {
+
+	public User(int i, String d, String m) {
 		this.id = i;
 		this.deviceId = d;
 		this.msisdnHash = m;
+	}
+	
+	public User(int i, String d, String m, Position p) {
+		new User(i,d,m);
 		this.lastPosition = p;
 	}
 
