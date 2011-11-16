@@ -2,6 +2,7 @@ package com.nearme;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import javax.servlet.ServletException;
@@ -29,7 +30,14 @@ public class AddressBookServlet extends NearMeServlet {
 		String s = convertStreamToString(req.getInputStream());
 		POSTedAddressBookParser pabp = new POSTedAddressBookParser();
 		pabp.parse(s);
-				
+		
+		try {
+			User u = uDao.write(pabp.getUser());
+			uDao.setAddressBook(u.getId(), pabp.getBook());
+		} catch (SQLException e) {
+			
+		}
+			
 		//TODO take the User and address book we have received and add them into the database
 		// then return a 200 code
 		// otherwise return a 500 and log an error

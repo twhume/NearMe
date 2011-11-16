@@ -59,9 +59,9 @@ public class UserDAODummyImpl implements UserDAO {
 		return ret;
 	}
 
-	public boolean write(User u) throws SQLException {
+	public User write(User u) throws SQLException {
 		// Again, the dummy implementation isn't tested much here
-		return false;
+		return u;
 	}
 
 	@Override

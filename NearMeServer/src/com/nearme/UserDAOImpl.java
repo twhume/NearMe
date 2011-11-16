@@ -180,13 +180,13 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public boolean write(User u) throws SQLException {
+	public User write(User u) throws SQLException {
 		
 		// if the user exists, update their details
 		// otherwise, create them
-		// return true
+		// return them in any case
 		
-		return false;
+		return null;
 	}
 
 	@Override
