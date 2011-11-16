@@ -181,12 +181,21 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public boolean write(User u) throws SQLException {
-		// TODO Auto-generated method stub
+		
+		// if the user exists, update their details
+		// otherwise, create them
+		// return true
+		
 		return false;
 	}
 
 	@Override
 	public boolean setAddressBook(int id, List<AddressBookEntry> book) {
+		// if the user exists
+		//   delete their old address book (but not hashes)
+		//   add the new address book (and any hashes)
+		//   return true
+		// else return false
 		// TODO Auto-generated method stub
 		return false;
 	}
