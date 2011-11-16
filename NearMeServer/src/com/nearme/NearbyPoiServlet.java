@@ -31,7 +31,7 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 
-public class NearbyPoiServlet extends NearMeServlet {
+public class NearbyPoiServlet extends GenericNearMeServlet {
 
 	private static final long serialVersionUID = 4851880984536596503L; // Having this stops Eclipse moaning at us
 

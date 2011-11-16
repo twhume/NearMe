@@ -16,7 +16,7 @@ import javax.sql.DataSource;
  *
  */
 
-public abstract class NearMeServlet extends HttpServlet {
+public abstract class GenericNearMeServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -100216811410495886L;
 	protected DataSource datasource = null;

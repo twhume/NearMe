@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 
-public class AddressBookServlet extends NearMeServlet {
+public class AddressBookServlet extends GenericNearMeServlet {
 
 	private static final long serialVersionUID = -1593856664522697355L;
 
