@@ -2,6 +2,60 @@ DROP DATABASE IF EXISTS `nearme`;
 CREATE DATABASE `nearme` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `nearme`;
 
+CREATE TABLE `user` (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	hashId	INTEGER NOT NULL,
+	deviceId	VARCHAR(64) UNIQUE NOT NULL,
+	latitude	DOUBLE,
+	longitude	DOUBLE,
+	lastReport DATETIME
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+
+ALTER TABLE user ADD INDEX deviceId_idx(deviceId);
+ALTER TABLE user ADD INDEX hash_idx(hashId);
+
+INSERT INTO user VALUES (1, 1, "android-123456", -123.45, 67.89, "2011-11-11 00:00:00");
+INSERT INTO user VALUES (2, 2, "android-7890", -123.45, 67.89, "2011-11-11 00:00:00");
+
+CREATE TABLE `idHash` (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	hash VARCHAR(64) NOT NULL
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+
+ALTER TABLE idHash ADD INDEX hash_idx(hash);
+
+INSERT INTO idHash VALUES (1, "hash-1234567890");
+INSERT INTO idHash VALUES (2, "hash-0987654321");
+INSERT INTO idHash VALUES (3, "hash-aaaaaaaaaa");
+INSERT INTO idHash VALUES (4, "hash-bbbbbbbbbb");
+INSERT INTO idHash VALUES (5, "hash-cccccccccc");
+
+CREATE TABLE `addressBook` (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	ownerId INTEGER NOT NULL,
+	name VARCHAR(128) NOT NULL,
+	permission INTEGER NOT NULL
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+
+ALTER TABLE addressBook ADD INDEX ownerName_idx(ownerId,name);
+
+INSERT INTO addressBook VALUES (1, 1, "Tom", 0);
+INSERT INTO addressBook VALUES (2, 1, "Dick", 0);
+INSERT INTO addressBook VALUES (3, 1, "Harry", 0);
+
+CREATE TABLE `addressBookHashMatcher` (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	hashId INTEGER NOT NULL,
+	addressBookId INTEGER NOT NULL
+);
+
+ALTER TABLE addressBookHashMatcher ADD INDEX book_idx(addressBookId);
+
+INSERT INTO addressBookHashMatcher VALUES (1, 3, 1);
+INSERT INTO addressBookHashMatcher VALUES (2, 4, 2);
+INSERT INTO addressBookHashMatcher VALUES (3, 5, 3);
+
+
 CREATE TABLE `poi` (
   `Id` int(50) NOT NULL auto_increment,
   `name` varchar(255) NOT NULL default '',

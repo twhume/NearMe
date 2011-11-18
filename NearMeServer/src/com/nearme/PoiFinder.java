@@ -7,8 +7,9 @@ package com.nearme;
  * talks to a MySQL database, and another dummy implementation which we can use when constructing unit tests
  * 
  */
+import java.sql.SQLException;
 import java.util.List;
 
 public interface PoiFinder {
-	public List<Poi> find(PoiQuery pq);
+	public List<Poi> find(PoiQuery pq) throws SQLException;
 }
