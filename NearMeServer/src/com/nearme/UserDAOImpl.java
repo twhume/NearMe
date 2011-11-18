@@ -12,7 +12,11 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+
 public class UserDAOImpl implements UserDAO {
+	
+	private static Logger logger = Logger.getLogger(UserDAOImpl.class);
 
 	/* In the real world I'd be using an ORM here, but that feels like one too many things
 	 * to shove at the team during this project. 
@@ -395,8 +399,7 @@ public class UserDAOImpl implements UserDAO {
 				
 				for (IdentityHash hash: entry.getHashes()) {
 					if (hash.getHash()==null) {
-						System.err.println("Null Hash!");
-						//TODO add proper log4j logging and replace all System.err etc stuff
+						logger.warn("Received null hash");
 					} else {
 						int hashId = findOrCreateIdHash(c, hash.getHash());
 						

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+
 /**
  * A PoiFinder class which talks to an SQL database and pulls out lists of
  * Points of Interest
@@ -18,6 +20,9 @@ import javax.sql.DataSource;
  */
 
 public class DatabasePoiFinder implements PoiFinder {
+	
+	private static final Logger logger = Logger.getLogger(DatabasePoiFinder.class);
+	
 	private DataSource dataSource = null;
 	static Connection conn = null;
 
@@ -35,7 +40,7 @@ public class DatabasePoiFinder implements PoiFinder {
 																	// base
 
 		if (conn != null) {
-			System.out.println("Database connection " + url);
+			logger.debug("Database connection " + url);
 			// conn.close();
 		}
 
@@ -84,7 +89,7 @@ public class DatabasePoiFinder implements PoiFinder {
 					rs.getInt("Id"));
 			ret.add(newPoi);
 
-			System.out.println(rs.getObject("name") + ", Longitude: "
+			logger.debug(rs.getObject("name") + ", Longitude: "
 					+ rs.getObject("longitude") + ", Latitude: "
 					+ rs.getObject("latitude"));
 		}

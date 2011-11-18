@@ -60,7 +60,6 @@ public class IdentityHash {
 			if (other.hash != null)
 				return false;
 		} else if (!hash.equals(other.hash))  {
-			System.err.println("F " + hash + "!="+ other.hash);
 			return false;
 		} if (id != other.id)
 			return false;

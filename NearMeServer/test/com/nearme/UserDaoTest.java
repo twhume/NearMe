@@ -61,7 +61,6 @@ public class UserDaoTest {
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
-		System.err.println(c.getTime());
 
 		User testUser = new User(1, "android-123456", "hash-1234567890", new Position(-123.45, 67.89, c.getTime()));
 

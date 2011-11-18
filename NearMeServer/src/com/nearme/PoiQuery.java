@@ -2,6 +2,7 @@ package com.nearme;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import org.apache.log4j.Logger;
 
 /**
  * Encapsulates a query for points of interest.
@@ -13,6 +14,8 @@ import java.util.StringTokenizer;
  *
  */
 public class PoiQuery {
+	
+	private static Logger logger = Logger.getLogger(PoiQuery.class);
 
 	private double latitude;			/* Latitude of the position to search from */
 	private double longitude;			/* Longitude of the position to search from */
@@ -20,7 +23,6 @@ public class PoiQuery {
 	private ArrayList<Integer> types;	/* List of Integers corresponding to the type IDs we are interested in */
 	
 	public PoiQuery(String path) {
-		System.err.println(path);
 		try {
 			StringTokenizer st = new StringTokenizer(path, "/?=");
 			this.latitude = Double.parseDouble(st.nextToken());
@@ -40,7 +42,7 @@ public class PoiQuery {
 						nextTok = typeTok.nextToken();
 						types.add(new Integer(Integer.parseInt(nextTok)));
 					}
-				} else System.err.println(nextTok);
+				} else logger.warn("unexpected token " + nextTok);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
