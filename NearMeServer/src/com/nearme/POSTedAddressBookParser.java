@@ -2,11 +2,7 @@ package com.nearme;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 /**
  * The AddressBookServlet has a User sent into it using an HTTP POST. This class takes responsibility
