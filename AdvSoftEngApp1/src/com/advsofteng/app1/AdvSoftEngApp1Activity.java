@@ -40,6 +40,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
 	private Button button = null;				/* start/stop button */
 	private Button buttonGetPOI = null;			/* get POIs button*/
+	private Button buttonMap = null;         /* View Map POI Button*/
 	
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	
@@ -95,7 +96,21 @@ public class AdvSoftEngApp1Activity extends Activity {
 
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new AdvSoftEngLocationListener(this));
 		
+	  //*************************************
+        //Deal with view map button
+       
+       buttonMap=  (Button) findViewById(R.id.mapButton);
+       buttonMap.setOnClickListener(new View.OnClickListener() {
 		
+		public void onClick(View v) {
+			Intent intentMAP = new Intent(AdvSoftEngApp1Activity.this, map.class);
+			
+			startActivity(intentMAP);
+			
+		}
+       });
+        
+       //*********************************
      
         //////////////////////////////////////////
         // deals with getPOI button.
@@ -104,15 +119,23 @@ public class AdvSoftEngApp1Activity extends Activity {
 			
 			public void onClick(View v) {
 
+				
 				Intent intentPOI = new Intent(AdvSoftEngApp1Activity.this, GetPOIActivity.class);
 				
 				startActivity(intentPOI);
+				
+				 buttonMap.setVisibility(0);
 				
 			} // end of onClickView(View v)
 			}//  end of View.OnClickListener
         ); // end of setOnClickListener
         // 
         /////////////////////////////
+        
+        
+        
+        
+     
            
     }
     

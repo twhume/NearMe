@@ -55,7 +55,8 @@ public class GetPOIActivity extends Activity {
 	private double testLongitude = -12.257; // longitude value of "Warung Tujuh" restaurant 
 	private double testLatitude = 49.56;    // latitude value of "Warung Tujuh" restaurant 
 	//
-	///////////////////////////////////
+ 
+	
 	
 	// Called at the start of the full lifetime. 
 	@Override 
@@ -90,14 +91,12 @@ public class GetPOIActivity extends Activity {
 	//
 	//////////
 	
-	
-	///////
 	// initialise button to respond to clicks with correct action
 	btnGetPOIdata = (Button) findViewById(R.id.getPOIDataButton);
 	btnGetPOIdata.setOnClickListener(new View.OnClickListener() {
        public void onClick(View v) {
     	  
-    	   
+    	  
     	   //TODO: check with Tom about how the server wants the data on POIs..???
     	   //bool / int POI, how to represent pub and restaurant request... for example???
     	   

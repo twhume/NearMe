@@ -11,6 +11,7 @@
     <string name="poi_checkbox3">Clubs</string>
     <string name="poi_checkbox4">Museum</string>
     <string name="get_poi_label">Get POIs</string>
+    <string name="map_poi_label">MAP POI</string>
     <string name="tvRadiusText">Radius = </string>
     <string name="serverAddress">http://nearme.tomhume.org:8080/NearMeServer/nearme/50.258/-14.752/1000000</string>
 </resources>
