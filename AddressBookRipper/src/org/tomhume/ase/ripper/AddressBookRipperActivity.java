@@ -40,6 +40,7 @@ public class AddressBookRipperActivity extends Activity {
 
 	private static final String TAG = "Ripper";
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
+	private static final String ENDPOINT = "http://192.168.1.98:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
 	
 	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
@@ -137,13 +138,13 @@ public class AddressBookRipperActivity extends Activity {
 			
 			
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("http://192.168.1.93:8080/NearMeServer/addressBook");
+			HttpPost post = new HttpPost(ENDPOINT);
 
 			try {
 				HttpEntity ent = new StringEntity(gson.toJson(abe[0]));
 				post.setEntity(ent);
 				HttpResponse response = client.execute(post);
-				Log.i(TAG, "post done, response="+response.getStatusLine().getStatusCode());
+				Log.i(TAG, "post to " + ENDPOINT + " done, response="+response.getStatusLine().getStatusCode());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				Log.i(TAG, "post threw " + e);
