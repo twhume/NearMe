@@ -23,7 +23,6 @@ public class AddressBookServlet extends GenericNearMeServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		
 		UserDAO uDao = new UserDAOImpl(datasource);
 
 		String s = convertStreamToString(req.getInputStream());

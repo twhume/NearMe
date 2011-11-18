@@ -39,8 +39,7 @@ public class UserDAOImpl implements UserDAO {
 	private static final String HASHMATCH_DELETE_SQL = "DELETE ah.* from addressBookHashMatcher ah, addressBook ab WHERE ab.ownerId = ? AND ah.addressBookId = ab.id";
 	private static final String BOOK_INSERT_SQL = "INSERT INTO addressBook (ownerId, name, permission) VALUES (?,?,?)";
 	private static final String MATCH_INSERT_SQL = "INSERT INTO addressBookHashMatcher (hashId, addressBookId) VALUES (?,?)";
-	
-	
+		
 	private DataSource dataSource = null;
 	
 	public UserDAOImpl(DataSource d) {
@@ -228,9 +227,9 @@ public class UserDAOImpl implements UserDAO {
 			 * 
 			 * It's meaningless to update their deviceId, as it's the way we found them.
 			 */
-			
+
 			if (exists!=null) {
-				if (!u.getLastPosition().equals(exists.getLastPosition())) {
+				if ((u.getLastPosition()!=null) && (exists.getLastPosition()!=null) && (!u.getLastPosition().equals(exists.getLastPosition()))) {
 					pst = c.prepareStatement(USER_UPDATE_POSITION_SQL);
 					pst.setDouble(1, u.getLastPosition().getLatitude());
 					pst.setDouble(2, u.getLastPosition().getLongitude());
@@ -395,13 +394,18 @@ public class UserDAOImpl implements UserDAO {
 				pst.close();
 				
 				for (IdentityHash hash: entry.getHashes()) {
-					int hashId = findOrCreateIdHash(c, hash.getHash());
-					
-					pst = c.prepareStatement(MATCH_INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
-					pst.setInt(1, hashId);
-					pst.setInt(2, addressBookId);
-					pst.executeUpdate();
-					pst.close();
+					if (hash.getHash()==null) {
+						System.err.println("Null Hash!");
+						//TODO add proper log4j logging and replace all System.err etc stuff
+					} else {
+						int hashId = findOrCreateIdHash(c, hash.getHash());
+						
+						pst = c.prepareStatement(MATCH_INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+						pst.setInt(1, hashId);
+						pst.setInt(2, addressBookId);
+						pst.executeUpdate();
+						pst.close();
+					}
 				}
 
 			}
