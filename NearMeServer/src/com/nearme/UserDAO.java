@@ -31,5 +31,5 @@ public interface UserDAO {
 	public User write(User u) throws SQLException;
 	
 	/* Set the AddressBook for the given User, removing old entries */
-	public boolean setAddressBook(int id, List<AddressBookEntry> book);
+	public boolean setAddressBook(int id, List<AddressBookEntry> book) throws SQLException;
 }

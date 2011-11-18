@@ -18,6 +18,9 @@ public class UserDAOImpl implements UserDAO {
 	 * to shove at the team during this project. 
 	 * 
 	 * Actually I'd probably write the thing in Groovy or Perl, but that'd be even crueller.
+	 * 
+	 * TODO: wrap these big sets of queries in transactions.
+	 * And check the database is set up to use them...
 	 */
 	private static final String READ_ID_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE user.id = ? AND idHash.id = user.hashId";
 	private static final String READ_HASH_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE idHash.hash = ? AND idHash.id = user.hashId";
@@ -28,8 +31,15 @@ public class UserDAOImpl implements UserDAO {
 	private static final String USER_INSERT_SQL = "INSERT INTO user (deviceId, hashId, latitude, longitude, lastReport) VALUES (?,?,?,?,?)";
 	private static final String USER_UPDATE_POSITION_SQL = "UPDATE user SET latitude = ?, longitude = ?, lastReport = ? WHERE id = ?";
 	private static final String USER_UPDATE_IDHASH_SQL = "UPDATE user SET hashId = ? WHERE id = ?";
+	
 	private static final String IDHASH_FIND_SQL = "SELECT id FROM idHash WHERE hash = ?";
 	private static final String IDHASH_INSERT_SQL = "INSERT INTO idHash (hash) VALUES (?)";
+	
+	private static final String BOOK_DELETE_SQL = "DELETE FROM addressBook WHERE ownerId = ?";
+	private static final String HASHMATCH_DELETE_SQL = "DELETE ah.* from addressBookHashMatcher ah, addressBook ab WHERE ab.ownerId = ? AND ah.addressBookId = ab.id";
+	private static final String BOOK_INSERT_SQL = "INSERT INTO addressBook (ownerId, name, permission) VALUES (?,?,?)";
+	private static final String MATCH_INSERT_SQL = "INSERT INTO addressBookHashMatcher (hashId, addressBookId) VALUES (?,?)";
+	
 	
 	private DataSource dataSource = null;
 	
@@ -154,6 +164,7 @@ public class UserDAOImpl implements UserDAO {
 					ret.add(abe);
 				}
 				hashes.add(ih);
+				lastId = rs.getInt("ab.id");
 			}
 		} finally {
 			if (pst!=null) pst.close();
@@ -190,6 +201,11 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return ret;
 	}
+	
+	/**
+	 * Writes the given User into the database, either inserting or updating, depending on whether a
+	 * record for them already exists.
+	 */
 
 	@Override
 	public User write(User u) throws SQLException {
@@ -315,14 +331,101 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public boolean setAddressBook(int id, List<AddressBookEntry> book) {
-		// if the user exists
-		//   delete their old address book (but not hashes)
-		//   add the new address book (and any hashes)
-		//   return true
-		// else return false
-		// TODO Auto-generated method stub
-		return false;
+	public boolean setAddressBook(int id, List<AddressBookEntry> book) throws SQLException {
+		
+		/* No such user? Not a valid request, so return false */
+		User u = read(id);
+		if (u==null) return false;
+
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		Connection c = null;
+
+		/* If they exist, delete their old address book and any orphaned hashes;
+		 * If this were a real-world app I'd consider this kind of approach kludgy;
+		 * a proper syncing mechanism would be quicker for migrating small changes
+		 * from client to server, and would minimise load on the database. But I
+		 * think that would be overcomplicating the app, in this case. 
+		 * 
+		 * This will be a *very* expensive operation - oodles of queries generated.
+		 * The good news is that it should be done only infrequently, but even so
+		 * I would definitely look to optimise this heavily "in the wild".
+		 */
+		
+		try {
+			
+			/* Delete all entries for this addressBook from the addressBookHashMatcher table */
+
+			c = dataSource.getConnection();
+			pst = c.prepareStatement(HASHMATCH_DELETE_SQL);
+			pst.setInt(1, u.getId());
+			pst.executeUpdate();
+
+			/* Delete all entries for this user from the addressBook table */
+			
+			c = dataSource.getConnection();
+			pst = c.prepareStatement(BOOK_DELETE_SQL);
+			pst.setInt(1, u.getId());
+			pst.executeUpdate();
+
+			/* For each new AddressBookEntry to be added
+			 * - create an entry in the AddressBook table
+			 * - for each hash for this entry
+			 * -- create it in the idHash table if necessary
+			 * -- create an entry linking it to the addressBook row in the addressBookHashMatcher table
+			 */
+			
+			for (AddressBookEntry entry: book) {
+				
+				/* Add an entry into the AddressBook table */
+				
+				pst = c.prepareStatement(BOOK_INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+				pst.setInt(1, u.getId());
+				pst.setString(2, entry.getName());
+				pst.setInt(3, entry.getPermission());
+				pst.executeUpdate();
+
+				/* Look up the unique ID for the entry we just added - we need this */
+				
+				rs = pst.getGeneratedKeys();
+				int addressBookId = -1;
+				if (rs.next()) addressBookId = rs.getInt(1);
+				else throw new RuntimeException("Never received insert_id when adding book");
+				rs.close();
+				pst.close();
+				
+				for (IdentityHash hash: entry.getHashes()) {
+					int hashId = findOrCreateIdHash(c, hash.getHash());
+					
+					pst = c.prepareStatement(MATCH_INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+					pst.setInt(1, hashId);
+					pst.setInt(2, addressBookId);
+					pst.executeUpdate();
+					pst.close();
+				}
+
+			}
+			
+			/* Finally, there may be hashes which used to be used, but no longer are
+			 * (if, for instance, the user has deleted a contact from their address
+			 * book). Remove these from the database.
+			 */
+			
+			//TODO Add this bit in. It's a tidy-up rather than essential, mind
+			/*
+			 * 
+			 * 
+			pst = c.prepareStatement(IDHASH_DELETE_ORPHAN_SQL);
+			pst.setInt(1, u.getId());
+			pst.executeUpdate();
+			pst.close();
+			*/
+			return true;
+		} finally {
+			if (rs!=null) rs.close();
+			if (pst!=null) pst.close();
+			if (c!=null) c.close();
+		}
 	}
 
 }

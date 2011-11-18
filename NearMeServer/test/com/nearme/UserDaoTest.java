@@ -16,6 +16,7 @@ public class UserDaoTest {
 	
 	private UserDAO uf = null;
 	private MysqlConnectionPoolDataSource dataSource = null;
+	private List<AddressBookEntry> testBook = null;
 	
 	@Before
 	public void setUp() {
@@ -37,6 +38,17 @@ public class UserDaoTest {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+
+		List<IdentityHash> fredHashes = new ArrayList<IdentityHash>();
+		fredHashes.add(new IdentityHash("fred-hash-1"));
+
+		List<IdentityHash> gingerHashes = new ArrayList<IdentityHash>();
+		gingerHashes.add(new IdentityHash("ginger-hash-1"));
+		gingerHashes.add(new IdentityHash("ginger-hash-2"));
+
+		testBook = new ArrayList<AddressBookEntry>();
+		testBook.add(new AddressBookEntry("fred", fredHashes, AddressBookEntry.PERM_HIDDEN));
+		testBook.add(new AddressBookEntry("ginger", gingerHashes, AddressBookEntry.PERM_HIDDEN));
 	}
 
 	@Test
@@ -160,5 +172,85 @@ public class UserDaoTest {
 		int numUsersAfter = asr.runQuery(userCountSQL);
 		assertEquals(numUsersAfter, numUsersBefore);
 	}
+
+	@Test
+	public void testSetAddressBookForNonExistentUser() throws SQLException {
+		assertEquals(false, uf.setAddressBook(99999, testBook));
+	}
+
+	@Test
+	public void testSetAddressBookForUserWithNoAddressBook() throws SQLException {
+		assertEquals(0, uf.getAddressBook(2).size());
+		assertEquals(true, uf.setAddressBook(2, testBook));
+
+		List<AddressBookEntry> book = uf.getAddressBook(2);
+		assertEquals(2, book.size());
+		assertEquals("fred", book.get(0).getName());
+		assertEquals("ginger", book.get(1).getName());
+	}
+
+	@Test
+	public void testSetAddressBookForUserWithAnAddressBookChangeNone() throws SQLException {
+		assertEquals(3, uf.getAddressBook(1).size());
+		List<AddressBookEntry> book = uf.getAddressBook(1);
+		assertEquals(true, uf.setAddressBook(1, book));
+		assertEquals(3, uf.getAddressBook(1).size());
+	}
+
+	@Test
+	public void testSetAddressBookForUserWithAnAddressBookChangeOne() throws SQLException {
+		assertEquals(3, uf.getAddressBook(1).size());
+		List<AddressBookEntry> book = uf.getAddressBook(1);
+		
+		book.get(1).setName("changed");
+		
+		assertEquals(true, uf.setAddressBook(1, book));
+		
+		List<AddressBookEntry> bookAgain = uf.getAddressBook(1);
+		assertEquals(3, bookAgain.size());
+		// was Dick, Harry, Tom
+
+		// Now is changed, Dick, Tom
+		assertEquals("changed", bookAgain.get(0).getName());
+		assertEquals("Dick", bookAgain.get(1).getName());
+		assertEquals("Tom", bookAgain.get(2).getName());
+	}
+
+	@Test
+	public void testSetAddressBookForUserWithAnAddressBookChangeAll() throws SQLException {
+		assertEquals(3, uf.getAddressBook(1).size());
+		List<AddressBookEntry> book = uf.getAddressBook(1);
+		
+		book.get(0).setName("changed1");
+		book.get(1).setName("changed2");
+		book.get(2).setName("changed3");
+		
+		assertEquals(true, uf.setAddressBook(1, book));
+		
+		List<AddressBookEntry> bookAgain = uf.getAddressBook(1);
+		assertEquals(3, bookAgain.size());
+		assertEquals("changed1", bookAgain.get(0).getName());
+		assertEquals("changed2", bookAgain.get(1).getName());
+		assertEquals("changed3", bookAgain.get(2).getName());
+	}
+	
+
+	@Test
+	public void testSetAddressBookForUserWithAnAddressBookDeleteOne() throws SQLException {
+		assertEquals(3, uf.getAddressBook(1).size());
+		List<AddressBookEntry> book = uf.getAddressBook(1);
+
+		// remove Harry
+		book.remove(1);
+		
+		assertEquals(true, uf.setAddressBook(1, book));
+		
+		List<AddressBookEntry> bookAgain = uf.getAddressBook(1);
+		assertEquals(2, bookAgain.size());
+		assertEquals("Dick", bookAgain.get(0).getName());
+		assertEquals("Tom", bookAgain.get(1).getName());
+		
+	}
+
 
 }
