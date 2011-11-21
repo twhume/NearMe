@@ -1,9 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="Task3Server">
-        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="Task3Server"/>
-        <property name="java-output-path" value="/Task3Server/build/classes"/>
-    </wb-module>
-</project-modules>
+<project-modules id="moduleCoreId"/>
