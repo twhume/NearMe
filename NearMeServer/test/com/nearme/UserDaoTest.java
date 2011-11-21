@@ -256,8 +256,66 @@ public class UserDaoTest {
 		User u = uf.read(1);
 		List<IdentityHash> perms = uf.getPermissions(u);
 		assertEquals(1, perms.size());
-		
 	}
 
+	@Test
+	public void testSetPermissionsUnknownUser() throws SQLException {
+		User u = new User();
+		u.setId(4);
+		assert(!uf.setPermissions(u, new ArrayList<IdentityHash>()));
+	}
+
+	@Test
+	public void testSetPermissionsExistingUserPermissionAdded() throws SQLException {
+		User u = uf.read(1);
+		// testGetPermissions() has already tested that user 1 has 1 permission in their address book
+		List<IdentityHash> perms = new ArrayList<IdentityHash>();
+		IdentityHash hash3 = new IdentityHash(3, "hash-aaaaaaaaaa");
+		IdentityHash hash4 = new IdentityHash(4, "hash-bbbbbbbbbb");
+		perms.add(hash3); // this is the one that's already there. If we don't include it, it'll get lost.
+		perms.add(hash4); // now we add dick to the address book
+		assertTrue(uf.setPermissions(u, perms));
+		
+		// dick and tom should be marked with permissions, harry not
+		List<AddressBookEntry> book = uf.getAddressBook(u.getId());
+		assertEquals(AddressBookEntry.PERM_SHOWN, book.get(0).getPermission());		// Dick
+		assertEquals(AddressBookEntry.PERM_HIDDEN, book.get(1).getPermission());	// Harry
+		assertEquals(AddressBookEntry.PERM_SHOWN, book.get(2).getPermission());		// Tom
+
+		// getpermissions should return their hashes
+		List<IdentityHash> hashes = uf.getPermissions(u);
+		assert(hashes.contains(hash3));
+		assert(hashes.contains(hash4));
+		assertEquals(2, hashes.size());
+	}
+
+	@Test
+	public void testSetPermissionsExistingUserPermissionRemoved() throws SQLException {
+		User u = uf.read(1);
+		// testGetPermissions() has already tested that user 1 has 1 permission in their address book
+		List<IdentityHash> perms = new ArrayList<IdentityHash>();
+
+		assertTrue(uf.setPermissions(u, perms)); // should remove all permissions
+
+		// no-one should have any permissions now
+		List<AddressBookEntry> book = uf.getAddressBook(u.getId());
+		assertEquals(AddressBookEntry.PERM_HIDDEN, book.get(0).getPermission());		// Dick
+		assertEquals(AddressBookEntry.PERM_HIDDEN, book.get(1).getPermission());	// Harry
+		assertEquals(AddressBookEntry.PERM_HIDDEN, book.get(2).getPermission());		// Tom
+
+		// getpermissions should return no hashes
+		List<IdentityHash> hashes = uf.getPermissions(u);
+		assertEquals(0, hashes.size());
+	}
+
+	@Test
+	public void testSetPermissionsExistingUserUnlinkedHash() throws SQLException {
+		User u = uf.read(1);
+		// testGetPermissions() has already tested that user 1 has 1 permission in their address book
+		List<IdentityHash> perms = new ArrayList<IdentityHash>();
+		
+		perms.add(new IdentityHash(1, "hash-1234567890")); // a poor orphan IdentityHash
+		assertFalse(uf.setPermissions(u, perms));
+	}
 
 }
