@@ -39,7 +39,7 @@ CREATE TABLE `addressBook` (
 
 ALTER TABLE addressBook ADD INDEX ownerName_idx(ownerId,name);
 
-INSERT INTO addressBook VALUES (1, 1, "Tom", 0);
+INSERT INTO addressBook VALUES (1, 1, "Tom", 1);
 INSERT INTO addressBook VALUES (2, 1, "Dick", 0);
 INSERT INTO addressBook VALUES (3, 1, "Harry", 0);
 

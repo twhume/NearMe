@@ -43,6 +43,8 @@ public class UserDAOImpl implements UserDAO {
 	private static final String HASHMATCH_DELETE_SQL = "DELETE ah.* from addressBookHashMatcher ah, addressBook ab WHERE ab.ownerId = ? AND ah.addressBookId = ab.id";
 	private static final String BOOK_INSERT_SQL = "INSERT INTO addressBook (ownerId, name, permission) VALUES (?,?,?)";
 	private static final String MATCH_INSERT_SQL = "INSERT INTO addressBookHashMatcher (hashId, addressBookId) VALUES (?,?)";
+
+	private static final String IDHASH_LIST_SQL = "SELECT ih.id, ih.hash from addressBook ab, addressBookHashMatcher hm, idHash ih WHERE ih.id = hm.hashId AND hm.addressBookId = ab.id and ab.ownerId = ? AND ab.permission = ?";
 		
 	private DataSource dataSource = null;
 	
@@ -433,6 +435,36 @@ public class UserDAOImpl implements UserDAO {
 			if (pst!=null) pst.close();
 			if (c!=null) c.close();
 		}
+	}
+
+	@Override
+	public List<IdentityHash> getPermissions(User u) throws SQLException {
+		Connection c = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		try {
+			c = dataSource.getConnection();
+			pst = c.prepareStatement(IDHASH_LIST_SQL);
+			pst.setInt(1, u.getId());
+			pst.setInt(2, AddressBookEntry.PERM_SHOWN);
+			rs = pst.executeQuery();
+			List<IdentityHash> ret = new ArrayList<IdentityHash>();
+			while (rs.next()) {
+				ret.add(new IdentityHash(rs.getInt(1), rs.getString(2)));
+			}
+			return ret;
+		} finally {
+			if (rs!=null) rs.close();
+			if (pst!=null) pst.close();
+			if (c!=null) c.close();
+		}
+	}
+
+	@Override
+	public boolean setPermissions(User u, List<IdentityHash> perms)
+			throws SQLException {
+			
+		return false;
 	}
 
 }

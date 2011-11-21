@@ -110,7 +110,7 @@ public class UserDaoTest {
 		
 		assertEquals(new AddressBookEntry(2, u, "Dick", AddressBookEntry.PERM_HIDDEN, list4), book.get(0));
 		assertEquals(new AddressBookEntry(3, u, "Harry", AddressBookEntry.PERM_HIDDEN, list5), book.get(1));
-		assertEquals(new AddressBookEntry(1, u, "Tom", AddressBookEntry.PERM_HIDDEN, list3), book.get(2));
+		assertEquals(new AddressBookEntry(1, u, "Tom", AddressBookEntry.PERM_SHOWN, list3), book.get(2));
 	}
 
 	@Test
@@ -248,6 +248,14 @@ public class UserDaoTest {
 		assertEquals(2, bookAgain.size());
 		assertEquals("Dick", bookAgain.get(0).getName());
 		assertEquals("Tom", bookAgain.get(1).getName());
+		
+	}
+	
+	@Test
+	public void testGetPermissions() throws SQLException {
+		User u = uf.read(1);
+		List<IdentityHash> perms = uf.getPermissions(u);
+		assertEquals(1, perms.size());
 		
 	}
 
