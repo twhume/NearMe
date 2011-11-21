@@ -19,7 +19,7 @@ public interface UserDAO {
 	public User readByHash(String string) throws SQLException;
 	
 	/* Look up a user by their device ID */
-	public Object readByDeviceId(String string) throws SQLException;
+	public User readByDeviceId(String string) throws SQLException;
 	
 	/* Look up the address book for a given user */
 	public List<AddressBookEntry> getAddressBook(int i) throws SQLException;
@@ -32,4 +32,13 @@ public interface UserDAO {
 	
 	/* Set the AddressBook for the given User, removing old entries */
 	public boolean setAddressBook(int id, List<AddressBookEntry> book) throws SQLException;
+	
+	/* Get a list of Hashes for the given user (identified by android device ID), that the user shares location with */
+	public List<IdentityHash> getPermissions(User u) throws SQLException;
+
+	/* Updates the address book for the user identified by deviceId, to withold location-sharing permissions
+	 * from all users bar those passed in in the "perms" list
+	 */
+	public boolean setPermissions(User u, List<IdentityHash> perms) throws SQLException;
+
 }
