@@ -32,6 +32,17 @@
     <url-pattern>/addressBook/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <description></description>
+    <display-name>Permissions</display-name>
+    <servlet-name>PermissionsServlet</servlet-name>
+    <servlet-class>com.nearme.PermissionsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PermissionsServlet</servlet-name>
+    <url-pattern>/permissions/*</url-pattern>
+  </servlet-mapping>
+
 
   <servlet>
     <description></description>
