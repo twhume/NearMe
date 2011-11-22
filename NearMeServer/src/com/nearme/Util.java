@@ -1,6 +1,8 @@
 package com.nearme;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Class for holding generally useful static methods
@@ -40,6 +42,17 @@ public class Util {
 		}
 		if (perms.size()>0) sb.setLength(sb.length()-1);
 		return sb.toString();
+	}
+
+	/**
+	 * Method cribbed from http://stackoverflow.com/questions/309424/in-java-how-do-a-read-convert-an-inputstream-in-to-a-string
+	 * TODO: move into a proper utility class
+	 * 
+	 * @param is
+	 * @return
+	 */
+	public static String convertStreamToString(InputStream is) { 
+	    return new Scanner(is).useDelimiter("\\A").next();
 	}
 
 }

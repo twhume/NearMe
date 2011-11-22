@@ -1,9 +1,7 @@
 package com.nearme;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +27,7 @@ public class AddressBookServlet extends GenericNearMeServlet {
 			throws ServletException, IOException {
 		UserDAO uDao = new UserDAOImpl(datasource);
 
-		String s = convertStreamToString(req.getInputStream());
+		String s = Util.convertStreamToString(req.getInputStream());
 		POSTedAddressBookParser pabp = new POSTedAddressBookParser();
 		pabp.parse(s);
 		
@@ -45,17 +43,6 @@ public class AddressBookServlet extends GenericNearMeServlet {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 			
-	}
-	
-	/**
-	 * Method cribbed from http://stackoverflow.com/questions/309424/in-java-how-do-a-read-convert-an-inputstream-in-to-a-string
-	 * TODO: move into a proper utility class
-	 * 
-	 * @param is
-	 * @return
-	 */
-	public static String convertStreamToString(InputStream is) { 
-	    return new Scanner(is).useDelimiter("\\A").next();
 	}
 
 }
