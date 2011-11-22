@@ -3,15 +3,11 @@ package com.nearme;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import com.google.gson.Gson;
-import com.nearme.POSTedAddressBookParser.PostedUser;
 
 /**
  * This servlet handles requests for reading and setting permissions for a given user
@@ -76,8 +72,14 @@ public class PermissionsServlet extends GenericNearMeServlet {
 
 				Gson gson = new Gson();
 				String[] hashes = gson.fromJson(input, String[].class);
-				if (ud.setPermissions(u, hashes)) resp.sendError(HttpServletResponse.SC_OK);
-				else resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				if (ud.setPermissions(u, hashes)) {
+					resp.sendError(HttpServletResponse.SC_OK);
+					logger.info("permissions received OK for "+ deviceId+": (" + hashes + ")");
+				}
+				else {
+					resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					logger.info("permissions received, but failed to save for "+ deviceId+": (" + hashes + ")");
+				}
 			}
 		} catch (SQLException e) {
 			logger.error(e);
