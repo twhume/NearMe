@@ -196,9 +196,10 @@ public class AddressBookRipperActivity extends Activity {
 			ArrayList<AddressBookEntry> entries = new ArrayList<AddressBookEntry>();
 			ArrayList<String> hashes = new ArrayList<String>();
 			String lastId = null;
+			a.setEntries(entries);
 
 			try {
-				managedCursor.moveToFirst();
+				if (!managedCursor.moveToFirst()) return a;
 				lastId = managedCursor.getString(3);
 				AddressBookEntry abe = new AddressBookEntry();
 				abe.setName(managedCursor.getString(1));
@@ -225,7 +226,6 @@ public class AddressBookRipperActivity extends Activity {
 				managedCursor.close();
 			}
 
-			a.setEntries(entries);
 			return a;
 		}
 	}
