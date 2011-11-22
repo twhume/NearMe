@@ -469,9 +469,14 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 
+
 	@Override
 	public boolean setPermissions(User u, List<IdentityHash> perms) throws SQLException {
-
+		return setPermissions(u, Util.hashListAsStringArray(perms));
+	}
+	
+	public boolean setPermissions(User u, String[] perms) throws SQLException {
+		
 		
 		Connection c = null;
 		PreparedStatement pst = null;
@@ -508,11 +513,11 @@ public class UserDAOImpl implements UserDAO {
 			pst.setInt(2, u.getId());
 			rows = 0;
 			
-			for (int i=0; i<perms.size(); i+= PERM_UPDATE_COUNT) {
+			for (int i=0; i<perms.length; i+= PERM_UPDATE_COUNT) {
 				for (int j=0; j<PERM_UPDATE_COUNT; j++) {
-					if (i+j<perms.size()) {
+					if (i+j<perms.length) {
 						logger.debug("set parameter " + (j+3) + " to hash " + (i+j));
-						pst.setString(j+3, perms.get(i+j).getHash());
+						pst.setString(j+3, perms[i+j]);
 					} else {
 						logger.debug("set parameter " + (j+3) + " to null");
 						pst.setString(j+3, null);
@@ -521,7 +526,7 @@ public class UserDAOImpl implements UserDAO {
 				rows += pst.executeUpdate();
 				logger.debug("setPermissions updated " + rows);
 			}
-			if ((perms.size()>0) && (rows==0)) return false; // the IdentityHash we were given wasn't linked to this user
+			if ((perms.length>0) && (rows==0)) return false; // the IdentityHash we were given wasn't linked to this user
 
 			c.commit();
 			c.setAutoCommit(true); // reset this to its usual setting
