@@ -53,6 +53,7 @@ public class LocationPoster extends BroadcastReceiver {
 
 		Log.i(AdvSoftEngApp1Activity.TAG, "time="+prefs.getString("time", null));
 
+
 		try {
 
 			/* Set the payload for this POST */

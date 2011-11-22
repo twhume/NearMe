@@ -27,4 +27,21 @@
         android:layout_height="wrap_content"
         android:text="Start" />
 
+    <Button
+        android:id="@+id/getPOIButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:onClick="POIActivity"
+        android:text="Get POIs" />
+
+    <Button
+        android:id="@+id/mapButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="invisible"        
+        android:text="View Map POI" />
+
+
 </LinearLayout>
