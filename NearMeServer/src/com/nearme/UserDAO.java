@@ -39,6 +39,6 @@ public interface UserDAO {
 	/* Updates the address book for the user identified by deviceId, to withold location-sharing permissions
 	 * from all users bar those passed in in the "perms" list
 	 */
-	public boolean setPermissions(User u, List<IdentityHash> perms) throws SQLException;
+	public boolean setPermissions(User u, String[] perms) throws SQLException;
 
 }

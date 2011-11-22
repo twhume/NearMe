@@ -262,18 +262,15 @@ public class UserDaoTest {
 	public void testSetPermissionsUnknownUser() throws SQLException {
 		User u = new User();
 		u.setId(4);
-		assert(!uf.setPermissions(u, new ArrayList<IdentityHash>()));
+		assert(!uf.setPermissions(u, new String[]{}));
 	}
 
 	@Test
 	public void testSetPermissionsExistingUserPermissionAdded() throws SQLException {
 		User u = uf.read(1);
 		// testGetPermissions() has already tested that user 1 has 1 permission in their address book
-		List<IdentityHash> perms = new ArrayList<IdentityHash>();
-		IdentityHash hash3 = new IdentityHash(3, "hash-aaaaaaaaaa");
-		IdentityHash hash4 = new IdentityHash(4, "hash-bbbbbbbbbb");
-		perms.add(hash3); // this is the one that's already there. If we don't include it, it'll get lost.
-		perms.add(hash4); // now we add dick to the address book
+
+		String[] perms = {"hash-aaaaaaaaaa","hash-bbbbbbbbbb"};
 		assertTrue(uf.setPermissions(u, perms));
 		
 		// dick and tom should be marked with permissions, harry not
@@ -284,8 +281,8 @@ public class UserDaoTest {
 
 		// getpermissions should return their hashes
 		List<IdentityHash> hashes = uf.getPermissions(u);
-		assert(hashes.contains(hash3));
-		assert(hashes.contains(hash4));
+		assertEquals(perms[0], hashes.get(0).getHash());
+		assertEquals(perms[1], hashes.get(1).getHash());
 		assertEquals(2, hashes.size());
 	}
 
@@ -293,9 +290,8 @@ public class UserDaoTest {
 	public void testSetPermissionsExistingUserPermissionRemoved() throws SQLException {
 		User u = uf.read(1);
 		// testGetPermissions() has already tested that user 1 has 1 permission in their address book
-		List<IdentityHash> perms = new ArrayList<IdentityHash>();
 
-		assertTrue(uf.setPermissions(u, perms)); // should remove all permissions
+		assertTrue(uf.setPermissions(u, new String[]{})); // should remove all permissions
 
 		// no-one should have any permissions now
 		List<AddressBookEntry> book = uf.getAddressBook(u.getId());
@@ -314,8 +310,7 @@ public class UserDaoTest {
 		// testGetPermissions() has already tested that user 1 has 1 permission in their address book
 		List<IdentityHash> perms = new ArrayList<IdentityHash>();
 		
-		perms.add(new IdentityHash(1, "hash-1234567890")); // a poor orphan IdentityHash
-		assertFalse(uf.setPermissions(u, perms));
+		assertFalse(uf.setPermissions(u, new String[]{"hash-1234567890"}));
 	}
 
 }

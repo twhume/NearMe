@@ -8,7 +8,7 @@ public class AddressBookParserTest {
 
 	@Test
 	public void test() {
-		String input = AddressBookServlet.convertStreamToString(getClass().getResourceAsStream("/test-address.json"));
+		String input = Util.convertStreamToString(getClass().getResourceAsStream("/test-address.json"));
 		POSTedAddressBookParser ape = new POSTedAddressBookParser();
 				
 		ape.parse(input);

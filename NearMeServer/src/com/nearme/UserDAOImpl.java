@@ -468,12 +468,6 @@ public class UserDAOImpl implements UserDAO {
 			if (c!=null) c.close();
 		}
 	}
-
-
-	@Override
-	public boolean setPermissions(User u, List<IdentityHash> perms) throws SQLException {
-		return setPermissions(u, Util.hashListAsStringArray(perms));
-	}
 	
 	public boolean setPermissions(User u, String[] perms) throws SQLException {
 		
