@@ -46,46 +46,15 @@ public class PermissionsServlet extends GenericNearMeServlet {
 				
 				resp.setContentType("application/json");
 				List<IdentityHash> perms = ud.getPermissions(u);
-				logger.info("permissions requested for "+ deviceId+": (" + getHashList(perms) + ")");
+				logger.info("permissions requested for "+ deviceId+": (" + Util.hashListAsString(perms) + ")");
 				Gson gson = new Gson();
-				resp.getOutputStream().print(gson.toJson(getStringArray(perms)));
+				resp.getOutputStream().print(gson.toJson(Util.hashListAsStringArray(perms)));
 			}
 		} catch (SQLException e) {
 			logger.error(e);
 			e.printStackTrace();
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}		
-	}
-	
-	/**
-	 * Helper method; takes a list of IdentityHashes and returns an array of Strings.
-	 * We do this to avoid passing IdentityHashes down to the client and confusing it
-	 * with yet another data-type.
-	 */
-	
-	private String[] getStringArray(List<IdentityHash> l) {
-		String[] s = new String[l.size()];
-		for (int i=0; i<l.size(); i++) {
-			s[i] = l.get(i).getHash();
-		}
-		return s;
-	}
-	
-	/**
-	 * Just used for logging; takes a list of IdentityHashes and returns a string of them, comma-separated
-	 * 
-	 * @param perms
-	 * @return
-	 */
-
-	private String getHashList(List<IdentityHash> perms) {
-		StringBuffer sb = new StringBuffer();
-		for (IdentityHash ih: perms) {
-			sb.append(ih.getHash());
-			sb.append(",");
-		}
-		if (perms.size()>0) sb.deleteCharAt(sb.length());
-		return sb.toString();
 	}
 	
 }
