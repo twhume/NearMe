@@ -76,7 +76,8 @@ public class PermissionsServlet extends GenericNearMeServlet {
 
 				Gson gson = new Gson();
 				String[] hashes = gson.fromJson(input, String[].class);
-				ud.setPermissions(u, hashes);
+				if (ud.setPermissions(u, hashes)) resp.sendError(HttpServletResponse.SC_OK);
+				else resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		} catch (SQLException e) {
 			logger.error(e);
