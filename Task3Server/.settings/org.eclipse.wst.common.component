@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="NearMeServer">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
@@ -8,3 +9,6 @@
         <property name="context-root" value="NearMeServer"/>
     </wb-module>
 </project-modules>
+=======
+<project-modules id="moduleCoreId"/>
+>>>>>>> dev/getPOIApp

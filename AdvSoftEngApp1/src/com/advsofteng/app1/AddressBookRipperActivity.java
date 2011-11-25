@@ -1,4 +1,4 @@
-package org.tomhume.ase.ripper;
+package com.advsofteng.app1;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -14,6 +14,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+//import org.tomhume.ase.ripper.R;
+//import org.tomhume.ase.ripper.AddressBookRipperActivity.GatherContactsTask;
+//import org.tomhume.ase.ripper.AddressBook;
+//import org.tomhume.ase.ripper.AddressBook;
+//import org.tomhume.ase.ripper.AddressBookRipperActivity.UploadContactsTask;
+//import org.tomhume.ase.ripper.AddressBook;
+//import org.tomhume.ase.ripper.AddressBookEntry;
+//import org.tomhume.ase.ripper.AddressBookRipperActivity.GatherContactsTask;
 
 import com.google.gson.Gson;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -32,16 +40,24 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class AddressBookRipperActivity extends Activity {
-
+	
 	private static final String TAG = "Ripper";
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
 	private static final String ENDPOINT = "http://192.168.1.98:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
+	AddressEntryAdapter adaptor = null;
+	boolean bHaveSomeContacts = false;
 	
 	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
 	private String ownNumber; /* Users own phone number */
@@ -50,29 +66,59 @@ public class AddressBookRipperActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-
-		Button ripButton = (Button) this.findViewById(R.id.btnRip);
-		gatherer = new GatherContactsTask();
+		setContentView(R.layout.contacts);
+		
 		
 		TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
 		countryCode = tm.getSimCountryIso();
 		ownNumber = tm.getLine1Number();
+		
+		
+
+		Button ripButton = (Button) this.findViewById(R.id.btnRip);
+		Button sendFriendList = (Button) this.findViewById(R.id.btnSendFriends);
+		//ListView list = (ListView)findViewById(R.id.friendslist);
+		
+		gatherer = new GatherContactsTask();
+		
+		if (gatherer.getStatus().equals(Status.RUNNING))
+			return;
+		if (gatherer.getStatus().equals(Status.FINISHED))
+			gatherer = new GatherContactsTask();
+		gatherer.execute();
+	
+		sendFriendList.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				//TODO: 1) update the selected friends' permissions and 2) post to server.....
+				
+				
+				//2)
+				uploadContacts(AdvSoftEngApp1Activity.globalAddressBook);
+				
+			}
+		});
+		//
 		
 		ripButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG, "CLICK!");
 
-				if (gatherer.getStatus().equals(Status.RUNNING))
-					return;
-				if (gatherer.getStatus().equals(Status.FINISHED))
-					gatherer = new GatherContactsTask();
-				gatherer.execute();
+				ListView list = (ListView)findViewById(R.id.friendslist);
+				adaptor = new AddressEntryAdapter();
+				
+				list.setAdapter(adaptor);
+				
 
 			}
 		});
+		
+		
+		
 	}
+	
+	////////////////////////////////////////////
 
 	private void uploadContacts(AddressBook a) {
     	UploadContactsTask uploader = new UploadContactsTask();
@@ -128,7 +174,8 @@ public class AddressBookRipperActivity extends Activity {
 		return new String(Base64.encode(bytes, 0));
 
 	}
-
+	////////////////////////////////////////////
+	
 	private class UploadContactsTask extends AsyncTask<AddressBook, Integer, Boolean> {
 
 		@Override
@@ -155,6 +202,7 @@ public class AddressBookRipperActivity extends Activity {
 			return true;
 		}
 	}
+
 	
 	/**
 	 * Private class to gather contacts from the on-phone address book and use
@@ -168,7 +216,16 @@ public class AddressBookRipperActivity extends Activity {
 
 		protected void onPostExecute(AddressBook result) {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
-			uploadContacts(result);
+			
+			AdvSoftEngApp1Activity.globalAddressBook = result;
+			
+			bHaveSomeContacts = true;
+			
+			
+			
+			
+			//TODO: make sure this gets called when user presses the Friends NearMe Button
+			//uploadContacts(result);
 		}
 
 		/**
@@ -229,5 +286,67 @@ public class AddressBookRipperActivity extends Activity {
 			return a;
 		}
 	}
+	
+	/*
+	 * Private Class that deals with our addressbook UI
+	 * 
+	 */
+	 class AddressEntryAdapter extends ArrayAdapter<AddressBookEntry> {
+		 AddressEntryAdapter() {
+		      super(AddressBookRipperActivity.this, 
+					R.layout.row,  
+					AdvSoftEngApp1Activity.globalAddressBook.getEntries());
+		    }
+		 
+		 
+		 public View getView(int position, View convertView, ViewGroup parent){
+			 
+			 View row=convertView;
+			 
+			 AddressHolder holder = null;
+			 
+			 if (row==null) { 
+				 LayoutInflater inflater=getLayoutInflater();
+			     row=inflater.inflate(R.layout.row, parent, false);
+			     holder=new AddressHolder(row);
+			     row.setTag(holder);
+				 
+			 }
+			 else{ // access existing row….
+				 holder=(AddressHolder)row.getTag();
+			 }
+			 holder.populateFrom(AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+			 
+			 return(row);
+		 }
+		 
+	 }
+
+	 // Loads addressBookEntries details into UI arrayAdaptor
+	 static class AddressHolder {
+		    private TextView name=null;
+		    private CheckBox friendCheckBox = null;
+		    private boolean bCheckBox = false;
+		    
+		    AddressHolder(View row) {
+		      name=(TextView)row.findViewById(R.id.row_name);
+		      friendCheckBox = (CheckBox)row.findViewById(R.id.row_checkbox);
+		      
+		    }
+		    
+		    void populateFrom(AddressBookEntry entry) {
+		    	
+		    	if(AddressBookEntry.PERM_SHOWN == entry.getPermission())
+		    		bCheckBox = true;
+		    	else
+		    		bCheckBox = false;
+		    	
+		        name.setText(entry.getName());
+		        friendCheckBox.setChecked(bCheckBox);
+		    
+		       
+		      }
+
+	 }
 
 }

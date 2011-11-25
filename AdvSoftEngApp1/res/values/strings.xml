@@ -2,8 +2,16 @@
 <resources>
 
     <string name="hello">Hello World, AdvSoftEngApp1Activity!</string>
-    <string name="app_name">AdvSoftEngApp1</string>
+    <string name="app_name">NearMe</string>
     <string name="no_gps_error">GPS not available</string>
     <string name="start_button_label">Start</string>
     <string name="stop_button_label">Stop</string>
+    <string name="poi_checkbox1">Restaurants</string>
+    <string name="poi_checkbox2">Pubs</string>
+    <string name="poi_checkbox3">Clubs</string>
+    <string name="poi_checkbox4">Museum</string>
+    <string name="get_poi_label">Get POIs</string>
+    <string name="map_poi_label">MAP POI</string>
+    <string name="tvRadiusText">Radius = </string>
+    <string name="serverAddress">http://nearme.tomhume.org:8080/NearMeServer/nearme/</string>
 </resources>
