@@ -1,5 +1,6 @@
 package com.nearme;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,7 +44,17 @@ public class UserDAOImpl implements UserDAO {
 	private static final String HASHMATCH_DELETE_SQL = "DELETE ah.* from addressBookHashMatcher ah, addressBook ab WHERE ab.ownerId = ? AND ah.addressBookId = ab.id";
 	private static final String BOOK_INSERT_SQL = "INSERT INTO addressBook (ownerId, name, permission) VALUES (?,?,?)";
 	private static final String MATCH_INSERT_SQL = "INSERT INTO addressBookHashMatcher (hashId, addressBookId) VALUES (?,?)";
-		
+
+	private static final String IDHASH_LIST_SQL = "SELECT ih.id, ih.hash from addressBook ab, addressBookHashMatcher hm, idHash ih WHERE ih.id = hm.hashId AND hm.addressBookId = ab.id and ab.ownerId = ? AND ab.permission = ?";
+
+	private static final String PERMS_RESET_SQL = "UPDATE addressBook SET permission = ? WHERE ownerId = ?";
+	private static final String PERMS_UPDATE_SQL = "UPDATE addressBook ab SET permission = ? WHERE ownerID = ? AND id IN (SELECT abHM.addressBookId FROM addressBookHashMatcher abhm, idHash h WHERE abhm.hashId = h.id AND h.hash IN (?,?,?,?,?,?,?,?,?,?))";
+	
+	/* See the comment for setPermissions() to understand what this is, and why it needs to match the 
+	 * number of question-marks in the subquery of PERMS_UPDATE_SQL
+	 */
+	private static final int PERM_UPDATE_COUNT = 10;
+	
 	private DataSource dataSource = null;
 	
 	public UserDAOImpl(DataSource d) {
@@ -433,6 +444,95 @@ public class UserDAOImpl implements UserDAO {
 			if (pst!=null) pst.close();
 			if (c!=null) c.close();
 		}
+	}
+
+	@Override
+	public List<IdentityHash> getPermissions(User u) throws SQLException {
+		Connection c = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		try {
+			c = dataSource.getConnection();
+			pst = c.prepareStatement(IDHASH_LIST_SQL);
+			pst.setInt(1, u.getId());
+			pst.setInt(2, AddressBookEntry.PERM_SHOWN);
+			rs = pst.executeQuery();
+			List<IdentityHash> ret = new ArrayList<IdentityHash>();
+			while (rs.next()) {
+				ret.add(new IdentityHash(rs.getInt(1), rs.getString(2)));
+			}
+			return ret;
+		} finally {
+			if (rs!=null) rs.close();
+			if (pst!=null) pst.close();
+			if (c!=null) c.close();
+		}
+	}
+	
+	public boolean setPermissions(User u, String[] perms) throws SQLException {
+		
+		
+		Connection c = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		try {
+			c = dataSource.getConnection();
+			
+			/* We wrap this whole operation in a transaction. This means that we can roll back the "resetting of permissions"
+			 * if it turns out that we're not making any changes further down the line
+			 */
+			
+			c.setAutoCommit(false);
+			/* First, set all permissions for this user to HIDDEN */
+			
+			pst = c.prepareStatement(PERMS_RESET_SQL); 
+			pst.setInt(1, AddressBookEntry.PERM_HIDDEN);
+			pst.setInt(2, u.getId());
+			int rows = pst.executeUpdate();
+			pst.close();
+			logger.debug("setPermissions reset " + rows);
+
+			/* Then, mark the ones we're interested in. This is more involved than it ought to be,
+			 * because the MySQL JDBC drivers don't let use use the setArray() method on a PreparedStatement
+			 * to pass in an array of stuff.
+			 * 
+			 * Instead, we have to have a query with an IN(?,?,?,?,?) clause and set each one of those 
+			 * substitutions to be null, or one of our values from our array... and then loop around
+			 * because, of course, we may have more friends to share with than are allowed for in that clause.
+			 * I kid you not.
+			 * */
+
+			pst = c.prepareStatement(PERMS_UPDATE_SQL);
+			pst.setInt(1, AddressBookEntry.PERM_SHOWN);
+			pst.setInt(2, u.getId());
+			rows = 0;
+			
+			for (int i=0; i<perms.length; i+= PERM_UPDATE_COUNT) {
+				for (int j=0; j<PERM_UPDATE_COUNT; j++) {
+					if (i+j<perms.length) {
+						logger.debug("set parameter " + (j+3) + " to hash " + (i+j));
+						pst.setString(j+3, perms[i+j]);
+					} else {
+						logger.debug("set parameter " + (j+3) + " to null");
+						pst.setString(j+3, null);
+					}
+				}
+				rows += pst.executeUpdate();
+				logger.debug("setPermissions updated " + rows);
+			}
+			if ((perms.length>0) && (rows==0)) return false; // the IdentityHash we were given wasn't linked to this user
+
+			c.commit();
+			c.setAutoCommit(true); // reset this to its usual setting
+			return true;
+		} finally {
+			if (rs!=null) rs.close();
+			if (pst!=null) pst.close();
+			if (c!=null) c.close();
+		}
+
+		
+		
 	}
 
 }

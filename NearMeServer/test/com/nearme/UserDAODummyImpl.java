@@ -4,6 +4,10 @@ package com.nearme;
  * For testing purposes: a sample UserFinder implementation that contains a single user
  * with an address-book of 3 friends.
  * 
+ * WARNING no longer used by unit tests and not kept up-to-date. Should probably be
+ * deleted - UserDaoTest now uses the "real" implementation of UserDao and therefore
+ * tests our SQL as well as our Java code.
+ * 
  */
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,7 +41,7 @@ public class UserDAODummyImpl implements UserDAO {
 		return null;
 	}
 
-	public Object readByDeviceId(String string) {
+	public User readByDeviceId(String string) {
 		if (string.equals("android-123456")) return testUserWithBook;
 		else if (string.equals("android-7890")) return testUserWithoutBook;
 		return null;
@@ -66,6 +70,19 @@ public class UserDAODummyImpl implements UserDAO {
 
 	@Override
 	public boolean setAddressBook(int id, List<AddressBookEntry> book) {
+		return false;
+	}
+
+	@Override
+	public List<IdentityHash> getPermissions(User u) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean setPermissions(User u, String[] perms)
+			throws SQLException {
+		// TODO Auto-generated method stub
 		return false;
 	}
 	

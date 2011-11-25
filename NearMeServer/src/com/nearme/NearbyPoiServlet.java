@@ -48,7 +48,7 @@ public class NearbyPoiServlet extends GenericNearMeServlet {
 			List<Poi> points = pf.find(pq);
 			logger.info("found " + points.size() + " POIs for user 1 within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
 			List<Poi> friends = uf.getNearestUsers(u, pq.getRadius());
-			logger.info("found " + friends.size() + " POIs for user 1 within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
+			logger.info("found " + friends.size() + " friends for user 1 within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
 			points.addAll(friends);
 			
 			/* Use GSon to serialise this list onto a JSON structure, and send it to the client.
