@@ -46,7 +46,6 @@ public class Util {
 
 	/**
 	 * Method cribbed from http://stackoverflow.com/questions/309424/in-java-how-do-a-read-convert-an-inputstream-in-to-a-string
-	 * TODO: move into a proper utility class
 	 * 
 	 * @param is
 	 * @return
