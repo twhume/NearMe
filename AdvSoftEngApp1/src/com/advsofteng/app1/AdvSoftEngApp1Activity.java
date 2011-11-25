@@ -42,6 +42,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private Button buttonGetPOI = null;			/* get POIs button*/
 	private Button buttonMap = null;         /* View Map POI Button*/
 	private Button buttonAddressBookRip = null;
+	private Button buttonAdd = null;
 	
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	public static AddressBook globalAddressBook = new AddressBook();
@@ -98,7 +99,23 @@ public class AdvSoftEngApp1Activity extends Activity {
 
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new AdvSoftEngLocationListener(this));
 		
-	  //*************************************
+		
+	   //**********************************
+		// Deal with add favourite button
+		buttonAdd=  (Button) findViewById(R.id.addButton);
+	    buttonAdd.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				Intent intentAdd = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
+				
+				startActivity(intentAdd);
+				
+			}
+	       });
+	        
+		
+		
+	   //*************************************
         //Deal with view map button
        
        buttonMap=  (Button) findViewById(R.id.mapButton);
@@ -112,8 +129,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 		}
        });
         
-       //*********************************
-     
+ 
         //////////////////////////////////////////
         // deals with getPOI button.
         buttonGetPOI = (Button) findViewById(R.id.getPOIButton);

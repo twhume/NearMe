@@ -33,11 +33,12 @@
             android:label="@string/get_poi_label"
             android:name=".GetPOIActivity">            
         </activity>
-        
         <activity 
             android:name=".AddressBookRipperActivity">
         </activity>
-                    
+        <activity
+            android:name=".addPlace">            
+        </activity>
         <receiver  android:process=":remote" android:name="LocationPoster"></receiver>
     </application>
 
