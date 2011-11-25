@@ -41,8 +41,10 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private Button button = null;				/* start/stop button */
 	private Button buttonGetPOI = null;			/* get POIs button*/
 	private Button buttonMap = null;         /* View Map POI Button*/
+	private Button buttonAddressBookRip = null;
 	
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
+	public static AddressBook globalAddressBook = new AddressBook();
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,6 +134,21 @@ public class AdvSoftEngApp1Activity extends Activity {
         // 
         /////////////////////////////
         
+        //////////////////////////////
+        //
+        
+        buttonAddressBookRip = (Button) findViewById(R.id.launchAddressBookRipper);
+        buttonAddressBookRip.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				Intent intentAddressRip = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
+				startActivity(intentAddressRip);
+				
+				
+			}
+		});
         
         
         

@@ -36,12 +36,17 @@
         android:text="Get POIs" />
 
     <Button
+        android:id="@+id/launchAddressBookRipper"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Friends NearMe" />
+
+    <Button
         android:id="@+id/mapButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:visibility="invisible"        
-        android:text="View Map POI" />
-
+        android:text="View Map POI"
+        android:visibility="invisible" />
 
 </LinearLayout>
