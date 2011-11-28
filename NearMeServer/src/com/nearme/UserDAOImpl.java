@@ -30,7 +30,7 @@ public class UserDAOImpl implements UserDAO {
 	private static final String READ_HASH_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE idHash.hash = ? AND idHash.id = user.hashId";
 	private static final String READ_DEVICE_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE user.deviceId = ? AND idHash.id = user.hashId";
 	private static final String READ_AB_SQL = "SELECT ab.id, ab.name, ab.permission, ih.id, ih.hash FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ab.ownerId = ? AND abhm.addressBookId = ab.id AND abhm.hashId = ih.id ORDER BY ab.name";
-	private static final String NEAREST_SQL = "SELECT u2.*, ab.name, ( 6371 * acos( cos( radians(-123.45) ) * cos( radians( u2.latitude ) ) * cos( radians( u2.longitude ) - radians(-45.37) ) + sin( radians(-123.45) ) * sin( radians( u2.latitude ) ) ) ) AS distance FROM user u, addressBook ab, addressBookHashMatcher abhm, user u2 WHERE u.id = 1 AND u.id = ab.ownerId AND abhm.addressBookId = ab.id AND abhm.hashId = u2.hashId  HAVING distance < ? ORDER BY distance";
+	private static final String NEAREST_SQL = "SELECT u2.*, ab.name, ( 6371 * acos( cos( radians(?) ) * cos( radians( u2.latitude ) ) * cos( radians( u2.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( u2.latitude ) ) ) ) AS distance FROM user u, addressBook ab, addressBookHashMatcher abhm, user u2 WHERE u.id = ? AND u.id = ab.ownerId AND abhm.addressBookId = ab.id AND abhm.hashId = u2.hashId  HAVING distance < ? ORDER BY distance";
 
 	private static final String USER_INSERT_SQL = "INSERT INTO user (deviceId, hashId, latitude, longitude, lastReport) VALUES (?,?,?,?,?)";
 	private static final String USER_UPDATE_POSITION_SQL = "UPDATE user SET latitude = ?, longitude = ?, lastReport = ? WHERE id = ?";
@@ -188,6 +188,7 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public List<Poi> getNearestUsers(User u, int radius) throws SQLException {
+		logger.debug("getNearestUsers() lat="+u.getLastPosition().getLatitude()+",long="+u.getLastPosition().getLongitude()+",id="+u.getId()+",radius="+radius);
 		Connection c = null;
 		PreparedStatement pst = null;
 		ResultSet rs = null;
