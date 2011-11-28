@@ -12,14 +12,14 @@ public class AddressBookEntry {
 	private User owner = null; /* Owner of this entry */
 	private String name; /* Name in address-book of this entry */
 	private int permission = PERM_HIDDEN; /* Permission granted to this entry */
-	private List<IdentityHash> hashes; /* List of IdentityHashes associated with this AddressBookEntry */
-	public AddressBookEntry(int i, User u, String n, int p, List<IdentityHash> h) {
+	private List<String> hashes; /* List of Hashes associated with this AddressBookEntry */
+	public AddressBookEntry(int i, User u, String n, int p, List<String> h) {
 		this(n,h,p);
 		this.id = i;
 		this.owner = u;
 	}
 
-	public AddressBookEntry(String n, List<IdentityHash> h, int p) {
+	public AddressBookEntry(String n, List<String> h, int p) {
 		this.name = n;
 		this.permission = p;
 		this.hashes = h;
@@ -52,21 +52,13 @@ public class AddressBookEntry {
 	public void setPermission(int permission) {
 		this.permission = permission;
 	}
-	public List<IdentityHash> getHashes() {
+	public List<String> getHashes() {
 		return hashes;
 	}
-	public void setHashes(List<IdentityHash> hashes) {
+	public void setHashes(List<String> hashes) {
 		this.hashes = hashes;
 	}
 	
-	public void setHashes(ArrayList<String> strHash){
-		//TODO: IMPORTANT!!! - THIS IS JUST A TEMP HACK
-		//TODO: SPEAK TO TOM ABOUT HASHES AND STRING ARRAYLISTS... THIS IS CALLED FROM 
-		// ADDRESSBOOKRIPPERACTIVITY.....
-		
-		//this.hashes.add(strHash);
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

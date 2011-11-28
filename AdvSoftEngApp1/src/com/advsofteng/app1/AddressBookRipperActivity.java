@@ -54,7 +54,7 @@ public class AddressBookRipperActivity extends Activity {
 	
 	private static final String TAG = "Ripper";
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
-	private static final String ENDPOINT = "http://192.168.1.98:8080/NearMeServer/addressBook";
+	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
 	AddressEntryAdapter adaptor = null;
 	boolean bHaveSomeContacts = false;
@@ -179,16 +179,16 @@ public class AddressBookRipperActivity extends Activity {
 	private class UploadContactsTask extends AsyncTask<AddressBook, Integer, Boolean> {
 
 		@Override
-		protected Boolean doInBackground(AddressBook... abe) {
+		protected Boolean doInBackground(AddressBook... ab) {
 			Gson gson = new Gson();
-			Log.i(TAG, "Got entries " + abe[0].getEntries().size());
+			Log.i(TAG, "Got entries " + ab[0].getEntries().size());
 			
 			
 			HttpClient client = new DefaultHttpClient();
 			HttpPost post = new HttpPost(ENDPOINT);
 
 			try {
-				HttpEntity ent = new StringEntity(gson.toJson(abe[0]));
+				HttpEntity ent = new StringEntity(gson.toJson(ab[0]));
 				post.setEntity(ent);
 				HttpResponse response = client.execute(post);
 				Log.i(TAG, "post to " + ENDPOINT + " done, response="+response.getStatusLine().getStatusCode());
@@ -264,12 +264,14 @@ public class AddressBookRipperActivity extends Activity {
 				do {
 
 					if (!managedCursor.getString(3).equals(lastId)) {
+						Log.d(TAG, "------");
 						abe.setHashes(hashes);
 						entries.add(abe);
 						abe = new AddressBookEntry();
 						abe.setName(managedCursor.getString(1));
 						hashes = new ArrayList<String>();
 					}
+					Log.d(TAG, "adding to hashes:" + hashMsisdn(managedCursor.getString(2)) + " from " + managedCursor.getString(2));
 
 					hashes.add(hashMsisdn(managedCursor.getString(2))); 
 					lastId = managedCursor.getString(3);
