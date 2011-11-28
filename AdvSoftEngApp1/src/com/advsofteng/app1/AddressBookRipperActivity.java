@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -40,10 +41,13 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -77,7 +81,7 @@ public class AddressBookRipperActivity extends Activity {
 
 		Button ripButton = (Button) this.findViewById(R.id.btnRip);
 		Button sendFriendList = (Button) this.findViewById(R.id.btnSendFriends);
-		//ListView list = (ListView)findViewById(R.id.friendslist);
+		final ListView list = (ListView)findViewById(R.id.friendslist);
 		
 		gatherer = new GatherContactsTask();
 		
@@ -86,6 +90,42 @@ public class AddressBookRipperActivity extends Activity {
 		if (gatherer.getStatus().equals(Status.FINISHED))
 			gatherer = new GatherContactsTask();
 		gatherer.execute();
+		
+		//////
+		// new code to try and save list entries checkbox state to addressbook list's permissions....
+		list.setOnItemClickListener(new OnItemClickListener(){
+			
+			// TODO: check all this code...
+			// do we need the permsission state to be saved????
+			@Override
+			public void onItemClick(AdapterView arg0, View arg1, int arg2, long arg3) {
+				
+				SparseBooleanArray a = list.getCheckedItemPositions();
+				List<AddressBookEntry> listAddresses =  ((List<AddressBookEntry>) AdvSoftEngApp1Activity.globalAddressBook.getEntries());
+				Log.i(TAG, "In onItemClick...");
+				for(int i = 0; i < AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++ ){
+					
+					if(a.valueAt(i)){ // need to get individual elements in the list... and how to check we are accessing the row's checkbox ????
+
+						listAddresses.get(i).setPermission(AddressBookEntry.PERM_SHOWN);
+						Log.i(TAG, "a.valueAt(i) == true");
+						Log.i(TAG,listAddresses.get(i).getName());
+
+						// may need this???? check...
+						//list.getAdapter().getItemViewType(i);
+					}
+					else // box is unchecked...
+					{
+						Log.i(TAG, "a.valueAt(i) == false");
+						Log.i(TAG,listAddresses.get(i).getName());
+						listAddresses.get(i).setPermission(AddressBookEntry.PERM_HIDDEN);
+					}
+				}
+			}
+			
+		});
+		// .. end of new code....
+		///////////////////////////////////
 	
 		sendFriendList.setOnClickListener(new OnClickListener(){
 			@Override
@@ -105,7 +145,7 @@ public class AddressBookRipperActivity extends Activity {
 			public void onClick(View v) {
 				Log.i(TAG, "CLICK!");
 
-				ListView list = (ListView)findViewById(R.id.friendslist);
+				//ListView list = (ListView)findViewById(R.id.friendslist);
 				adaptor = new AddressEntryAdapter();
 				
 				list.setAdapter(adaptor);
@@ -113,6 +153,8 @@ public class AddressBookRipperActivity extends Activity {
 
 			}
 		});
+		
+		
 		
 		
 		
@@ -297,6 +339,7 @@ public class AddressBookRipperActivity extends Activity {
 					R.layout.row,  
 					AdvSoftEngApp1Activity.globalAddressBook.getEntries());
 		    }
+		 
 		 
 		 
 		 public View getView(int position, View convertView, ViewGroup parent){
