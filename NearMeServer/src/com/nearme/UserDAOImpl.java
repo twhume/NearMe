@@ -188,12 +188,16 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public List<Poi> getNearestUsers(User u, int radius) throws SQLException {
+		List<Poi> ret = new ArrayList<Poi>();
+		if (u==null) {
+			logger.debug("getNearestUsers() u=null,radius="+radius);
+			return ret; /* By definition we have no nearby friends for users we don't know! */
+		}
 		logger.debug("getNearestUsers() lat="+u.getLastPosition().getLatitude()+",long="+u.getLastPosition().getLongitude()+",id="+u.getId()+",radius="+radius);
 		Connection c = null;
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		
-		List<Poi> ret = new ArrayList<Poi>();
 		try {
 			c = dataSource.getConnection();
 			pst = c.prepareStatement(NEAREST_SQL);

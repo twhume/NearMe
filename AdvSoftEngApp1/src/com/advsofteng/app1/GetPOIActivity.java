@@ -1,26 +1,20 @@
 package com.advsofteng.app1;
 
-import java.util.ArrayList;
-
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-//import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
@@ -137,11 +131,20 @@ public class GetPOIActivity extends Activity {
    					
    					// At this point WE KNOW that prefs have phone's current GPS co-ords - thats all working...
    					// Testing block - to delete.... see above notes... 
-  					HttpGet get = new HttpGet(ENDPOINT + "/" + String.valueOf(testLatitude) 
+   					
+   					/* Android ID is calculated according to code from
+   					 * http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
+   					 */
+   						
+   					String androidId = Secure.getString(getApplicationContext().getContentResolver(),Secure.ANDROID_ID);
+   					
+  					HttpGet get = new HttpGet(ENDPOINT + "/" + androidId + "/" + String.valueOf(testLatitude) 
 									+ "/" + String.valueOf(testLongitude)
 									+ "/" + intRadius.toString()
 									+ "/" + "1");   					
-   	   												
+
+	   					Log.d("GetPoiActivity", "get="+get.getURI());
+
   					// end of testing block to delete...
 
    					/* Create a new HTTPClient to do our POST for us */
@@ -162,7 +165,7 @@ public class GetPOIActivity extends Activity {
 
    					try
    					{
-   	   					
+   	   					Log.d("GetPoiActivity", "json="+responseBody);
    	   				    JsonParser parser = new JsonParser();
    	   				    JsonArray array = parser.parse(responseBody).getAsJsonArray();
    	   				    

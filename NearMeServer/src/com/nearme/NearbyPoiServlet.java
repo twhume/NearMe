@@ -44,7 +44,7 @@ public class NearbyPoiServlet extends GenericNearMeServlet {
 	
 			/* Get a list of all nearby points of interest and add in nearby friends */
 			
-			User u = uf.read(1); //TODO fix grotty hardcoding, take device-ID from URL
+			User u = uf.readByDeviceId(pq.getAndroidId());
 			List<Poi> points = pf.find(pq);
 			logger.info("found " + points.size() + " POIs for user 1 within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
 			List<Poi> friends = uf.getNearestUsers(u, pq.getRadius());
