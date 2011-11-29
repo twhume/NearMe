@@ -50,9 +50,9 @@ import android.widget.Toast;
 
 public class AddressBookRipperActivity extends Activity {
 	
-	private static final String TAG = "Ripper";
+	private static final String TAG = "Ripper"; 
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
-	private static final String ENDPOINT = "http://192.168.1.98:8080/NearMeServer/addressBook";
+	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
 	AddressEntryAdapter adaptor = null;
 	
