@@ -15,14 +15,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-//import org.tomhume.ase.ripper.R;
-//import org.tomhume.ase.ripper.AddressBookRipperActivity.GatherContactsTask;
-//import org.tomhume.ase.ripper.AddressBook;
-//import org.tomhume.ase.ripper.AddressBook;
-//import org.tomhume.ase.ripper.AddressBookRipperActivity.UploadContactsTask;
-//import org.tomhume.ase.ripper.AddressBook;
-//import org.tomhume.ase.ripper.AddressBookEntry;
-//import org.tomhume.ase.ripper.AddressBookRipperActivity.GatherContactsTask;
 
 import com.google.gson.Gson;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -41,18 +33,20 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
-import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
+//import apt.tutorial.R;
+import android.widget.Toast;
 
 public class AddressBookRipperActivity extends Activity {
 	
@@ -61,7 +55,6 @@ public class AddressBookRipperActivity extends Activity {
 	private static final String ENDPOINT = "http://192.168.1.98:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
 	AddressEntryAdapter adaptor = null;
-	boolean bHaveSomeContacts = false;
 	
 	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
 	private String ownNumber; /* Users own phone number */
@@ -81,7 +74,7 @@ public class AddressBookRipperActivity extends Activity {
 
 		Button ripButton = (Button) this.findViewById(R.id.btnRip);
 		Button sendFriendList = (Button) this.findViewById(R.id.btnSendFriends);
-		final ListView list = (ListView)findViewById(R.id.friendslist);
+		//ListView list = (ListView)findViewById(R.id.friendslist);
 		
 		gatherer = new GatherContactsTask();
 		
@@ -90,50 +83,11 @@ public class AddressBookRipperActivity extends Activity {
 		if (gatherer.getStatus().equals(Status.FINISHED))
 			gatherer = new GatherContactsTask();
 		gatherer.execute();
-		
-		//////
-		// new code to try and save list entries checkbox state to addressbook list's permissions....
-		list.setOnItemClickListener(new OnItemClickListener(){
-			
-			// TODO: check all this code...
-			// do we need the permsission state to be saved????
-			@Override
-			public void onItemClick(AdapterView arg0, View arg1, int arg2, long arg3) {
-				
-				SparseBooleanArray a = list.getCheckedItemPositions();
-				List<AddressBookEntry> listAddresses =  ((List<AddressBookEntry>) AdvSoftEngApp1Activity.globalAddressBook.getEntries());
-				Log.i(TAG, "In onItemClick...");
-				for(int i = 0; i < AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++ ){
-					
-					if(a.valueAt(i)){ // need to get individual elements in the list... and how to check we are accessing the row's checkbox ????
-
-						listAddresses.get(i).setPermission(AddressBookEntry.PERM_SHOWN);
-						Log.i(TAG, "a.valueAt(i) == true");
-						Log.i(TAG,listAddresses.get(i).getName());
-
-						// may need this???? check...
-						//list.getAdapter().getItemViewType(i);
-					}
-					else // box is unchecked...
-					{
-						Log.i(TAG, "a.valueAt(i) == false");
-						Log.i(TAG,listAddresses.get(i).getName());
-						listAddresses.get(i).setPermission(AddressBookEntry.PERM_HIDDEN);
-					}
-				}
-			}
-			
-		});
-		// .. end of new code....
-		///////////////////////////////////
 	
 		sendFriendList.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				//TODO: 1) update the selected friends' permissions and 2) post to server.....
-				
-				
-				//2)
+
 				uploadContacts(AdvSoftEngApp1Activity.globalAddressBook);
 				
 			}
@@ -145,16 +99,18 @@ public class AddressBookRipperActivity extends Activity {
 			public void onClick(View v) {
 				Log.i(TAG, "CLICK!");
 
-				//ListView list = (ListView)findViewById(R.id.friendslist);
+				ListView list = (ListView)findViewById(R.id.friendslist);
 				adaptor = new AddressEntryAdapter();
 				
 				list.setAdapter(adaptor);
+				
+				//list.setOnItemClickListener(onListClick);
 				
 
 			}
 		});
 		
-		
+		// place check/uncheck box here????
 		
 		
 		
@@ -223,14 +179,43 @@ public class AddressBookRipperActivity extends Activity {
 		@Override
 		protected Boolean doInBackground(AddressBook... abe) {
 			Gson gson = new Gson();
-			Log.i(TAG, "Got entries " + abe[0].getEntries().size());
+			Log.i(TAG, "Got " + abe[0].getEntries().size() + " total entries");
 			
+			// now go through and add entries that are not PERM_HIDDEN to the addressbook that will be sent to server...
+			AddressBook shownAddressBook = new AddressBook();
+			ArrayList<AddressBookEntry> shownEntries = new ArrayList<AddressBookEntry>();
+			
+			// copy over the main addressbook state data before we select and copy over individual addressbook entries
+			
+			shownAddressBook.setDeviceId(AdvSoftEngApp1Activity.globalAddressBook.getDeviceId());
+			shownAddressBook.setOwnerHash(AdvSoftEngApp1Activity.globalAddressBook.getOwnerHash());
+			
+			for(int i = 0; i < abe[0].getEntries().size(); i++){
+				
+				int iPermission = ((AddressBookEntry)AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i)).getPermission();
+				
+				if (AddressBookEntry.PERM_HIDDEN != iPermission){
+					
+					AddressBookEntry shownAddBkEntry = new AddressBookEntry();
+					
+					CopyAddressBookEntry(((AddressBookEntry)AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i)), shownAddBkEntry );
+			
+					shownEntries.add(shownAddBkEntry);
+				}
+			}
+			
+			shownAddressBook.setEntries(shownEntries);
+			
+			Log.i(TAG, "Got " + shownAddressBook.getEntries().size() + " entries to be sent to server");
 			
 			HttpClient client = new DefaultHttpClient();
 			HttpPost post = new HttpPost(ENDPOINT);
 
 			try {
-				HttpEntity ent = new StringEntity(gson.toJson(abe[0]));
+				 //TODO: changed below line to line 2 down... need to test...
+				//HttpEntity ent = new StringEntity(gson.toJson(abe[0]));   // swapped this....
+				HttpEntity ent = new StringEntity(gson.toJson(shownAddressBook)); // with this.....
+				
 				post.setEntity(ent);
 				HttpResponse response = client.execute(post);
 				Log.i(TAG, "post to " + ENDPOINT + " done, response="+response.getStatusLine().getStatusCode());
@@ -243,6 +228,17 @@ public class AddressBookRipperActivity extends Activity {
 			
 			return true;
 		}
+	}
+	
+	void CopyAddressBookEntry(AddressBookEntry originalAddBookEnt, AddressBookEntry copiedAddBookEnt ){
+		
+		copiedAddBookEnt.setHashes(originalAddBookEnt.getHashes());
+		copiedAddBookEnt.setId(originalAddBookEnt.getId());
+		copiedAddBookEnt.setName(originalAddBookEnt.getName());
+		copiedAddBookEnt.setOwner(originalAddBookEnt.getOwner());
+		copiedAddBookEnt.setPermission(originalAddBookEnt.getPermission());
+		
+		return;
 	}
 
 	
@@ -260,11 +256,6 @@ public class AddressBookRipperActivity extends Activity {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
 			
 			AdvSoftEngApp1Activity.globalAddressBook = result;
-			
-			bHaveSomeContacts = true;
-			
-			
-			
 			
 			//TODO: make sure this gets called when user presses the Friends NearMe Button
 			//uploadContacts(result);
@@ -341,17 +332,33 @@ public class AddressBookRipperActivity extends Activity {
 		    }
 		 
 		 
-		 
-		 public View getView(int position, View convertView, ViewGroup parent){
+		 public View getView( int position, View convertView, ViewGroup parent){
 			 
 			 View row=convertView;
-			 
 			 AddressHolder holder = null;
-			 
+			 final AddressBookEntry currentEntry = ((AddressBookEntry)AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+
 			 if (row==null) { 
 				 LayoutInflater inflater=getLayoutInflater();
 			     row=inflater.inflate(R.layout.row, parent, false);
 			     holder=new AddressHolder(row);
+			     
+			     holder.friendCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+			    	 @Override
+                     public void onCheckedChanged(CompoundButton buttonView,
+                             boolean isChecked) {
+		    		 
+			    		 if(buttonView.isChecked())
+			    			 currentEntry.setPermission(AddressBookEntry.PERM_SHOWN);
+			    		 else
+			    			 currentEntry.setPermission(AddressBookEntry.PERM_HIDDEN);
+			    		 
+			    		 //Log.i(TAG, "Name = " + currentEntry.getName() + " Permission = " + currentEntry.getPermission());
+			    		 
+                     }
+
+			     });
+			     
 			     row.setTag(holder);
 				 
 			 }
