@@ -9,7 +9,6 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-
   <servlet>
     <description></description>
     <display-name>NearbyPoi</display-name>
@@ -20,7 +19,6 @@
     <servlet-name>NearbyPoiServlet</servlet-name>
     <url-pattern>/nearme/*</url-pattern>
   </servlet-mapping>
-
   <servlet>
     <description></description>
     <display-name>AddressBook</display-name>
@@ -31,8 +29,6 @@
     <servlet-name>AddressBookServlet</servlet-name>
     <url-pattern>/addressBook/*</url-pattern>
   </servlet-mapping>
-
-
   <servlet>
     <description></description>
     <display-name>ServletTask3</display-name>
@@ -43,15 +39,20 @@
     <servlet-name>ServletTask3</servlet-name>
     <url-pattern>/ServletTask3</url-pattern>
   </servlet-mapping>
- 
-  <resource-ref> 
-<description>DB Connection</description> 
-<res-ref-name>jdbc/nearme</res-ref-name> 
-<res-type>javax.sql.DataSource</res-type> 
-<res-auth>Container</res-auth> 
-</resource-ref> 
-
-
-  
-
+  <resource-ref>
+    <description>DB Connection</description>
+    <res-ref-name>jdbc/nearme</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+  <servlet>
+    <description></description>
+    <display-name>AddPOIServlet</display-name>
+    <servlet-name>AddPOIServlet</servlet-name>
+    <servlet-class>com.nearme.AddPOIServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddPOIServlet</servlet-name>
+    <url-pattern>/AddPOIServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
