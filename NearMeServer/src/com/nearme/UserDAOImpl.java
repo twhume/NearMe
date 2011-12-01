@@ -47,7 +47,7 @@ public class UserDAOImpl implements UserDAO {
 	private static final String IDHASH_LIST_SQL = "SELECT ih.id, ih.hash from addressBook ab, addressBookHashMatcher hm, idHash ih WHERE ih.id = hm.hashId AND hm.addressBookId = ab.id and ab.ownerId = ? AND ab.permission = ?";
 
 	private static final String PERMS_RESET_SQL = "UPDATE addressBook SET permission = ? WHERE ownerId = ?";
-	private static final String PERMS_UPDATE_SQL = "UPDATE addressBook ab SET permission = ? WHERE ownerID = ? AND id IN (SELECT abHM.addressBookId FROM addressBookHashMatcher abhm, idHash h WHERE abhm.hashId = h.id AND h.hash IN (?,?,?,?,?,?,?,?,?,?))";
+	private static final String PERMS_UPDATE_SQL = "UPDATE addressBook ab SET permission = ? WHERE ownerID = ? AND id IN (SELECT abhm.addressBookId FROM addressBookHashMatcher abhm, idHash h WHERE abhm.hashId = h.id AND h.hash IN (?,?,?,?,?,?,?,?,?,?))";
 	
 	private static final String USER_DELETE_SQL = "DELETE FROM user WHERE id = ?";
 	
