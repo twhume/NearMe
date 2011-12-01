@@ -45,10 +45,6 @@ public class GetPOIActivity extends Activity {
 	// string holding the server address
 	private static  String ENDPOINT =null; 
 	private static final String tagPOI = "GetPOIActivity"; // used for logging
-	//TODO: delete these variables when we are done testing GPS and JSON.
-	private double testLongitude = -12.257; // longitude value of "Warung Tujuh" restaurant 
-	private double testLatitude = 49.56;    // latitude value of "Warung Tujuh" restaurant 
-	//
  
 	
 	
@@ -120,10 +116,8 @@ public class GetPOIActivity extends Activity {
    	   												+ "/" + intRadius.toString()
    	   												+ "/" + "1");
    	   				
-   	   				//TODO: (2) 
-   	   				 * remove this testing block once we know we are getting data from the prefs
-   					//testing to see if we are getting long and lat data...  
-   					Log.i(tagPOI, "Long from prefs = "+ prefs.getString("longitude", ""));
+   	   				//TODO: (2)  
+   	   				 * remove this testing block once we know we are String("longitude", ""));
    					Log.i(tagPOI, "lat from prefs = " + prefs.getString("latitude", ""));
    					 * 
    	   				*/
@@ -138,8 +132,8 @@ public class GetPOIActivity extends Activity {
    						
    					String androidId = Secure.getString(getApplicationContext().getContentResolver(),Secure.ANDROID_ID);
    					
-  					HttpGet get = new HttpGet(ENDPOINT + "/" + androidId + "/" + String.valueOf(testLatitude) 
-									+ "/" + String.valueOf(testLongitude)
+  					HttpGet get = new HttpGet(ENDPOINT + "/" + androidId + "/" + String.valueOf(prefs.getString("latitude", "")) 
+									+ "/" + String.valueOf(prefs.getString("longitude", ""))
 									+ "/" + intRadius.toString()
 									+ "/" + "1");   					
 
