@@ -38,16 +38,19 @@ public class UnsubscribeServlet extends GenericNearMeServlet {
 			/* User doesn't exist? return 404 */
 			
 			if (u==null) {
+				logger.info("unsubscription requested for unknown user " + deviceId);
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			} else {
 
 				ud.deleteUser(u);
 				resp.sendError(HttpServletResponse.SC_OK);
+				logger.info("unsubscribed user " + u.getId());
 			}
 		} catch (SQLException e) {
 			logger.error(e);
 			e.printStackTrace();
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			logger.info("unsubscription failed with " + e);
 		}		
 	}
 
