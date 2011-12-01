@@ -36,7 +36,7 @@ import android.widget.TextView;
  */
 public class AdvSoftEngApp1Activity extends Activity {
 
-	public static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/";
+	public static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer";
 	public static final String TAG = "LocationPoster";	/* used for logging purposes */
 	public static final int MAGIC_NUMBER = 12345;		/* used as a reference to an Alarm */
 	public static String DEVICE_ID = null;
