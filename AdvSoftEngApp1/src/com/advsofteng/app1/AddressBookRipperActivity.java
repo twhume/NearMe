@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -14,14 +15,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-//import org.tomhume.ase.ripper.R;
-//import org.tomhume.ase.ripper.AddressBookRipperActivity.GatherContactsTask;
-//import org.tomhume.ase.ripper.AddressBook;
-//import org.tomhume.ase.ripper.AddressBook;
-//import org.tomhume.ase.ripper.AddressBookRipperActivity.UploadContactsTask;
-//import org.tomhume.ase.ripper.AddressBook;
-//import org.tomhume.ase.ripper.AddressBookEntry;
-//import org.tomhume.ase.ripper.AddressBookRipperActivity.GatherContactsTask;
 
 import com.google.gson.Gson;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -40,24 +33,28 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
+//import apt.tutorial.R;
+import android.widget.Toast;
 
 public class AddressBookRipperActivity extends Activity {
 	
-	private static final String TAG = "Ripper";
+	private static final String TAG = "Ripper"; 
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
 	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
 	AddressEntryAdapter adaptor = null;
-	boolean bHaveSomeContacts = false;
 	
 	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
 	private String ownNumber; /* Users own phone number */
@@ -90,10 +87,7 @@ public class AddressBookRipperActivity extends Activity {
 		sendFriendList.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				//TODO: 1) update the selected friends' permissions and 2) post to server.....
-				
-				
-				//2)
+
 				uploadContacts(AdvSoftEngApp1Activity.globalAddressBook);
 				
 			}
@@ -110,9 +104,13 @@ public class AddressBookRipperActivity extends Activity {
 				
 				list.setAdapter(adaptor);
 				
+				//list.setOnItemClickListener(onListClick);
+				
 
 			}
 		});
+		
+		// place check/uncheck box here????
 		
 		
 		
@@ -183,7 +181,6 @@ public class AddressBookRipperActivity extends Activity {
 			Gson gson = new Gson();
 			Log.i(TAG, "Got entries " + ab[0].getEntries().size());
 			
-			
 			HttpClient client = new DefaultHttpClient();
 			HttpPost post = new HttpPost(ENDPOINT);
 
@@ -202,6 +199,17 @@ public class AddressBookRipperActivity extends Activity {
 			return true;
 		}
 	}
+	
+	void CopyAddressBookEntry(AddressBookEntry originalAddBookEnt, AddressBookEntry copiedAddBookEnt ){
+		
+		copiedAddBookEnt.setHashes(originalAddBookEnt.getHashes());
+		copiedAddBookEnt.setId(originalAddBookEnt.getId());
+		copiedAddBookEnt.setName(originalAddBookEnt.getName());
+		copiedAddBookEnt.setOwner(originalAddBookEnt.getOwner());
+		copiedAddBookEnt.setPermission(originalAddBookEnt.getPermission());
+		
+		return;
+	}
 
 	
 	/**
@@ -218,11 +226,6 @@ public class AddressBookRipperActivity extends Activity {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
 			
 			AdvSoftEngApp1Activity.globalAddressBook = result;
-			
-			bHaveSomeContacts = true;
-			
-			
-			
 			
 			//TODO: make sure this gets called when user presses the Friends NearMe Button
 			//uploadContacts(result);
@@ -301,16 +304,33 @@ public class AddressBookRipperActivity extends Activity {
 		    }
 		 
 		 
-		 public View getView(int position, View convertView, ViewGroup parent){
+		 public View getView( int position, View convertView, ViewGroup parent){
 			 
 			 View row=convertView;
-			 
 			 AddressHolder holder = null;
-			 
+			 final AddressBookEntry currentEntry = ((AddressBookEntry)AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+
 			 if (row==null) { 
 				 LayoutInflater inflater=getLayoutInflater();
 			     row=inflater.inflate(R.layout.row, parent, false);
 			     holder=new AddressHolder(row);
+			     
+			     holder.friendCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+			    	 @Override
+                     public void onCheckedChanged(CompoundButton buttonView,
+                             boolean isChecked) {
+		    		 
+			    		 if(buttonView.isChecked())
+			    			 currentEntry.setPermission(AddressBookEntry.PERM_SHOWN);
+			    		 else
+			    			 currentEntry.setPermission(AddressBookEntry.PERM_HIDDEN);
+			    		 
+			    		 //Log.i(TAG, "Name = " + currentEntry.getName() + " Permission = " + currentEntry.getPermission());
+			    		 
+                     }
+
+			     });
+			     
 			     row.setTag(holder);
 				 
 			 }
