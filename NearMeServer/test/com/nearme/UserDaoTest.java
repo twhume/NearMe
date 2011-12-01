@@ -132,9 +132,7 @@ public class UserDaoTest {
 
 	@Test
 	public void testUpdateHashForExistingUser() throws SQLException {
-		String userCountSQL = "SELECT COUNT(id) FROM user";
-		ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
-		int numUsersBefore = asr.runQuery(userCountSQL);
+		int numUsersBefore = countUsers();
 		String newHash = "updated-hash";
 		User u = uf.read(2);
 		u.setMsisdnHash(newHash);
@@ -148,15 +146,13 @@ public class UserDaoTest {
 		
 		/* Check there are no new users */
 		
-		int numUsersAfter = asr.runQuery(userCountSQL);
+		int numUsersAfter = countUsers();
 		assertEquals(numUsersAfter, numUsersBefore);
 	}
 
 	@Test
 	public void testUpdatePositionForExistingUser() throws SQLException {
-		String userCountSQL = "SELECT COUNT(id) FROM user";
-		ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
-		int numUsersBefore = asr.runQuery(userCountSQL);
+		int numUsersBefore = countUsers();
 		User u = uf.read(2);
 		u.setLastPosition(new Position(1,1,new Date(1410969600000L)));
 		uf.write(u);
@@ -168,7 +164,7 @@ public class UserDaoTest {
 		
 		/* Check there are no new users */
 		
-		int numUsersAfter = asr.runQuery(userCountSQL);
+		int numUsersAfter = countUsers();
 		assertEquals(numUsersAfter, numUsersBefore);
 	}
 
@@ -315,13 +311,44 @@ public class UserDaoTest {
 
 	@Test
 	public void testDeleteUserOK() throws SQLException {
-		fail("unimplemented");
-		
+		int beforeUsers = countUsers();
+		int beforeAb = countAddressBookEntries();
+		User u = uf.read(1);
+		uf.deleteUser(u);
+		int afterUsers = countUsers();
+		int afterAb = countAddressBookEntries();
+		assertEquals(beforeUsers-1, afterUsers);
+		assertEquals(beforeAb-3, afterAb);
 	}
 
 	@Test
 	public void testDeleteUserDoesntExist() throws SQLException {
-		fail("unimplemented");
+		int before = countUsers();
+		int beforeAb = countAddressBookEntries();
+		User u = new User();
+		u.setId(999);
+		uf.deleteUser(u);
+		int after = countUsers();
+		int afterAb = countAddressBookEntries();
+		assertEquals(before, after);
+		assertEquals(beforeAb, afterAb);
 	}
 
+	/**
+	 * Simple helper methods, just counts how many users or address book entries there are in the database
+	 * @return
+	 * @throws SQLException
+	 */
+	private int countUsers() throws SQLException {
+		return countQuery("SELECT COUNT(id) FROM user");
+	}
+	
+	private int countAddressBookEntries() throws SQLException {
+		return countQuery("SELECT COUNT(id) FROM addressBook");
+	}
+
+	private int countQuery(String query) throws SQLException {
+		ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
+		return asr.runQuery(query);
+	}
 }
