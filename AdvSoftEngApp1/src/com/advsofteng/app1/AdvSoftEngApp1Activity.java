@@ -3,14 +3,12 @@ package com.advsofteng.app1;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -22,6 +20,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DigitalClock;
@@ -59,6 +60,39 @@ public class AdvSoftEngApp1Activity extends Activity {
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	public static AddressBook globalAddressBook = new AddressBook();
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.options, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+		    case R.id.add_poi:
+		        addPlace();
+		        return true;
+		    case R.id.upload_ab:
+		    	manageAddressBook();
+		    	return true;
+		    default:
+		        return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	private void addPlace() {
+		Intent intentAdd = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
+		startActivity(intentAdd);
+	}
+	
+	private void manageAddressBook() {
+		Intent intentAddressRip = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
+		startActivity(intentAddressRip);
+	}
+	
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -89,12 +123,8 @@ public class AdvSoftEngApp1Activity extends Activity {
 		// Deal with add favourite button
 		buttonAdd=  (Button) findViewById(R.id.addButton);
 	    buttonAdd.setOnClickListener(new View.OnClickListener() {
-			
 			public void onClick(View v) {
-				Intent intentAdd = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
-				
-				startActivity(intentAdd);
-				
+				addPlace();
 			}
 	       });
 	        
@@ -140,14 +170,9 @@ public class AdvSoftEngApp1Activity extends Activity {
         
         buttonAddressBookRip = (Button) findViewById(R.id.launchAddressBookRipper);
         buttonAddressBookRip.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				
-				Intent intentAddressRip = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
-				startActivity(intentAddressRip);
-				
-				
+				manageAddressBook();
 			}
 		});
         

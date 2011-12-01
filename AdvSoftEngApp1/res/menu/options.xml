@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/add_poi"
+          android:icon="@drawable/gmap_blue_icon"
+          android:title="@string/menu_add_poi" />
+    <item android:id="@+id/upload_ab"
+          android:icon="@drawable/gmap_blue_icon"
+          android:title="@string/menu_upload_ab" />
+    <item android:id="@+id/help"
+          android:icon="@drawable/gmap_blue_icon"
+          android:title="@string/menu_help" />
+</menu>
