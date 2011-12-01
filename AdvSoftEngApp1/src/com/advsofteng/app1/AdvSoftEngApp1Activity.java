@@ -1,8 +1,15 @@
-	package com.advsofteng.app1;
+package com.advsofteng.app1;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -11,7 +18,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.*;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,9 +36,11 @@ import android.widget.TextView;
  */
 public class AdvSoftEngApp1Activity extends Activity {
 
+	public static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/";
 	public static final String TAG = "LocationPoster";	/* used for logging purposes */
 	public static final int MAGIC_NUMBER = 12345;		/* used as a reference to an Alarm */
-
+	public static String DEVICE_ID = null;
+	
 	/* Interval between deliveries of location data to the server */
 	private static final int POLL_INTERVAL = (5 * 60 * 1000);
 	private LocationManager manager;
@@ -43,44 +54,18 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private Button buttonMap = null;         /* View Map POI Button*/
 	private Button buttonAddressBookRip = null;
 	private Button buttonAdd = null;
+	private Button buttonUnsubscribe = null;	/* "unsubscribe me" button */
 	
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	public static AddressBook globalAddressBook = new AddressBook();
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
         
-        /* Set the on-screen button to start and stop the location provider */
-   
-        button = (Button) findViewById(R.id.postButton);
-        button.setOnClickListener(new View.OnClickListener() {
+        if (DEVICE_ID==null) DEVICE_ID = Secure.getString(getApplicationContext().getContentResolver(), Secure.ANDROID_ID);
+        
+        setContentView(R.layout.main);
 
-        	public void onClick(View v) {
-
-            	AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-            	if (alarmIntent==null) {
-            		
-            		/* Start a regular process to poll the server */
-            		
-	            	Log.i(TAG,"starting poll");
-	            	Calendar cal = Calendar.getInstance();
-	        		Intent intent = new Intent(getApplicationContext(), LocationPoster.class);
-	        		alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), MAGIC_NUMBER, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-	        		am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), POLL_INTERVAL , alarmIntent);
-	        		button.setText(getString(R.string.stop_button_label));
-            	} else {
-	            	Log.i(TAG,"finishing poll");
-
-	            	/* Cancel the polling process */
-	            	
-            		am.cancel(alarmIntent);
-            		alarmIntent = null;
-            		button.setText(getString(R.string.start_button_label));
-            	}
-            }
-        });
         
         /* get handles to the TextView where GPS position is displayed, and the on-screen clock */
         
@@ -166,6 +151,15 @@ public class AdvSoftEngApp1Activity extends Activity {
 			}
 		});
         
+        buttonUnsubscribe = (Button) findViewById(R.id.unsubButton);
+        buttonUnsubscribe.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+		    	UnsubscribeTask unsubscriber = new UnsubscribeTask();
+		    	unsubscriber.execute();
+			}
+		});
         
         
      
@@ -232,6 +226,44 @@ public class AdvSoftEngApp1Activity extends Activity {
 			am.cancel(alarmIntent);
 			alarmIntent = null;
 			button.setText(R.string.start_button_label);
+		}
+	}
+	
+	/**
+	 * Fires off an HTTP request to unsubscribe this app from the service
+	 * 
+	 * @author twhume
+	 *
+	 */
+
+	private class UnsubscribeTask extends AsyncTask<Void, Integer, Void> {
+
+		protected void onPostExecute(Void result) {
+			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
+			buttonUnsubscribe.setEnabled(false);
+		}
+
+		/**
+		 * Fire off the "unsubscribe me from this service" HTTP request
+		 */
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			Log.i(TAG, System.currentTimeMillis() + " starting");
+			
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + DEVICE_ID);
+
+			try {
+				HttpResponse response = client.execute(post);
+				Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				Log.i(TAG, "post threw " + e);
+				e.printStackTrace();
+			}
+			
+			return null;
 		}
 	}
 	

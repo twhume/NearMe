@@ -129,10 +129,8 @@ public class GetPOIActivity extends Activity {
    					/* Android ID is calculated according to code from
    					 * http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
    					 */
-   						
-   					String androidId = Secure.getString(getApplicationContext().getContentResolver(),Secure.ANDROID_ID);
-   					
-  					HttpGet get = new HttpGet(ENDPOINT + "/" + androidId + "/" + String.valueOf(prefs.getString("latitude", "")) 
+   						   					
+  					HttpGet get = new HttpGet(ENDPOINT + "/" + AdvSoftEngApp1Activity.DEVICE_ID + "/" + String.valueOf(prefs.getString("latitude", "")) 
 									+ "/" + String.valueOf(prefs.getString("longitude", ""))
 									+ "/" + intRadius.toString()
 									+ "/" + "1");   					
