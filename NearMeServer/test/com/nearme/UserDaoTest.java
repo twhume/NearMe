@@ -313,4 +313,15 @@ public class UserDaoTest {
 		assertFalse(uf.setPermissions(u, new String[]{"hash-1234567890"}));
 	}
 
+	@Test
+	public void testDeleteUserOK() throws SQLException {
+		fail("unimplemented");
+		
+	}
+
+	@Test
+	public void testDeleteUserDoesntExist() throws SQLException {
+		fail("unimplemented");
+	}
+
 }
