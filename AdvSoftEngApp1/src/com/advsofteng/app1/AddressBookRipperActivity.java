@@ -21,7 +21,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.telephony.TelephonyManager;
@@ -48,6 +47,7 @@ public class AddressBookRipperActivity extends Activity {
 	
 	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
 	private String ownNumber; /* Users own phone number */
+	private Button sendFriendList;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -55,55 +55,23 @@ public class AddressBookRipperActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts);
 		
-		
 		TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
 		countryCode = tm.getSimCountryIso();
 		ownNumber = tm.getLine1Number();
 		
-		
-
-		Button ripButton = (Button) this.findViewById(R.id.btnRip);
-		Button sendFriendList = (Button) this.findViewById(R.id.btnSendFriends);
-		//ListView list = (ListView)findViewById(R.id.friendslist);
-		
 		gatherer = new GatherContactsTask();
-		
-		if (gatherer.getStatus().equals(Status.RUNNING))
-			return;
-		if (gatherer.getStatus().equals(Status.FINISHED))
-			gatherer = new GatherContactsTask();
 		gatherer.execute();
+
+		sendFriendList = (Button) this.findViewById(R.id.btnSendFriends);
+		sendFriendList.setText(R.string.friends_loading);
+		sendFriendList.setEnabled(false);
 	
 		sendFriendList.setOnClickListener(new OnClickListener(){
-			@Override
 			public void onClick(View v) {
-
 				uploadContacts(AdvSoftEngApp1Activity.globalAddressBook);
-				
 			}
 		});
-		//
-		
-		ripButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Log.i(TAG, "CLICK!");
-
-				ListView list = (ListView)findViewById(R.id.friendslist);
-				adaptor = new AddressEntryAdapter();
 				
-				list.setAdapter(adaptor);
-				
-				//list.setOnItemClickListener(onListClick);
-				
-
-			}
-		});
-		
-		// place check/uncheck box here????
-		
-		
-		
 	}
 	
 	////////////////////////////////////////////
@@ -180,7 +148,6 @@ public class AddressBookRipperActivity extends Activity {
 				HttpResponse response = client.execute(post);
 				Log.i(TAG, "post to " + ENDPOINT + " done, response="+response.getStatusLine().getStatusCode());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				Log.i(TAG, "post threw " + e);
 				e.printStackTrace();
 				return false;
@@ -216,9 +183,11 @@ public class AddressBookRipperActivity extends Activity {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
 			
 			AdvSoftEngApp1Activity.globalAddressBook = result;
-			
-			//TODO: make sure this gets called when user presses the Friends NearMe Button
-			//uploadContacts(result);
+			ListView list = (ListView)findViewById(R.id.friendslist);
+			adaptor = new AddressEntryAdapter();
+			list.setAdapter(adaptor);
+			sendFriendList.setText(R.string.friends_loaded);
+			sendFriendList.setEnabled(true);
 		}
 
 		/**
