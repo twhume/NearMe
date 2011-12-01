@@ -193,6 +193,11 @@ public class UserDAOImpl implements UserDAO {
 			logger.debug("getNearestUsers() u=null,radius="+radius);
 			return ret; /* By definition we have no nearby friends for users we don't know! */
 		}
+		if (u.getLastPosition()==null) {
+			logger.debug("getNearestUsers() u="+u.getId()+",lastPosition=null,radius="+radius);
+			return ret; /* By definition we have no nearby friends for users we don't know a last position for */
+			
+		}
 		logger.debug("getNearestUsers() lat="+u.getLastPosition().getLatitude()+",long="+u.getLastPosition().getLongitude()+",id="+u.getId()+",radius="+radius);
 		Connection c = null;
 		PreparedStatement pst = null;
@@ -248,7 +253,9 @@ public class UserDAOImpl implements UserDAO {
 			 */
 
 			if (exists!=null) {
-				if ((u.getLastPosition()!=null) && (exists.getLastPosition()!=null) && (!u.getLastPosition().equals(exists.getLastPosition()))) {
+				logger.debug("write() user already exists");
+				if ((u.getLastPosition()!=null) && (!u.getLastPosition().equals(exists.getLastPosition()))) {
+					logger.debug("write() updating last known position");
 					pst = c.prepareStatement(USER_UPDATE_POSITION_SQL);
 					pst.setDouble(1, u.getLastPosition().getLatitude());
 					pst.setDouble(2, u.getLastPosition().getLongitude());
@@ -256,7 +263,9 @@ public class UserDAOImpl implements UserDAO {
 					pst.setInt(4, exists.getId());
 					pst.executeUpdate();
 					pst.close();
-				}
+				} else
+					logger.debug("write() no position updated; null or unchanged, old="+exists.getLastPosition()+",current="+u.getLastPosition());
+
 				
 				if (!u.getMsisdnHash().equals(exists.getMsisdnHash())) {
 					
