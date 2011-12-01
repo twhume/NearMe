@@ -3,6 +3,7 @@ package com.nearme;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,9 +43,16 @@ public class NearbyPoiServlet extends GenericNearMeServlet {
 			PoiFinder pf = new DatabasePoiFinder(datasource);
 			UserDAO uf = new UserDAOImpl(datasource);
 	
-			/* Get a list of all nearby points of interest and add in nearby friends */
+			/* Look up the user, and set their last known position to be the one they've supplied */
 			
 			User u = uf.readByDeviceId(pq.getAndroidId());
+			Position currentPos = new Position(pq.getLatitude(), pq.getLongitude());
+			currentPos.setWhen(new Date());
+			u.setLastPosition(currentPos);
+			uf.write(u);
+
+			/* Get a list of all nearby points of interest and add in nearby friends */
+
 			List<Poi> points = pf.find(pq);
 			logger.info("found " + points.size() + " POIs for user 1 within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
 			List<Poi> friends = uf.getNearestUsers(u, pq.getRadius());
