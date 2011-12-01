@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/unsubscribe"
+          android:icon="@drawable/ic_menu_flash"
+          android:title="@string/menu_unsubscribe" />
+    <item android:id="@+id/help"
+          android:icon="@drawable/gmap_blue_icon"
+          android:title="@string/menu_help" />
+</menu>

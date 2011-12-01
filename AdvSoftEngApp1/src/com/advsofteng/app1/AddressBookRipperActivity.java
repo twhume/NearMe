@@ -26,7 +26,11 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -36,6 +40,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AddressBookRipperActivity extends Activity {
 	
@@ -72,6 +77,30 @@ public class AddressBookRipperActivity extends Activity {
 			}
 		});
 				
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.addressbook, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+		    case R.id.unsubscribe:
+		    	unsubscribe();
+		        return true;
+		    default:
+		        return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	private void unsubscribe() {
+		UnsubscribeTask unsubscriber = new UnsubscribeTask();
+    	unsubscriber.execute();
 	}
 	
 	////////////////////////////////////////////
@@ -329,5 +358,43 @@ public class AddressBookRipperActivity extends Activity {
 		      }
 
 	 }
+	 
+		/**
+		 * Fires off an HTTP request to unsubscribe this app from the service
+		 * 
+		 * @author twhume
+		 *
+		 */
+
+		private class UnsubscribeTask extends AsyncTask<Void, Integer, Void> {
+
+			protected void onPostExecute(Void result) {
+				finish();
+					Toast toast=Toast.makeText(getApplicationContext(), getString(R.string.unsubscribed), 2000);
+					toast.show();
+			}
+
+			/**
+			 * Fire off the "unsubscribe me from this service" HTTP request
+			 */
+			
+			@Override
+			protected Void doInBackground(Void... params) {
+				Log.i(TAG, System.currentTimeMillis() + " starting");
+				
+				HttpClient client = new DefaultHttpClient();
+				HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + AdvSoftEngApp1Activity.DEVICE_ID);
+
+				try {
+					HttpResponse response = client.execute(post);
+					Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
+				} catch (Exception e) {
+					Log.i(TAG, "post threw " + e);
+					e.printStackTrace();
+				}
+				
+				return null;
+			}
+		}
 
 }

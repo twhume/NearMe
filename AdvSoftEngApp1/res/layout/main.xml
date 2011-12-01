@@ -30,24 +30,6 @@
         android:text="Get POIs" />
 
     <Button
-        android:id="@+id/launchAddressBookRipper"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Get Friends NearMe" />
-    <Button
-        android:id="@+id/addButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center" 
-        android:text="Add Favourite Place" />
-
-    <Button
-        android:id="@+id/unsubButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Unsubscribe" />
-
-    <Button
         android:id="@+id/mapButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

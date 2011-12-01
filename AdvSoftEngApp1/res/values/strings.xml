@@ -17,4 +17,6 @@
     <string name="menu_upload_ab">Address Book</string>
     <string name="friends_loading">Reading your address book, hold on...</string>
     <string name="friends_loaded">Click to save</string>
+    <string name="menu_unsubscribe">Unsubscribe</string>
+    <string name="unsubscribed">You have been unsubscribed from NearMe.</string>
 </resources>
