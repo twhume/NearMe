@@ -86,56 +86,37 @@ public class GetPOIActivity extends Activity {
 	btnGetPOIdata.setOnClickListener(new View.OnClickListener() {
        public void onClick(View v) {
     	  
-    	  
-    	   //TODO: check with Tom about how the server wants the data on POIs..???
-    	   //bool / int POI, how to represent pub and restaurant request... for example???
-    	   
-    	   /*
-    	   // have all data here.... boolean - how to work with database POI request???
-    	   checkBox1.isChecked();
-    	   checkBox2.isChecked();
-    	   checkBox3.isChecked();
-    	   checkBox4.isChecked();
-    	   checkBox5.isChecked();
-    	   
-    	   // and user set radius data...
-    	   // intRadius;
-    	    */
+  
    			try {
 
    	   			
    				if(null != prefs.getString("time", null)) // if we actually get a latitude value back.. then 
    				{												 //  the GPS is working proceed...
-   					
-   					/*TODO: (1)
-   					I have temp overriden this function call to HttpGet to plug in GPS co-ords that will get us a result from the server
-   					 UNCOMMENT this block and delete following block when finished testing....
-   					 
-   					HttpGet get = new HttpGet(ENDPOINT + "/" + prefs.getString("latitude", "") 
-   	   												+ "/" + prefs.getString("longitude", "")
-   	   												+ "/" + intRadius.toString()
-   	   												+ "/" + "1");
-   	   				
-   	   				//TODO: (2)  
-   	   				 * remove this testing block once we know we are String("longitude", ""));
-   					Log.i(tagPOI, "lat from prefs = " + prefs.getString("latitude", ""));
-   					 * 
-   	   				*/
-   					
-   					
-   					// At this point WE KNOW that prefs have phone's current GPS co-ords - thats all working...
-   					// Testing block - to delete.... see above notes... 
-   					
+
    					/* Android ID is calculated according to code from
    					 * http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
    					 */
    						
    					String androidId = Secure.getString(getApplicationContext().getContentResolver(),Secure.ANDROID_ID);
    					
-  					HttpGet get = new HttpGet(ENDPOINT + "/" + androidId + "/" + String.valueOf(prefs.getString("latitude", "")) 
-									+ "/" + String.valueOf(prefs.getString("longitude", ""))
-									+ "/" + intRadius.toString()
-									+ "/" + "1");   					
+   					String myUrl = ENDPOINT + "/" + androidId + "/" + String.valueOf(prefs.getString("latitude", "")) 
+							+ "/" + String.valueOf(prefs.getString("longitude", ""))
+							+ "/" + intRadius.toString();
+
+   					/* If the user's checked any checkbox, add a parameter to the URL listing whichever
+   					 * checkboxes they've chosen - so they can choose particular classes of POI
+   					 */
+   					
+   					if (checkBox1.isChecked() || checkBox2.isChecked() || checkBox3.isChecked() || checkBox4.isChecked()) {
+   						myUrl = myUrl + "?t=";
+   						if (checkBox1.isChecked()) myUrl = myUrl + "1,";
+   						if (checkBox2.isChecked()) myUrl = myUrl + "2,";
+   						if (checkBox3.isChecked()) myUrl = myUrl + "3,";
+   						if (checkBox4.isChecked()) myUrl = myUrl + "4,";
+   						myUrl = myUrl.substring(0, myUrl.length()-1);
+   					}
+   					
+  					HttpGet get = new HttpGet(myUrl);   					
 
 	   					Log.d("GetPoiActivity", "get="+get.getURI());
 
