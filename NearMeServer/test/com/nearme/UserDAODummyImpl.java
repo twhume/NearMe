@@ -85,5 +85,10 @@ public class UserDAODummyImpl implements UserDAO {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public void deleteUser(User u) throws SQLException {
+		// TODO Auto-generated method stub
+	}
 	
 }
