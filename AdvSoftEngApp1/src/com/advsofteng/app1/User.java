@@ -1,9 +1,6 @@
 package com.advsofteng.app1;
 
 
-import java.sql.SQLException;
-import java.util.List;
-
 public class User {
 	private int id = NO_ID; /* Unique ID for this record, used as database key */
 	private String deviceId; /* Unique ID of their Android device */
