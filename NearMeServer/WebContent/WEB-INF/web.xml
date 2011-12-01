@@ -43,18 +43,17 @@
     <url-pattern>/permissions/*</url-pattern>
   </servlet-mapping>
 
-
   <servlet>
     <description></description>
-    <display-name>ServletTask3</display-name>
-    <servlet-name>ServletTask3</servlet-name>
-    <servlet-class>com.servlet.task3.ServletTask3</servlet-class>
+    <display-name>Unsubscribe</display-name>
+    <servlet-name>UnsubscribeServlet</servlet-name>
+    <servlet-class>com.nearme.UnsubscribeServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ServletTask3</servlet-name>
-    <url-pattern>/ServletTask3</url-pattern>
+    <servlet-name>UnsubscribeServlet</servlet-name>
+    <url-pattern>/unsubscribe/*</url-pattern>
   </servlet-mapping>
- 
+  
   <resource-ref> 
 <description>DB Connection</description> 
 <res-ref-name>jdbc/nearme</res-ref-name> 
