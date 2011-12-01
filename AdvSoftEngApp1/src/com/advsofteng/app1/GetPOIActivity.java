@@ -51,11 +51,11 @@ public class GetPOIActivity extends Activity {
 	// Called at the start of the full lifetime. 
 	@Override 
 	public void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState); 
-	// Initialize activity.
+		super.onCreate(savedInstanceState); 
+		// Initialize activity.
 	
-	setContentView(R.layout.get_poi);
-	
+		setContentView(R.layout.get_poi);
+
 	// initialise class member data
 	resources1 = getResources();
 	prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
