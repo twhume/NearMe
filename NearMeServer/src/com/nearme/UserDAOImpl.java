@@ -49,6 +49,8 @@ public class UserDAOImpl implements UserDAO {
 	private static final String PERMS_RESET_SQL = "UPDATE addressBook SET permission = ? WHERE ownerId = ?";
 	private static final String PERMS_UPDATE_SQL = "UPDATE addressBook ab SET permission = ? WHERE ownerID = ? AND id IN (SELECT abHM.addressBookId FROM addressBookHashMatcher abhm, idHash h WHERE abhm.hashId = h.id AND h.hash IN (?,?,?,?,?,?,?,?,?,?))";
 	
+	private static final String USER_DELETE_SQL = "DELETE FROM user WHERE id = ?";
+	
 	/* See the comment for setPermissions() to understand what this is, and why it needs to match the 
 	 * number of question-marks in the subquery of PERMS_UPDATE_SQL
 	 */
@@ -357,6 +359,26 @@ public class UserDAOImpl implements UserDAO {
 		throw new RuntimeException("couldn't add an IdentityHash");
 	}
 
+	private void deleteAddressBook(Connection c, int userId) throws SQLException {
+		PreparedStatement pst = null;
+		try {
+			/* Delete all entries for this addressBook from the addressBookHashMatcher table */
+	
+			pst = c.prepareStatement(HASHMATCH_DELETE_SQL);
+			pst.setInt(1, userId);
+			pst.executeUpdate();
+	
+			/* Delete all entries for this user from the addressBook table */
+			
+			pst = c.prepareStatement(BOOK_DELETE_SQL);
+			pst.setInt(1, userId);
+			pst.executeUpdate();
+		} finally {
+			if (pst!=null) pst.close();
+		}
+
+	}
+	
 	@Override
 	public boolean setAddressBook(int id, List<AddressBookEntry> book) throws SQLException {
 		
@@ -380,20 +402,8 @@ public class UserDAOImpl implements UserDAO {
 		 */
 		
 		try {
-			
-			/* Delete all entries for this addressBook from the addressBookHashMatcher table */
-
 			c = dataSource.getConnection();
-			pst = c.prepareStatement(HASHMATCH_DELETE_SQL);
-			pst.setInt(1, u.getId());
-			pst.executeUpdate();
-
-			/* Delete all entries for this user from the addressBook table */
-			
-			c = dataSource.getConnection();
-			pst = c.prepareStatement(BOOK_DELETE_SQL);
-			pst.setInt(1, u.getId());
-			pst.executeUpdate();
+			deleteAddressBook(c, u.getId());
 
 			/* For each new AddressBookEntry to be added
 			 * - create an entry in the AddressBook table
@@ -546,6 +556,22 @@ public class UserDAOImpl implements UserDAO {
 
 		
 		
+	}
+
+	@Override
+	public void deleteUser(User u) throws SQLException {
+		Connection c = dataSource.getConnection();
+		PreparedStatement pst = null;
+		
+		try {
+			deleteAddressBook(c, u.getId());
+			
+			pst = c.prepareStatement(USER_DELETE_SQL);
+			pst.setInt(1, u.getId());
+			pst.executeUpdate();
+		} finally {
+			if (pst!=null) pst.close();
+		}
 	}
 
 }
