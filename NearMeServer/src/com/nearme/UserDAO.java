@@ -41,4 +41,7 @@ public interface UserDAO {
 	 */
 	public boolean setPermissions(User u, String[] perms) throws SQLException;
 
+	/* Deletes the user from the system completely, so they are effectively unsubscribed */
+	public void deleteUser(User u) throws SQLException;
+
 }

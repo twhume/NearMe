@@ -45,6 +45,17 @@
 
   <servlet>
     <description></description>
+    <display-name>Unsubscribe</display-name>
+    <servlet-name>UnsubscribeServlet</servlet-name>
+    <servlet-class>com.nearme.UnsubscribeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UnsubscribeServlet</servlet-name>
+    <url-pattern>/unsubscribe/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <description></description>
     <display-name>AddPOIServlet</display-name>
     <servlet-name>AddPOIServlet</servlet-name>
     <servlet-class>com.nearme.AddPOIServlet</servlet-class>
@@ -53,12 +64,12 @@
     <servlet-name>AddPOIServlet</servlet-name>
     <url-pattern>/AddPOIServlet</url-pattern>
   </servlet-mapping>
- 
+  
   <resource-ref> 
-<description>DB Connection</description> 
-<res-ref-name>jdbc/nearme</res-ref-name> 
-<res-type>javax.sql.DataSource</res-type> 
-<res-auth>Container</res-auth> 
-</resource-ref> 
+	<description>DB Connection</description> 
+	<res-ref-name>jdbc/nearme</res-ref-name> 
+	<res-type>javax.sql.DataSource</res-type> 
+	<res-auth>Container</res-auth> 
+  </resource-ref> 
 
 </web-app>

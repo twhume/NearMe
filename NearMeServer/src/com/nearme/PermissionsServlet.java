@@ -88,22 +88,5 @@ public class PermissionsServlet extends GenericNearMeServlet {
 		}	
 	}
 
-	
-	/**
-	 * Helper method, returns the device ID from this request.
-	 * Returns null if it can't find one.
-	 * 
-	 * @param req
-	 * @return
-	 */
-	
-	private String getDeviceId(HttpServletRequest req) {
-		String deviceId = req.getPathInfo();
-		if ((deviceId==null) || (deviceId.length()<2)) return null;
-		
-		return deviceId.substring(1, deviceId.length());
-		
-	}
-
 
 }

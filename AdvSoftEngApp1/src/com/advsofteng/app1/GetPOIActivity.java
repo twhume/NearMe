@@ -43,7 +43,6 @@ public class GetPOIActivity extends Activity {
 	private Boolean isSavedInstanceState= false; 
 	
 	// string holding the server address
-	private static  String ENDPOINT =null; 
 	private static final String tagPOI = "GetPOIActivity"; // used for logging
  
 	
@@ -60,9 +59,6 @@ public class GetPOIActivity extends Activity {
 	resources1 = getResources();
 	prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
 	
-	// set server address.
-	ENDPOINT = getResources().getString(R.string.serverAddress);
-
 	
 	//
 	if(null != savedInstanceState){ // get saved state from bundle after a soft kill
@@ -96,10 +92,9 @@ public class GetPOIActivity extends Activity {
    					/* Android ID is calculated according to code from
    					 * http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
    					 */
-   						
    					String androidId = Secure.getString(getApplicationContext().getContentResolver(),Secure.ANDROID_ID);
    					
-   					String myUrl = ENDPOINT + "/" + androidId + "/" + String.valueOf(prefs.getString("latitude", "")) 
+   					String myUrl = AdvSoftEngApp1Activity.ENDPOINT + "/nearme/" + androidId + "/" + String.valueOf(prefs.getString("latitude", "")) 
 							+ "/" + String.valueOf(prefs.getString("longitude", ""))
 							+ "/" + intRadius.toString();
 

@@ -6,6 +6,7 @@ import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 /**
@@ -31,6 +32,21 @@ public abstract class GenericNearMeServlet extends HttpServlet {
 			ne.printStackTrace();
 			throw new ServletException(ne);
 		}
+	}
+
+	/**
+	 * Helper method, returns the device ID from this request.
+	 * Returns null if it can't find one.
+	 * 
+	 * @param req
+	 * @return
+	 */
+	protected String getDeviceId(HttpServletRequest req) {
+		String deviceId = req.getPathInfo();
+		if ((deviceId==null) || (deviceId.length()<2)) return null;
+		
+		return deviceId.substring(1, deviceId.length());
+		
 	}
 
 }

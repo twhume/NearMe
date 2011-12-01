@@ -251,7 +251,7 @@ public class AddressBookRipperActivity extends Activity {
 					Phone.DISPLAY_NAME + " ASC");
 
 			AddressBook a = new AddressBook();
-			a.setDeviceId(Secure.getString(getApplicationContext().getContentResolver(), Secure.ANDROID_ID));
+			a.setDeviceId(AdvSoftEngApp1Activity.DEVICE_ID);
 			a.setOwnerHash(hashMsisdn(ownNumber));
 			ArrayList<AddressBookEntry> entries = new ArrayList<AddressBookEntry>();
 			ArrayList<String> hashes = new ArrayList<String>();

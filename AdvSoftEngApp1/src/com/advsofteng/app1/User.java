@@ -10,7 +10,6 @@ public class User {
 	private String msisdnHash; /* Hash of their MSISDN, used for identity purposes */
 
 	private Position lastPosition; /* Last reported position */
-	private UserDAO finder; /* The UserFinder that found this user */
 
 	public static final int NO_ID = -1;
 
@@ -25,18 +24,8 @@ public class User {
 		this.lastPosition = p;
 	}
 
-	public User(int i, String d, String m, Position p, UserDAO f) {
-		this(i,d,m,p);
-		this.finder = f;
-	}
-
 	public User() {
 		// TODO Auto-generated constructor stub
-	}
-
-	public List<AddressBookEntry> getAddressBook() throws SQLException {
-		if (finder==null) return null;
-		return finder.getAddressBook(this.id);
 	}
 
 	public int getId() {
