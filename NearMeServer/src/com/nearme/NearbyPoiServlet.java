@@ -45,9 +45,17 @@ public class NearbyPoiServlet extends GenericNearMeServlet {
 			PoiFinder pf = new DatabasePoiFinder(datasource);
 			UserDAO uf = new UserDAOImpl(datasource);
 	
-			/* Look up the user, and set their last known position to be the one they've supplied */
+			/* Look up the user, and set their last known position to be the one they've supplied.
+			 * If we don't know them, make a new record for them.
+			 */
 			
 			User u = uf.readByDeviceId(pq.getAndroidId());
+			if (u==null) {
+				u = new User();
+				u.setDeviceId(pq.getAndroidId());
+				u.setMsisdnHash("unknown");
+				u = uf.write(u);
+			}
 			Position currentPos = new Position(pq.getLatitude(), pq.getLongitude());
 			currentPos.setWhen(new Date());
 			u.setLastPosition(currentPos);
