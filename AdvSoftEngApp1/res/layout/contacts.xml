@@ -13,13 +13,13 @@
         android:id="@+id/btnRip"
         android:layout_width="100px"
         android:layout_height="wrap_content"
-        android:text="Update Contacts" />
+        android:text="Grab address book" />
         
 <Button 
     android:id="@+id/btnSendFriends"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content"
-    android:text="Get Friends NearMe..." >   
+    android:text="Upload address book" >   
 </Button>
         
 </TableLayout>
