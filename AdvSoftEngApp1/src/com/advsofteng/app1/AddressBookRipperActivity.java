@@ -26,7 +26,6 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -162,6 +161,17 @@ public class AddressBookRipperActivity extends Activity {
 	
 	private class UploadContactsTask extends AsyncTask<AddressBook, Integer, Boolean> {
 
+		/**
+		 * Tell the user we've saved their address book, and exit the activity
+		 */
+		
+		protected void onPostExecute(Boolean result) {
+			int resource = result ? R.string.upload_ab_ok : R.string.upload_ab_failed;
+			Toast toast=Toast.makeText(getApplicationContext(), getString(resource), 2000);
+			toast.show();
+			finish();
+		}
+		
 		@Override
 		protected Boolean doInBackground(AddressBook... ab) {
 			Gson gson = new Gson();
@@ -369,8 +379,8 @@ public class AddressBookRipperActivity extends Activity {
 
 			protected void onPostExecute(Void result) {
 				finish();
-					Toast toast=Toast.makeText(getApplicationContext(), getString(R.string.unsubscribed), 2000);
-					toast.show();
+				Toast toast=Toast.makeText(getApplicationContext(), getString(R.string.unsubscribed), 2000);
+				toast.show();
 			}
 
 			/**
