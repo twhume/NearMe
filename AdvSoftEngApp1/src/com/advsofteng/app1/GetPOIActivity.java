@@ -1,5 +1,6 @@
 package com.advsofteng.app1;
 
+import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -8,12 +9,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.Settings.Secure;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -112,57 +113,50 @@ public class GetPOIActivity extends Activity {
    					}
    					
   					HttpGet get = new HttpGet(myUrl);   					
-
-	   					Log.d("GetPoiActivity", "get="+get.getURI());
-
-  					// end of testing block to delete...
+  					Log.d("GetPoiActivity", "get="+get.getURI());
 
    					/* Create a new HTTPClient to do our POST for us */
    					HttpClient client = new DefaultHttpClient();
    					HttpResponse response = client.execute(get);
-   					
-   					//get text out of body of response....
    					String responseBody = HttpHelper.getResponseBody(response);
    					
    					// get the Poi objects out of the string....
    					// ref: http://benjii.me/2010/04/deserializing-json-in-android-using-gson/
    					
-   					JSONArray j; 
-   					// object deserialises json objects
    					Gson gson = new Gson();
    					
-   					AdvSoftEngApp1Activity.poiArray.clear(); // get rid of any old Pois from last request...
-
+   					ArrayList<Poi> newPois = new ArrayList<Poi>();
+   					boolean gotNewPoi = false;
    					try
    					{
    	   					Log.d("GetPoiActivity", "json="+responseBody);
    	   				    JsonParser parser = new JsonParser();
    	   				    JsonArray array = parser.parse(responseBody).getAsJsonArray();
    	   				    
-   	   				    int iCounter = 0;
    	   				    for(JsonElement counter : array)
    	   				    {	
    	   				    	// run through the JsonArray converting each entry into an actual Poi object in the Poi ArrayList
-   	   				    	AdvSoftEngApp1Activity.poiArray.add( gson.fromJson(array.get(iCounter), Poi.class));
-   	   				    	
-   	   				    	//TODO: delete this block when finished testing....
-   	   				    	Log.i(tagPOI, String.valueOf(iCounter) + " - - - - - - - - - - -");
-   	   				    	Log.i(tagPOI, "Current POI name = " + AdvSoftEngApp1Activity.poiArray.get(iCounter).getName());
-   	   				    	Log.i(tagPOI, "Current POI Latitude = " + String.valueOf(AdvSoftEngApp1Activity.poiArray.get(iCounter).getLatitude()));
-   	   				    	Log.i(tagPOI, "Current POI Longitude = " + String.valueOf(AdvSoftEngApp1Activity.poiArray.get(iCounter).getLongitude()));
-   	   				    	Log.i(tagPOI, "Current POI ID = " + String.valueOf(AdvSoftEngApp1Activity.poiArray.get(iCounter).getId()));
-   	   				    	//
-   	   				    	
-   	   				    	iCounter++;
+   	   				    	Poi p = gson.fromJson(counter, Poi.class);
+   	   				    	if (!AdvSoftEngApp1Activity.poiArray.contains(p)) gotNewPoi = true;
+   	   				    	newPois.add(p);
    	   				    }
    	   				    
+   	   				    AdvSoftEngApp1Activity.poiArray = newPois;
+   	   				    
+   	   				    /*
+   	   				     * If we received any new Pois as part of this update, then alert the user
+   	   				     */
+   	   				    
+   	   				    if (gotNewPoi) {
+		   	   				  Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		   	   				  vib.vibrate(300);
+   	   				    }
    					}
    					catch(Exception e)
    					{
    						e.printStackTrace();
-   						Log.i(tagPOI, "Error in parsing Json data from sever, " + e.getMessage());
+   						Log.e(tagPOI, "Error in parsing Json data from sever, " + e.getMessage());
    					}
-   					
    				} 
    				else { 
    					// we have NOT got GPS data.....
