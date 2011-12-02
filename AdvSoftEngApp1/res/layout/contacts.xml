@@ -9,12 +9,6 @@
         android:layout_alignParentBottom="true"
         android:stretchColumns="1" >
 
-    <Button
-        android:id="@+id/btnRip"
-        android:layout_width="100px"
-        android:layout_height="wrap_content"
-        android:text="Grab address book" />
-        
 <Button 
     android:id="@+id/btnSendFriends"
     android:layout_width="fill_parent" 

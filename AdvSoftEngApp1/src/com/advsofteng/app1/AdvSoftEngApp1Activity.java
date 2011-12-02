@@ -1,16 +1,7 @@
 package com.advsofteng.app1;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -18,13 +9,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.*;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DigitalClock;
 import android.widget.TextView;
 
 /**
@@ -47,18 +39,47 @@ public class AdvSoftEngApp1Activity extends Activity {
 	
 	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
 	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
-	private DigitalClock clock = null;			/* on-screen clock */
 	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
 	private Button button = null;				/* start/stop button */
 	private Button buttonGetPOI = null;			/* get POIs button*/
 	private Button buttonMap = null;         /* View Map POI Button*/
-	private Button buttonAddressBookRip = null;
-	private Button buttonAdd = null;
-	private Button buttonUnsubscribe = null;	/* "unsubscribe me" button */
 	
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	public static AddressBook globalAddressBook = new AddressBook();
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.options, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+		    case R.id.add_poi:
+		        addPlace();
+		        return true;
+		    case R.id.upload_ab:
+		    	manageAddressBook();
+		    	return true;
+		    default:
+		        return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	private void addPlace() {
+		Intent intentAdd = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
+		startActivity(intentAdd);
+	}
+	
+	private void manageAddressBook() {
+		Intent intentAddressRip = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
+		startActivity(intentAddressRip);
+	}
+	
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -66,11 +87,9 @@ public class AdvSoftEngApp1Activity extends Activity {
         
         setContentView(R.layout.main);
 
-        
-        /* get handles to the TextView where GPS position is displayed, and the on-screen clock */
+        /* get handles to the TextView where GPS position is displayed */
         
         tvGPS = (TextView) findViewById(R.id.textViewGPS);
-        clock = (DigitalClock) findViewById(R.id.digitalClock1);
         
         /* We may know a location even before we start; if so, use it. */
 
@@ -84,20 +103,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new AdvSoftEngLocationListener(this));
 		
-		
-	   //**********************************
-		// Deal with add favourite button
-		buttonAdd=  (Button) findViewById(R.id.addButton);
-	    buttonAdd.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				Intent intentAdd = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
-				
-				startActivity(intentAdd);
-				
-			}
-	       });
-	        
 		
 		
 	   //*************************************
@@ -132,36 +137,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 			} // end of onClickView(View v)
 			}//  end of View.OnClickListener
         ); // end of setOnClickListener
-        // 
-        /////////////////////////////
-        
-        //////////////////////////////
-        //
-        
-        buttonAddressBookRip = (Button) findViewById(R.id.launchAddressBookRipper);
-        buttonAddressBookRip.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				Intent intentAddressRip = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
-				startActivity(intentAddressRip);
-				
-				
-			}
-		});
-        
-        buttonUnsubscribe = (Button) findViewById(R.id.unsubButton);
-        buttonUnsubscribe.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-		    	UnsubscribeTask unsubscriber = new UnsubscribeTask();
-		    	unsubscriber.execute();
-			}
-		});
-        
-        
      
            
     }
@@ -191,18 +166,12 @@ public class AdvSoftEngApp1Activity extends Activity {
 		tvGPS.setText(strGPS);
 		
 		// then slap it into those shared preferences so it gets sent up in a poll
-
-		//TODO: temp commented this out, as it was sending too much to the log - AD.
-		//Log.i(TAG, "set time to "+ clock.getText());
 		
 		SharedPreferences.Editor edit = prefs.edit();
 		edit.putString("time", new Date().toString());
 		edit.putString("latitude", Double.toString(location.getLatitude()));
 		edit.putString("longitude", Double.toString(location.getLongitude()));
 		edit.commit();
-		//TODO: temp commented out this line - it was sending too much data to the log - AD
-		//Log.i(TAG, "saved location OK");
-		//Log.i(TAG, "new time="+prefs.getString("time", "notset"));
     }
     
     private void emptyPrefs() {
@@ -229,43 +198,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 		}
 	}
 	
-	/**
-	 * Fires off an HTTP request to unsubscribe this app from the service
-	 * 
-	 * @author twhume
-	 *
-	 */
 
-	private class UnsubscribeTask extends AsyncTask<Void, Integer, Void> {
-
-		protected void onPostExecute(Void result) {
-			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
-			buttonUnsubscribe.setEnabled(false);
-		}
-
-		/**
-		 * Fire off the "unsubscribe me from this service" HTTP request
-		 */
-		
-		@Override
-		protected Void doInBackground(Void... params) {
-			Log.i(TAG, System.currentTimeMillis() + " starting");
-			
-			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + DEVICE_ID);
-
-			try {
-				HttpResponse response = client.execute(post);
-				Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				Log.i(TAG, "post threw " + e);
-				e.printStackTrace();
-			}
-			
-			return null;
-		}
-	}
 	
 }
 
