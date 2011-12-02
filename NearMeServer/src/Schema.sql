@@ -4,7 +4,7 @@ USE `nearme`;
 
 CREATE TABLE `user` (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	hashId	INTEGER NOT NULL,
+	hashId INTEGER NOT NULL,
 	deviceId VARCHAR(64) UNIQUE NOT NULL,
 	latitude DOUBLE,
 	longitude DOUBLE,
@@ -68,21 +68,21 @@ CREATE TABLE `poi` (
   PRIMARY KEY  (`Id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 
-INSERT INTO `poi` VALUES (1,'Warung Tujuh','49.56','-12.257','0001');
-INSERT INTO `poi` VALUES (2,'L\'Eglise','56.145','-15.251','0001');
-INSERT INTO `poi` VALUES (3,'Breeze','45.265','-16.120','0001');
-INSERT INTO `poi` VALUES (4,'Casa Don Carlos','50.025','-13.121','0001');
-INSERT INTO `poi` VALUES (5,'The Heart and Hand, Brighton','48.254','-12.354','0002');
-INSERT INTO `poi` VALUES (6,'The Evening Star, Brighton','50.157','-12.200','0002');
-INSERT INTO `poi` VALUES (7,'The King and Queen ','50.698','-14.587','0002');
-INSERT INTO `poi` VALUES (8,'Grace Brighton','53.251','-13.248','0003');
-INSERT INTO `poi` VALUES (9,'Oceana Brighton','50.314','-13.369','0003');
-INSERT INTO `poi` VALUES (10,'Madame Geisha','47.58','-15.211','0003');
-INSERT INTO `poi` VALUES (11,'Revolution','52.879','-16.587','0003');
-INSERT INTO `poi` VALUES (12,'Coalition','50.258','-14.753','0003');
-INSERT INTO `poi` VALUES (13,'Brighton Museum & Art Gallery','58.487','-17.187','0004');
-INSERT INTO `poi` VALUES (14,'Brighton Toy and Model Museum','45.477','-16.248','0004');
-INSERT INTO `poi` VALUES (15,'Brighton Fishing Museum & Quarter ','56.898','-11.157','0004');
+INSERT INTO `poi` VALUES (1,'Warung Tujuh','50.820171','-0.138659','0001');
+INSERT INTO `poi` VALUES (2,'L\'Eglise','50.829144','-0.177498','0001');
+INSERT INTO `poi` VALUES (3,'Breeze','50.819439','-0.128016','0001');
+INSERT INTO `poi` VALUES (4,'Casa Don Carlos','50.822204','-0.141191','0001');
+INSERT INTO `poi` VALUES (5,'The Heart and Hand, Brighton','50.825864','-0.139518','0002');
+INSERT INTO `poi` VALUES (6,'The Evening Star, Brighton','50.827897','-0.141878','0002');
+INSERT INTO `poi` VALUES (7,'The King and Queen ','50.824536','-0.136986','0002');
+INSERT INTO `poi` VALUES (8,'Grace Brighton','50.824156','-0.141792','0003');
+INSERT INTO `poi` VALUES (9,'Oceana Brighton','50.820889','-0.144861','0003');
+INSERT INTO `poi` VALUES (10,'Madame Geisha','50.819818','-0.138963','0003');
+INSERT INTO `poi` VALUES (11,'Revolution','50.821364','-0.144367','0003');
+INSERT INTO `poi` VALUES (12,'Coalition','50.82013','-0.143402','0003');
+INSERT INTO `poi` VALUES (13,'Brighton Museum & Art Gallery','50.823424','-0.137758','0004');
+INSERT INTO `poi` VALUES (14,'Brighton Toy and Model Museum','50.828764','-0.140719','0004');
+INSERT INTO `poi` VALUES (15,'Brighton Fishing Museum & Quarter ','50.819954','-0.141921','0004');
 
 CREATE TABLE `type` (
   `Id` varchar(11) NOT NULL default '0',
