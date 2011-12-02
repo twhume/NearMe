@@ -11,12 +11,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 /**
  * Servlet implementation class AddPOIServlet
  */
 
 
 public class AddPOIServlet extends HttpServlet {
+	
+	//TODO: why are these class variables, and why static?
 	
 	private static final long serialVersionUID = -1593856664522697355L;
 	private static String latitude;
@@ -30,7 +34,7 @@ public class AddPOIServlet extends HttpServlet {
 	static String password = "nearme";
 	static String url = "jdbc:mysql://localhost/" + bd;
 	
-	
+	private static Logger logger = Logger.getLogger(AddPOIServlet.class);
 	
 	
 	public static void main(String args[]) throws Exception {
@@ -63,6 +67,9 @@ public class AddPOIServlet extends HttpServlet {
 		type = request.getParameter("type"); 
 	    //System.out.println("try");
 		
+		//TODO move this code into the POIFinder, and rename POIFinder to POIDAO
+		// This is so we keep database code in as few places as possible, thus enforcing a bit of modularity
+		// and a consistent style across the project
 		
 		try
 		  {
@@ -93,6 +100,8 @@ public class AddPOIServlet extends HttpServlet {
 			locationAdd.executeUpdate();
 			
 			locationAdd.close();
+			logger.info("received new POI " + name + " at (" + latitude + "," + "longitude)");
+
 			System.out.println("Data Saved");
 			conn.close();
 			

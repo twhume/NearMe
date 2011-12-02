@@ -43,7 +43,7 @@ public class PermissionsServlet extends GenericNearMeServlet {
 				
 				resp.setContentType("application/json");
 				List<IdentityHash> perms = ud.getPermissions(u);
-				logger.info("permissions requested for "+ deviceId+": (" + Util.hashListAsString(perms) + ")");
+				logger.info("permissions granted for user "+ u.getId()+": (" + Util.hashListAsString(perms) + ")");
 				Gson gson = new Gson();
 				resp.getOutputStream().print(gson.toJson(Util.hashListAsStringArray(perms)));
 			}

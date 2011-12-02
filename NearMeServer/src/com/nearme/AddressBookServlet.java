@@ -31,12 +31,11 @@ public class AddressBookServlet extends GenericNearMeServlet {
 		POSTedAddressBookParser pabp = new POSTedAddressBookParser();
 		pabp.parse(s);
 		
-		logger.info("received address book from " + pabp.getUser().getId() + " with " + pabp.getBook().size() + " entries");
 		try {
 			User u = uDao.write(pabp.getUser());
 			uDao.setAddressBook(u.getId(), pabp.getBook());
 			resp.sendError(HttpServletResponse.SC_OK);
-			logger.debug("parsed address book OK");
+			logger.info("received address book from " + pabp.getUser().getId() + " with " + pabp.getBook().size() + " entries");
 		} catch (SQLException e) {
 			logger.error(e);
 			e.printStackTrace();
