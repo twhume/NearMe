@@ -196,7 +196,7 @@ public class GetPOIActivity extends Activity {
 			// update member variable and textview with new radius data...
 			intRadius = progress;
 			tvRadius = (TextView) findViewById(R.id.tvRadius);
-			tvRadius.setText(resources1.getText((R.string.tvRadiusText)) + Integer.toString(intRadius) + "m");
+			tvRadius.setText(resources1.getText((R.string.tvRadiusText)) + " " + Integer.toString(intRadius) + "m");
 			
 		}
 	};
