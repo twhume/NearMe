@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="27dp"
         android:layout_marginTop="39dp"
-        android:text="poi_radio_btn1" />
+        android:text="@string/poi_checkbox1" />
 
     <CheckBox
         android:id="@+id/CheckBox2"
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/CheckBox1"
         android:layout_below="@+id/CheckBox1"
-        android:text="poi_radio_btn2" />
+        android:text="@string/poi_checkbox2" />
 
     <CheckBox
         android:id="@+id/CheckBox3"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/CheckBox2"
         android:layout_below="@+id/CheckBox2"
-        android:text="poi_radio_btn3" />
+        android:text="@string/poi_checkbox3" />
 
     <CheckBox
         android:id="@+id/CheckBox4"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/CheckBox3"
         android:layout_below="@+id/CheckBox3"
-        android:text="poi_radio_btn4" />
+        android:text="@string/poi_checkbox4" />
 
     <Button
         android:id="@+id/getPOIDataButton"

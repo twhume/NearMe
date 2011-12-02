@@ -150,6 +150,7 @@ public class GetPOIActivity extends Activity {
    	   				    if (gotNewPoi) {
 		   	   				  Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		   	   				  vib.vibrate(300);
+		   	   				  //TODO put in an Android notification here?
    	   				    }
    					}
    					catch(Exception e)
@@ -195,7 +196,7 @@ public class GetPOIActivity extends Activity {
 			// update member variable and textview with new radius data...
 			intRadius = progress;
 			tvRadius = (TextView) findViewById(R.id.tvRadius);
-			tvRadius.setText(resources1.getText((R.string.tvRadiusText)) + Integer.toString(intRadius) + " m");
+			tvRadius.setText(resources1.getText((R.string.tvRadiusText)) + Integer.toString(intRadius) + "m");
 			
 		}
 	};
@@ -224,12 +225,6 @@ public class GetPOIActivity extends Activity {
 		checkBox2 = (CheckBox) findViewById(R.id.CheckBox2);
 		checkBox3 = (CheckBox) findViewById(R.id.CheckBox3);
 		checkBox4 = (CheckBox) findViewById(R.id.CheckBox4);
-
-		// set text....
-		checkBox1.setText(resources1.getText(R.string.poi_checkbox1));
-		checkBox2.setText(resources1.getText(R.string.poi_checkbox2));
-		checkBox3.setText(resources1.getText(R.string.poi_checkbox3));
-		checkBox4.setText(resources1.getText(R.string.poi_checkbox4));
 	
 		/////////////////
 		//seekBar and corresponding label set up
@@ -282,46 +277,34 @@ public class GetPOIActivity extends Activity {
 	
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		
 		isSavedInstanceState= true;
-		
 		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox1)), checkBox1.isChecked());
 		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox2)), checkBox2.isChecked());
 		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox3)), checkBox3.isChecked());
 		savedInstanceState.putBoolean((String)resources1.getText((R.string.poi_checkbox4)), checkBox4.isChecked());
-		
 		savedInstanceState.putInt((String)resources1.getText(R.string.tvRadiusText), intRadius);
-		
 		super.onSaveInstanceState(savedInstanceState);
-
 	}
 
     protected void onStart() {
-       // Log.i(tagPOI,"onStart");
-        
         InitialiseCheckBoxsAndBtns(null);
         super.onStart();
     }
+    
     protected void onResume() {
-       // Log.i(tagPOI,"onResume");
     	isSavedInstanceState= false;
         super.onResume();
     }
+    
     protected void onStop() {
-    	
     	if (!isSavedInstanceState){ // this is a HARD KILL, write to prefs
-      
             SharedPreferences.Editor editor = prefs.edit();
-            
             editor.putBoolean((String)resources1.getText(R.string.poi_checkbox1), checkBox1.isChecked());
             editor.putBoolean((String)resources1.getText(R.string.poi_checkbox2), checkBox2.isChecked());
             editor.putBoolean((String)resources1.getText(R.string.poi_checkbox3), checkBox3.isChecked());
             editor.putBoolean((String)resources1.getText(R.string.poi_checkbox4), checkBox4.isChecked());
             editor.putInt((String)resources1.getText(R.string.tvRadiusText), intRadius);
-            
             editor.commit();
-           // Log.i(tagPOI,"savedPrefs");
-            
         }
         super.onStop();
     }
