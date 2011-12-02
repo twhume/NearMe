@@ -1,26 +1,20 @@
 package com.advsofteng.app1;
 
-import java.util.ArrayList;
-
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-//import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
@@ -49,30 +43,22 @@ public class GetPOIActivity extends Activity {
 	private Boolean isSavedInstanceState= false; 
 	
 	// string holding the server address
-	private static  String ENDPOINT =null; 
 	private static final String tagPOI = "GetPOIActivity"; // used for logging
-	//TODO: delete these variables when we are done testing GPS and JSON.
-	private double testLongitude = -12.257; // longitude value of "Warung Tujuh" restaurant 
-	private double testLatitude = 49.56;    // latitude value of "Warung Tujuh" restaurant 
-	//
  
 	
 	
 	// Called at the start of the full lifetime. 
 	@Override 
 	public void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState); 
-	// Initialize activity.
+		super.onCreate(savedInstanceState); 
+		// Initialize activity.
 	
-	setContentView(R.layout.get_poi);
-	
+		setContentView(R.layout.get_poi);
+
 	// initialise class member data
 	resources1 = getResources();
 	prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
 	
-	// set server address.
-	ENDPOINT = getResources().getString(R.string.serverAddress);
-
 	
 	//
 	if(null != savedInstanceState){ // get saved state from bundle after a soft kill
@@ -96,52 +82,39 @@ public class GetPOIActivity extends Activity {
 	btnGetPOIdata.setOnClickListener(new View.OnClickListener() {
        public void onClick(View v) {
     	  
-    	  
-    	   //TODO: check with Tom about how the server wants the data on POIs..???
-    	   //bool / int POI, how to represent pub and restaurant request... for example???
-    	   
-    	   /*
-    	   // have all data here.... boolean - how to work with database POI request???
-    	   checkBox1.isChecked();
-    	   checkBox2.isChecked();
-    	   checkBox3.isChecked();
-    	   checkBox4.isChecked();
-    	   checkBox5.isChecked();
-    	   
-    	   // and user set radius data...
-    	   // intRadius;
-    	    */
+  
    			try {
 
    	   			
    				if(null != prefs.getString("time", null)) // if we actually get a latitude value back.. then 
    				{												 //  the GPS is working proceed...
+
+   					/* Android ID is calculated according to code from
+   					 * http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
+   					 */
+   					String androidId = Secure.getString(getApplicationContext().getContentResolver(),Secure.ANDROID_ID);
    					
-   					/*TODO: (1)
-   					I have temp overriden this function call to HttpGet to plug in GPS co-ords that will get us a result from the server
-   					 UNCOMMENT this block and delete following block when finished testing....
-   					 
-   					HttpGet get = new HttpGet(ENDPOINT + "/" + prefs.getString("latitude", "") 
-   	   												+ "/" + prefs.getString("longitude", "")
-   	   												+ "/" + intRadius.toString()
-   	   												+ "/" + "1");
-   	   				
-   	   				//TODO: (2) 
-   	   				 * remove this testing block once we know we are getting data from the prefs
-   					//testing to see if we are getting long and lat data...  
-   					Log.i(tagPOI, "Long from prefs = "+ prefs.getString("longitude", ""));
-   					Log.i(tagPOI, "lat from prefs = " + prefs.getString("latitude", ""));
-   					 * 
-   	   				*/
+   					String myUrl = AdvSoftEngApp1Activity.ENDPOINT + "/nearme/" + androidId + "/" + String.valueOf(prefs.getString("latitude", "")) 
+							+ "/" + String.valueOf(prefs.getString("longitude", ""))
+							+ "/" + intRadius.toString();
+
+   					/* If the user's checked any checkbox, add a parameter to the URL listing whichever
+   					 * checkboxes they've chosen - so they can choose particular classes of POI
+   					 */
    					
+   					if (checkBox1.isChecked() || checkBox2.isChecked() || checkBox3.isChecked() || checkBox4.isChecked()) {
+   						myUrl = myUrl + "?t=";
+   						if (checkBox1.isChecked()) myUrl = myUrl + "1,";
+   						if (checkBox2.isChecked()) myUrl = myUrl + "2,";
+   						if (checkBox3.isChecked()) myUrl = myUrl + "3,";
+   						if (checkBox4.isChecked()) myUrl = myUrl + "4,";
+   						myUrl = myUrl.substring(0, myUrl.length()-1);
+   					}
    					
-   					// At this point WE KNOW that prefs have phone's current GPS co-ords - thats all working...
-   					// Testing block - to delete.... see above notes... 
-  					HttpGet get = new HttpGet(ENDPOINT + "/" + String.valueOf(testLatitude) 
-									+ "/" + String.valueOf(testLongitude)
-									+ "/" + intRadius.toString()
-									+ "/" + "1");   					
-   	   												
+  					HttpGet get = new HttpGet(myUrl);   					
+
+	   					Log.d("GetPoiActivity", "get="+get.getURI());
+
   					// end of testing block to delete...
 
    					/* Create a new HTTPClient to do our POST for us */
@@ -162,7 +135,7 @@ public class GetPOIActivity extends Activity {
 
    					try
    					{
-   	   					
+   	   					Log.d("GetPoiActivity", "json="+responseBody);
    	   				    JsonParser parser = new JsonParser();
    	   				    JsonArray array = parser.parse(responseBody).getAsJsonArray();
    	   				    

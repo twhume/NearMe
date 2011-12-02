@@ -12,7 +12,8 @@ public class PoiQueryTest {
 
 	@Test
 	public void testValidPoiQueryConstruction() {
-		PoiQuery pq = new PoiQuery("/101.123245/-56.12/10");
+		PoiQuery pq = new PoiQuery("/fred/101.123245/-56.12/10");
+		assertEquals("fred", pq.getAndroidId());
 		assertEquals(101.123245, pq.getLatitude(), 0);
 		assertEquals(-56.12, pq.getLongitude(), 0);
 		assertEquals(10, pq.getRadius());
@@ -26,27 +27,28 @@ public class PoiQueryTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNewPoiFailsBadLongitude() {
-		new PoiQuery("/101.123245/something/10");
+		new PoiQuery("/fred/101.123245/something/10");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNewPoiFailsNullRadius() {
-		new PoiQuery("/101.123245/");
+		new PoiQuery("/fred/101.123245/");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNewPoiFailMissingParameter() {
-		new PoiQuery("/101.123245/-56.12");
+		new PoiQuery("/fred/101.123245/-56.12");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNewPoiFailsBadRadius() {
-		new PoiQuery("/101.123245/-56.12/fred");
+		new PoiQuery("/fred/101.123245/-56.12/fred");
 	}
 
 	@Test
 	public void testWithOneType() {
-		PoiQuery pq = new PoiQuery("/101.123245/-56.12/10?t=1");
+		PoiQuery pq = new PoiQuery("/fred/101.123245/-56.12/10?t=1");
+		assertEquals("fred", pq.getAndroidId());
 		assertEquals(101.123245, pq.getLatitude(), 0);
 		assertEquals(-56.12, pq.getLongitude(), 0);
 		assertEquals(10, pq.getRadius());
@@ -56,7 +58,8 @@ public class PoiQueryTest {
 
 	@Test
 	public void testWithTwoTypes() {
-		PoiQuery pq = new PoiQuery("/101.123245/-56.12/10?t=1,2");
+		PoiQuery pq = new PoiQuery("/fred/101.123245/-56.12/10?t=1,2");
+		assertEquals("fred", pq.getAndroidId());
 		assertEquals(101.123245, pq.getLatitude(), 0);
 		assertEquals(-56.12, pq.getLongitude(), 0);
 		assertEquals(10, pq.getRadius());

@@ -1,6 +1,5 @@
 package com.nearme;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,7 +30,7 @@ public class UserDAOImpl implements UserDAO {
 	private static final String READ_HASH_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE idHash.hash = ? AND idHash.id = user.hashId";
 	private static final String READ_DEVICE_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE user.deviceId = ? AND idHash.id = user.hashId";
 	private static final String READ_AB_SQL = "SELECT ab.id, ab.name, ab.permission, ih.id, ih.hash FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ab.ownerId = ? AND abhm.addressBookId = ab.id AND abhm.hashId = ih.id ORDER BY ab.name";
-	private static final String NEAREST_SQL = "SELECT u2.*, ab.name, ( 6371 * acos( cos( radians(-123.45) ) * cos( radians( u2.latitude ) ) * cos( radians( u2.longitude ) - radians(-45.37) ) + sin( radians(-123.45) ) * sin( radians( u2.latitude ) ) ) ) AS distance FROM user u, addressBook ab, addressBookHashMatcher abhm, user u2 WHERE u.id = 1 AND u.id = ab.ownerId AND abhm.addressBookId = ab.id AND abhm.hashId = u2.hashId  HAVING distance < ? ORDER BY distance";
+	private static final String NEAREST_SQL = "SELECT u2.*, ab.name, ( 6371 * acos( cos( radians(?) ) * cos( radians( u2.latitude ) ) * cos( radians( u2.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( u2.latitude ) ) ) ) AS distance FROM user u, addressBook ab, addressBookHashMatcher abhm, user u2 WHERE u.id = ? AND u.id = ab.ownerId AND abhm.addressBookId = ab.id AND abhm.hashId = u2.hashId  HAVING distance < ? ORDER BY distance";
 
 	private static final String USER_INSERT_SQL = "INSERT INTO user (deviceId, hashId, latitude, longitude, lastReport) VALUES (?,?,?,?,?)";
 	private static final String USER_UPDATE_POSITION_SQL = "UPDATE user SET latitude = ?, longitude = ?, lastReport = ? WHERE id = ?";
@@ -48,7 +47,9 @@ public class UserDAOImpl implements UserDAO {
 	private static final String IDHASH_LIST_SQL = "SELECT ih.id, ih.hash from addressBook ab, addressBookHashMatcher hm, idHash ih WHERE ih.id = hm.hashId AND hm.addressBookId = ab.id and ab.ownerId = ? AND ab.permission = ?";
 
 	private static final String PERMS_RESET_SQL = "UPDATE addressBook SET permission = ? WHERE ownerId = ?";
-	private static final String PERMS_UPDATE_SQL = "UPDATE addressBook ab SET permission = ? WHERE ownerID = ? AND id IN (SELECT abHM.addressBookId FROM addressBookHashMatcher abhm, idHash h WHERE abhm.hashId = h.id AND h.hash IN (?,?,?,?,?,?,?,?,?,?))";
+	private static final String PERMS_UPDATE_SQL = "UPDATE addressBook ab SET permission = ? WHERE ownerID = ? AND id IN (SELECT abhm.addressBookId FROM addressBookHashMatcher abhm, idHash h WHERE abhm.hashId = h.id AND h.hash IN (?,?,?,?,?,?,?,?,?,?))";
+	
+	private static final String USER_DELETE_SQL = "DELETE FROM user WHERE id = ?";
 	
 	/* See the comment for setPermissions() to understand what this is, and why it needs to match the 
 	 * number of question-marks in the subquery of PERMS_UPDATE_SQL
@@ -189,11 +190,21 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public List<Poi> getNearestUsers(User u, int radius) throws SQLException {
+		List<Poi> ret = new ArrayList<Poi>();
+		if (u==null) {
+			logger.debug("getNearestUsers() u=null,radius="+radius);
+			return ret; /* By definition we have no nearby friends for users we don't know! */
+		}
+		if (u.getLastPosition()==null) {
+			logger.debug("getNearestUsers() u="+u.getId()+",lastPosition=null,radius="+radius);
+			return ret; /* By definition we have no nearby friends for users we don't know a last position for */
+			
+		}
+		logger.debug("getNearestUsers() lat="+u.getLastPosition().getLatitude()+",long="+u.getLastPosition().getLongitude()+",id="+u.getId()+",radius="+radius);
 		Connection c = null;
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		
-		List<Poi> ret = new ArrayList<Poi>();
 		try {
 			c = dataSource.getConnection();
 			pst = c.prepareStatement(NEAREST_SQL);
@@ -244,7 +255,9 @@ public class UserDAOImpl implements UserDAO {
 			 */
 
 			if (exists!=null) {
-				if ((u.getLastPosition()!=null) && (exists.getLastPosition()!=null) && (!u.getLastPosition().equals(exists.getLastPosition()))) {
+				logger.debug("write() user already exists");
+				if ((u.getLastPosition()!=null) && (!u.getLastPosition().equals(exists.getLastPosition()))) {
+					logger.debug("write() updating last known position");
 					pst = c.prepareStatement(USER_UPDATE_POSITION_SQL);
 					pst.setDouble(1, u.getLastPosition().getLatitude());
 					pst.setDouble(2, u.getLastPosition().getLongitude());
@@ -252,7 +265,9 @@ public class UserDAOImpl implements UserDAO {
 					pst.setInt(4, exists.getId());
 					pst.executeUpdate();
 					pst.close();
-				}
+				} else
+					logger.debug("write() no position updated; null or unchanged, old="+exists.getLastPosition()+",current="+u.getLastPosition());
+
 				
 				if (!u.getMsisdnHash().equals(exists.getMsisdnHash())) {
 					
@@ -344,6 +359,26 @@ public class UserDAOImpl implements UserDAO {
 		throw new RuntimeException("couldn't add an IdentityHash");
 	}
 
+	private void deleteAddressBook(Connection c, int userId) throws SQLException {
+		PreparedStatement pst = null;
+		try {
+			/* Delete all entries for this addressBook from the addressBookHashMatcher table */
+	
+			pst = c.prepareStatement(HASHMATCH_DELETE_SQL);
+			pst.setInt(1, userId);
+			pst.executeUpdate();
+	
+			/* Delete all entries for this user from the addressBook table */
+			
+			pst = c.prepareStatement(BOOK_DELETE_SQL);
+			pst.setInt(1, userId);
+			pst.executeUpdate();
+		} finally {
+			if (pst!=null) pst.close();
+		}
+
+	}
+	
 	@Override
 	public boolean setAddressBook(int id, List<AddressBookEntry> book) throws SQLException {
 		
@@ -367,20 +402,8 @@ public class UserDAOImpl implements UserDAO {
 		 */
 		
 		try {
-			
-			/* Delete all entries for this addressBook from the addressBookHashMatcher table */
-
 			c = dataSource.getConnection();
-			pst = c.prepareStatement(HASHMATCH_DELETE_SQL);
-			pst.setInt(1, u.getId());
-			pst.executeUpdate();
-
-			/* Delete all entries for this user from the addressBook table */
-			
-			c = dataSource.getConnection();
-			pst = c.prepareStatement(BOOK_DELETE_SQL);
-			pst.setInt(1, u.getId());
-			pst.executeUpdate();
+			deleteAddressBook(c, u.getId());
 
 			/* For each new AddressBookEntry to be added
 			 * - create an entry in the AddressBook table
@@ -533,6 +556,22 @@ public class UserDAOImpl implements UserDAO {
 
 		
 		
+	}
+
+	@Override
+	public void deleteUser(User u) throws SQLException {
+		Connection c = dataSource.getConnection();
+		PreparedStatement pst = null;
+		
+		try {
+			deleteAddressBook(c, u.getId());
+			
+			pst = c.prepareStatement(USER_DELETE_SQL);
+			pst.setInt(1, u.getId());
+			pst.executeUpdate();
+		} finally {
+			if (pst!=null) pst.close();
+		}
 	}
 
 }

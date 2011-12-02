@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="hello">Hello World, AdvSoftEngApp1Activity!</string>
     <string name="app_name">NearMe</string>
     <string name="no_gps_error">GPS not available</string>
@@ -13,5 +12,11 @@
     <string name="get_poi_label">Get POIs</string>
     <string name="map_poi_label">MAP POI</string>
     <string name="tvRadiusText">Radius = </string>
-    <string name="serverAddress">http://nearme.tomhume.org:8080/NearMeServer/nearme/</string>
+    <string name="menu_help">Help</string>
+    <string name="menu_add_poi">Add Place</string>
+    <string name="menu_upload_ab">Address Book</string>
+    <string name="friends_loading">Reading your address book, hold on...</string>
+    <string name="friends_loaded">Click to save</string>
+    <string name="menu_unsubscribe">Unsubscribe</string>
+    <string name="unsubscribed">You have been unsubscribed from NearMe.</string>
 </resources>

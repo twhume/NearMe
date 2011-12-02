@@ -17,6 +17,7 @@ public class PoiQuery {
 	
 	private static Logger logger = Logger.getLogger(PoiQuery.class);
 
+	private String androidId;			/* Unique ID of the device making the PoiQuery */
 	private double latitude;			/* Latitude of the position to search from */
 	private double longitude;			/* Longitude of the position to search from */
 	private int radius;					/* Metres from the current position to search within */
@@ -25,6 +26,7 @@ public class PoiQuery {
 	public PoiQuery(String path) {
 		try {
 			StringTokenizer st = new StringTokenizer(path, "/?=");
+			this.androidId = st.nextToken();
 			this.latitude = Double.parseDouble(st.nextToken());
 			this.longitude = Double.parseDouble(st.nextToken());
 			this.radius = Integer.parseInt(st.nextToken());
@@ -74,6 +76,14 @@ public class PoiQuery {
 
 	public void setTypes(ArrayList<Integer> types) {
 		this.types = types;
+	}
+
+	public String getAndroidId() {
+		return androidId;
+	}
+
+	public void setAndroidId(String androidId) {
+		this.androidId = androidId;
 	}
 	
 	

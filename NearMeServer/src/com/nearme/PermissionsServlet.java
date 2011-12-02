@@ -43,7 +43,7 @@ public class PermissionsServlet extends GenericNearMeServlet {
 				
 				resp.setContentType("application/json");
 				List<IdentityHash> perms = ud.getPermissions(u);
-				logger.info("permissions requested for "+ deviceId+": (" + Util.hashListAsString(perms) + ")");
+				logger.info("permissions granted for user "+ u.getId()+": (" + Util.hashListAsString(perms) + ")");
 				Gson gson = new Gson();
 				resp.getOutputStream().print(gson.toJson(Util.hashListAsStringArray(perms)));
 			}
@@ -86,23 +86,6 @@ public class PermissionsServlet extends GenericNearMeServlet {
 			e.printStackTrace();
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}	
-	}
-
-	
-	/**
-	 * Helper method, returns the device ID from this request.
-	 * Returns null if it can't find one.
-	 * 
-	 * @param req
-	 * @return
-	 */
-	
-	private String getDeviceId(HttpServletRequest req) {
-		String deviceId = req.getPathInfo();
-		if ((deviceId==null) || (deviceId.length()<2)) return null;
-		
-		return deviceId.substring(1, deviceId.length());
-		
 	}
 
 

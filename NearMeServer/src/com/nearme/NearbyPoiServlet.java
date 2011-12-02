@@ -3,6 +3,8 @@ package com.nearme;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,19 +38,37 @@ public class NearbyPoiServlet extends GenericNearMeServlet {
 	
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
 		res.setContentType("application/json");
-		PoiQuery pq = new PoiQuery(req.getPathInfo());
+		logger.debug("url=" + req.getPathInfo() + "?" + req.getQueryString());
+		PoiQuery pq = new PoiQuery(req.getPathInfo() + "?" + req.getQueryString());
 
 		try {
 			PoiFinder pf = new DatabasePoiFinder(datasource);
 			UserDAO uf = new UserDAOImpl(datasource);
 	
-			/* Get a list of all nearby points of interest and add in nearby friends */
+			/* Look up the user, and set their last known position to be the one they've supplied.
+			 * If we don't know them, make a new record for them.
+			 */
 			
-			User u = uf.read(1); //TODO fix grotty hardcoding, take device-ID from URL
-			List<Poi> points = pf.find(pq);
-			logger.info("found " + points.size() + " POIs for user 1 within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
+			User u = uf.readByDeviceId(pq.getAndroidId());
+			if (u==null) {
+				u = new User();
+				u.setDeviceId(pq.getAndroidId());
+				u.setMsisdnHash("unknown");
+				u = uf.write(u);
+			}
+			Position currentPos = new Position(pq.getLatitude(), pq.getLongitude());
+			currentPos.setWhen(new Date());
+			u.setLastPosition(currentPos);
+			uf.write(u);
+
+			/* Get a list of all nearby points of interest and add in nearby friends */
+
+			List<Poi> points = new ArrayList<Poi>();
+			logger.debug("types="+pq.getTypes());
+			if (pq.getTypes().size()>0) points.addAll(pf.find(pq));
+			logger.info("found " + points.size() + " POIs for user " + u.getId() + " within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
 			List<Poi> friends = uf.getNearestUsers(u, pq.getRadius());
-			logger.info("found " + friends.size() + " friends for user 1 within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
+			logger.info("found " + friends.size() + " friends for user " + u.getId() + " within " + pq.getRadius() + " of (" + pq.getLatitude() + "," + pq.getLongitude() + ")");
 			points.addAll(friends);
 			
 			/* Use GSon to serialise this list onto a JSON structure, and send it to the client.

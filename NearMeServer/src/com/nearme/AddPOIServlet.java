@@ -6,13 +6,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 /**
  * Servlet implementation class AddPOIServlet
@@ -21,19 +20,22 @@ import javax.servlet.http.HttpServletResponse;
 
 public class AddPOIServlet extends HttpServlet {
 	
+	//TODO: why are these class variables, and why static?
+	
 	private static final long serialVersionUID = -1593856664522697355L;
-
 	private static String latitude;
 	private static String longitude;
 	private static String name;
 	private static String type;
 	private static int id_type;  
 	static Connection conn = null;
-    
 	static String bd = "nearme";
 	static String login = "nearme";
 	static String password = "nearme";
 	static String url = "jdbc:mysql://localhost/" + bd;
+	
+	private static Logger logger = Logger.getLogger(AddPOIServlet.class);
+	
 	
 	public static void main(String args[]) throws Exception {
 
@@ -42,10 +44,7 @@ public class AddPOIServlet extends HttpServlet {
 
 		
 	}
-	public void init(ServletConfig config) throws ServletException {
-		  super.init(config);
-		 
-		  }
+
    public AddPOIServlet() {
         super();
         
@@ -53,26 +52,29 @@ public class AddPOIServlet extends HttpServlet {
 
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doPost(request,response);
+		
+		doPost (request, response);
+	
 	}
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+	
 		latitude = request.getParameter("lat");
 		longitude = request.getParameter("lng");
 		name = request.getParameter("name");
 		type = request.getParameter("type"); 
+	    //System.out.println("try");
 		
-	    /*name = "new";
-		type ="Pubs";
-		latitude = "12.54";
-		longitude = "16.59";*/
+		//TODO move this code into the POIFinder, and rename POIFinder to POIDAO
+		// This is so we keep database code in as few places as possible, thus enforcing a bit of modularity
+		// and a consistent style across the project
 		
 		try
 		  {
 			conn = DriverManager.getConnection(url, login, password); // connect with data base
-			
+			//System.out.println("try 2");
 			ResultSet rs = null;
 			PreparedStatement typeSearch =  conn.prepareStatement("Select id from type Where name = ?");
 			typeSearch.setString(1, type);
@@ -84,8 +86,11 @@ public class AddPOIServlet extends HttpServlet {
 				// get the id of the type name
 				id_type =Integer.parseInt(rs.getString("id")); 
 			}    
+			rs.close();
+			typeSearch.close();
 			
 			//System.out.println(id_type);
+			
 			//insert the new favourite place in the database 
 			PreparedStatement locationAdd = conn.prepareStatement("insert into poi values (default, ?, ?, ?, ?)");
 			locationAdd.setString(1, name);
@@ -94,17 +99,20 @@ public class AddPOIServlet extends HttpServlet {
 			locationAdd.setInt(4, id_type);
 			locationAdd.executeUpdate();
 			
-			
-			//System.out.println("Data Saved");
+			locationAdd.close();
+			logger.info("received new POI " + name + " at (" + latitude + "," + "longitude)");
+
+			System.out.println("Data Saved");
+			conn.close();
 			
 		  }
 		  catch (SQLException e) {
 			  e.printStackTrace(); 
 		  }
+	
 		
-		
-		
-		
+		response.setContentType("text/plain");
+		response.getOutputStream().println("OK");
 	}
 
 }

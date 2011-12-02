@@ -73,8 +73,18 @@ public class DatabasePoiFinder implements PoiFinder {
 		 * 
 		 */
 
-		PreparedStatement locationSearch = conn
-				.prepareStatement("SELECT *, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance  FROM poi HAVING distance < ? ORDER BY distance");
+		String sql = "SELECT *, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance  FROM poi WHERE type IN (";
+
+		for (int i: pq.getTypes()) {
+			sql = sql + i + ",";
+		}
+		sql = sql.substring(0, sql.length()-1);
+
+		sql = sql + ") HAVING distance < ? ORDER BY distance";
+		
+		logger.debug("find() sql="+sql);
+
+		PreparedStatement locationSearch = conn.prepareStatement(sql);
 		locationSearch.setDouble(1, pq.getLatitude());
 		locationSearch.setDouble(2, pq.getLongitude());
 		locationSearch.setDouble(3, pq.getLatitude());
