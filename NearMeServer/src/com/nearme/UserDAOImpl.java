@@ -30,7 +30,7 @@ public class UserDAOImpl implements UserDAO {
 	private static final String READ_HASH_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE idHash.hash = ? AND idHash.id = user.hashId";
 	private static final String READ_DEVICE_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE user.deviceId = ? AND idHash.id = user.hashId";
 	private static final String READ_AB_SQL = "SELECT ab.id, ab.name, ab.permission, ih.id, ih.hash FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ab.ownerId = ? AND abhm.addressBookId = ab.id AND abhm.hashId = ih.id ORDER BY ab.name";
-	private static final String NEAREST_SQL = "SELECT u2.*, ab.name, ( 6371 * acos( cos( radians(?) ) * cos( radians( u2.latitude ) ) * cos( radians( u2.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( u2.latitude ) ) ) ) AS distance FROM user u, addressBook ab, addressBookHashMatcher abhm, user u2 WHERE u.id = ? AND u.id = ab.ownerId AND abhm.addressBookId = ab.id AND abhm.hashId = u2.hashId  HAVING distance < ? ORDER BY distance";
+	private static final String NEAREST_SQL = "SELECT u.id, ab.name, u.latitude, u.longitude, ( 6371 * acos( cos( radians(?) ) * cos( radians( u.latitude ) ) * cos( radians( u.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( u.latitude ) ) ) ) AS distance, abhm.* FROM user u, addressBook ab, addressBookHashMatcher abhm WHERE ab.ownerId = ? AND abhm.addressBookId = ab.id AND abhm.hashId = u.hashId AND u.id IN (/* All those who have user with the supplied hash in their address book with permission > 0 */ SELECT distinct ab.ownerId FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ih.hash = ? AND abhm.hashId = ih.id AND abhm.addressBookId = ab.id AND ab.permission > 0 ) HAVING distance < ? ORDER BY distance";
 
 	private static final String USER_INSERT_SQL = "INSERT INTO user (deviceId, hashId, latitude, longitude, lastReport) VALUES (?,?,?,?,?)";
 	private static final String USER_UPDATE_POSITION_SQL = "UPDATE user SET latitude = ?, longitude = ?, lastReport = ? WHERE id = ?";
@@ -212,11 +212,12 @@ public class UserDAOImpl implements UserDAO {
 			pst.setDouble(2, u.getLastPosition().getLongitude());
 			pst.setDouble(3, u.getLastPosition().getLatitude());
 			pst.setInt(4, u.getId());
-			pst.setInt(5, radius);
+			pst.setString(5,u.getMsisdnHash());
+			pst.setInt(6, radius);
 
 			rs = pst.executeQuery();
 			while (rs.next()) {
-				Poi p = new Poi(rs.getString("ab.name"), rs.getDouble("u2.latitude"), rs.getDouble("u2.longitude"), PoiType.FRIEND, 0);
+				Poi p = new Poi(rs.getString("ab.name"), rs.getDouble("u.latitude"), rs.getDouble("u.longitude"), PoiType.FRIEND, 0);
 				ret.add(p);
 			}
 		} finally {

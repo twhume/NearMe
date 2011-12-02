@@ -20,8 +20,8 @@ public class Position {
 	}
 	
 	public Position(double l1, double l2, Date w) {
+		this(l1, l2);
 		this.when = w;
-		new Position(l1, l2);
 	}
 	
 	public double getLatitude() {

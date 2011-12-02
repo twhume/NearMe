@@ -14,8 +14,9 @@ CREATE TABLE `user` (
 ALTER TABLE user ADD INDEX deviceId_idx(deviceId);
 ALTER TABLE user ADD INDEX hash_idx(hashId);
 
-INSERT INTO user VALUES (1, 1, "android-123456", -123.45, 67.89, "2011-11-11 00:00:00");
+INSERT INTO user VALUES (1, 1, "android-123456", -123.45, 57.89, "2011-11-11 00:00:00");
 INSERT INTO user VALUES (2, 2, "android-7890", -123.45, 67.89, "2011-11-11 00:00:00");
+INSERT INTO user VALUES (3, 3, "android-456", -123.45, 67.89, "2011-11-11 00:00:00");
 
 CREATE TABLE `idHash` (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -42,6 +43,7 @@ ALTER TABLE addressBook ADD INDEX ownerName_idx(ownerId,name);
 INSERT INTO addressBook VALUES (1, 1, "Tom", 1);
 INSERT INTO addressBook VALUES (2, 1, "Dick", 0);
 INSERT INTO addressBook VALUES (3, 1, "Harry", 0);
+INSERT INTO addressBook VALUES (4, 3, "User-1", 0);
 
 CREATE TABLE `addressBookHashMatcher` (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -54,6 +56,7 @@ ALTER TABLE addressBookHashMatcher ADD INDEX book_idx(addressBookId);
 INSERT INTO addressBookHashMatcher VALUES (1, 3, 1);
 INSERT INTO addressBookHashMatcher VALUES (2, 4, 2);
 INSERT INTO addressBookHashMatcher VALUES (3, 5, 3);
+INSERT INTO addressBookHashMatcher VALUES (4, 1, 4);
 
 
 CREATE TABLE `poi` (

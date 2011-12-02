@@ -8,11 +8,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 public class UserDaoTest {
+	
+	private static Logger logger = Logger.getLogger(UserDaoTest.class);
 	
 	private UserDAO uf = null;
 	private MysqlConnectionPoolDataSource dataSource = null;
@@ -62,7 +65,7 @@ public class UserDaoTest {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 
-		User testUser = new User(1, "android-123456", "hash-1234567890", new Position(-123.45, 67.89, c.getTime()));
+		User testUser = new User(1, "android-123456", "hash-1234567890", new Position(-123.45, 57.89, c.getTime()));
 
 		assertEquals(testUser, uf.read(1));
 		
@@ -277,9 +280,9 @@ public class UserDaoTest {
 
 		// getpermissions should return their hashes
 		List<IdentityHash> hashes = uf.getPermissions(u);
-		assertEquals(perms[0], hashes.get(0).getHash());
-		assertEquals(perms[1], hashes.get(1).getHash());
 		assertEquals(2, hashes.size());
+		assertEquals(perms[1], hashes.get(0).getHash());
+		assertEquals(perms[0], hashes.get(1).getHash());
 	}
 
 	@Test
@@ -336,18 +339,68 @@ public class UserDaoTest {
 	
 	@Test
 	public void testGetNearestUsersNoUsersNearby() throws SQLException {
-		fail("not implemented");
+		// look at co-ordinate -123.45, 67.89 - where user ID 2 is, with no users near
+		User u = uf.read(2);
+		List<Poi> ret = uf.getNearestUsers(u, 100);
+		assertNotNull(ret);
+		assertEquals(0, ret.size());
 	}
 
 	@Test
 	public void testGetNearestUsersOneUserNearbyWithoutPermission() throws SQLException {
-		fail("not implemented");
+		// move user 1 to -123.45, 57.89 - where user 3 is currently sat
+		User u1 = uf.read(1);
+		u1.setLastPosition(new Position(-123.45, 67.89, new Date()));
+		uf.write(u1);
+		
+		// withdraw permission from user 1 to share his location with user 3
+		
+		ArbitrarySQLRunner asr = new ArbitrarySQLRunner(dataSource);
+		asr.runSQL("UPDATE addressBook SET permission = 0 WHERE id = 1");
+
+		User u = uf.read(3);
+
+		// user 1 should *not* turn up in the results now
+		
+		List<Poi> ret = uf.getNearestUsers(u, 100);
+		assertNotNull(ret);
+		assertEquals(0, ret.size());
 	}
 
 	@Test
 	public void testGetNearestUsersOneUserNearbyWithPermission() throws SQLException {
-		fail("not implemented");
+		// move user 1 to -123.45, 67.89 - where user 3 is currently sat
+		User u1 = uf.read(1);
+		u1.setLastPosition(new Position(-123.45, 67.89, new Date()));
+		uf.write(u1);
+
+		
+		User u = uf.read(3);
+
+		// user 1 should turn up in the results now
+		
+		List<Poi> ret = uf.getNearestUsers(u, 100);
+		assertNotNull(ret);
+		assertEquals(1, ret.size());
 	}
+	
+	@Test
+	public void testGetNearestUsersOneUserOutOfRangeWithPermission() throws SQLException {
+		// move user 1 to -100.45, 57.89 - out of range of user 3
+		User u1 = uf.read(1);
+		u1.setLastPosition(new Position(-100.45, 57.89, new Date()));
+		uf.write(u1);
+
+		
+		User u = uf.read(3);
+
+		// user 1 should no longer turn up in the results now
+		
+		List<Poi> ret = uf.getNearestUsers(u, 100);
+		assertNotNull(ret);
+		assertEquals(0, ret.size());
+	}
+	
 
 	/**
 	 * Simple helper methods, just counts how many users or address book entries there are in the database

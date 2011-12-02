@@ -44,6 +44,14 @@ public class ArbitrarySQLRunner {
 		}
 		conn.close();
 	}
+
+	public void runSQL(String s) throws SQLException {
+		Connection conn = dataSource.getConnection();
+		PreparedStatement pst = conn.prepareStatement(s);
+		pst.executeUpdate();
+		pst.close();
+		conn.close();
+	}
 	
 	/**
 	 * Runs the supplied SQL and returns the integer returned.
