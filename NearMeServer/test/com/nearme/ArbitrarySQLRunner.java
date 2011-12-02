@@ -43,7 +43,6 @@ public class ArbitrarySQLRunner {
 		while (scanner.hasNext()) {
 			String sql = scanner.next();
 			if (sql.length()>1) {
-				logger.debug("runSQL: " + sql);
 				PreparedStatement pst = conn.prepareStatement(sql);
 				pst.executeUpdate();
 				pst.close();

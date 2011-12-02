@@ -49,6 +49,7 @@ public class POSTedAddressBookParser {
 			AddressBookEntry abe = new AddressBookEntry();
 			abe.setName(e.name);
 			abe.setOwner(user);
+			abe.setPermission(e.permission);
 			List<IdentityHash> hashes = new ArrayList<IdentityHash>();
 			if (e.hashes!=null) {
 				for (String s: e.hashes) {
@@ -76,6 +77,7 @@ public class POSTedAddressBookParser {
 	class Entry {
 		List<String> hashes;
 		String name;
+		int permission;
 		
 		public String toString() {
 			return "name="+name+",hashes="+hashes;

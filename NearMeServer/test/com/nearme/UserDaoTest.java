@@ -50,8 +50,9 @@ public class UserDaoTest {
 		gingerHashes.add(new IdentityHash("ginger-hash-2"));
 
 		testBook = new ArrayList<AddressBookEntry>();
-		testBook.add(new AddressBookEntry("fred", fredHashes, AddressBookEntry.PERM_HIDDEN));
+		testBook.add(new AddressBookEntry("fred", fredHashes, AddressBookEntry.PERM_SHOWN));
 		testBook.add(new AddressBookEntry("ginger", gingerHashes, AddressBookEntry.PERM_HIDDEN));
+		
 	}
 
 	@Test
@@ -248,6 +249,21 @@ public class UserDaoTest {
 		assertEquals("Dick", bookAgain.get(0).getName());
 		assertEquals("Tom", bookAgain.get(1).getName());
 		
+	}
+	
+	
+	@Test
+	public void testSetAddressBookSetsPermissionsOK() throws SQLException {
+		assertEquals(0, uf.getAddressBook(2).size());
+		assertEquals(true, uf.setAddressBook(2, testBook));
+
+		List<AddressBookEntry> book = uf.getAddressBook(2);
+		assertEquals(2, book.size());
+		assertEquals("fred", book.get(0).getName());
+		assertEquals(AddressBookEntry.PERM_SHOWN, book.get(0).getPermission());
+		assertEquals("ginger", book.get(1).getName());
+		assertEquals(AddressBookEntry.PERM_HIDDEN, book.get(1).getPermission());
+
 	}
 	
 	@Test
