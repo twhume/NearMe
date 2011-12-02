@@ -213,7 +213,7 @@ public class UserDAOImpl implements UserDAO {
 			pst.setDouble(3, u.getLastPosition().getLatitude());
 			pst.setInt(4, u.getId());
 			pst.setString(5,u.getMsisdnHash());
-			pst.setInt(6, radius);
+			pst.setDouble(6, ((float) radius/ (float) 1000));
 
 			rs = pst.executeQuery();
 			while (rs.next()) {

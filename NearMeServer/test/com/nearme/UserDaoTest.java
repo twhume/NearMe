@@ -377,9 +377,9 @@ public class UserDaoTest {
 		
 		User u = uf.read(3);
 
-		// user 1 should turn up in the results now
+		// user 1 should turn up in the results now, within 1m of user 3
 		
-		List<Poi> ret = uf.getNearestUsers(u, 100);
+		List<Poi> ret = uf.getNearestUsers(u, 1);
 		assertNotNull(ret);
 		assertEquals(1, ret.size());
 	}

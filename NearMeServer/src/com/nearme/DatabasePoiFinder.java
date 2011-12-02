@@ -88,7 +88,8 @@ public class DatabasePoiFinder implements PoiFinder {
 		locationSearch.setDouble(1, pq.getLatitude());
 		locationSearch.setDouble(2, pq.getLongitude());
 		locationSearch.setDouble(3, pq.getLatitude());
-		locationSearch.setDouble(4, pq.getRadius());
+		float radiusInKm = ((float) pq.getRadius() / 1000);
+		locationSearch.setDouble(4, radiusInKm);
 		ResultSet rs = locationSearch.executeQuery();
 
 		while (rs.next()) // Return false when there is not more data in the
@@ -99,9 +100,9 @@ public class DatabasePoiFinder implements PoiFinder {
 					rs.getInt("Id"));
 			ret.add(newPoi);
 
-			logger.debug(rs.getObject("name") + ", Longitude: "
+			logger.debug("Found " + rs.getObject("name") + ", Longitude: "
 					+ rs.getObject("longitude") + ", Latitude: "
-					+ rs.getObject("latitude"));
+					+ rs.getObject("latitude") +", distance="+ rs.getString("distance"));
 		}
 		rs.close();
 
