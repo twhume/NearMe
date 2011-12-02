@@ -7,8 +7,11 @@
         android:id="@+id/mapView"
         android:layout_width="fill_parent"
         android:layout_height="355dp"
-        android:apiKey="0Ey-NKxG6fvVMFi4al0jvsayI2J40GBly-osuDA"
+        android:apiKey="0staPCb6rpYVTeuhJjCeveideNuwfn5ezXtKgYg"
         android:clickable="true"
         android:enabled="true" />
     
     </LinearLayout>
+    <!-- mariana's key = 0Ey-NKxG6fvVMFi4al0jvsayI2J40GBly-osuDA -->
+    <!-- Alans key: 0staPCb6rpYVTeuhJjCeveideNuwfn5ezXtKgYg -->
+    
