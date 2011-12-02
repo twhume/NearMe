@@ -333,6 +333,21 @@ public class UserDaoTest {
 		assertEquals(before, after);
 		assertEquals(beforeAb, afterAb);
 	}
+	
+	@Test
+	public void testGetNearestUsersNoUsersNearby() throws SQLException {
+		fail("not implemented");
+	}
+
+	@Test
+	public void testGetNearestUsersOneUserNearbyWithoutPermission() throws SQLException {
+		fail("not implemented");
+	}
+
+	@Test
+	public void testGetNearestUsersOneUserNearbyWithPermission() throws SQLException {
+		fail("not implemented");
+	}
 
 	/**
 	 * Simple helper methods, just counts how many users or address book entries there are in the database
