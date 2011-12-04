@@ -76,6 +76,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 	
 	private void manageAddressBook() {
 		Intent intentAddressRip = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
+		Log.i(TAG, "ManageAddressBook");
 		startActivity(intentAddressRip);
 	}
 	
