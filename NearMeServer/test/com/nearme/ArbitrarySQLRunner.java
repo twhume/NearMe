@@ -9,6 +9,8 @@ import java.util.Scanner;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+
 /**
  * I got to the point in my tests where I was testing we're writing things in and out of a
  * database correctly, and needed (a) a quick way to reset the database to a known good
@@ -21,6 +23,8 @@ import javax.sql.DataSource;
 
 public class ArbitrarySQLRunner {
 
+	private Logger logger = Logger.getLogger(ArbitrarySQLRunner.class);
+	
 	private DataSource dataSource = null;
 	
 	public ArbitrarySQLRunner(DataSource d) {
@@ -38,9 +42,11 @@ public class ArbitrarySQLRunner {
 		Connection conn = dataSource.getConnection();
 		while (scanner.hasNext()) {
 			String sql = scanner.next();
-			PreparedStatement pst = conn.prepareStatement(sql);
-			pst.executeUpdate();
-			pst.close();
+			if (sql.length()>1) {
+				PreparedStatement pst = conn.prepareStatement(sql);
+				pst.executeUpdate();
+				pst.close();
+			}
 		}
 		conn.close();
 	}

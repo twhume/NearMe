@@ -26,7 +26,6 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,7 +45,6 @@ public class AddressBookRipperActivity extends Activity {
 	
 	private static final String TAG = "Ripper"; 
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
-	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
 	AddressEntryAdapter adaptor = null;
 	
@@ -163,19 +161,30 @@ public class AddressBookRipperActivity extends Activity {
 	
 	private class UploadContactsTask extends AsyncTask<AddressBook, Integer, Boolean> {
 
+		/**
+		 * Tell the user we've saved their address book, and exit the activity
+		 */
+		
+		protected void onPostExecute(Boolean result) {
+			int resource = result ? R.string.upload_ab_ok : R.string.upload_ab_failed;
+			Toast toast=Toast.makeText(getApplicationContext(), getString(resource), 2000);
+			toast.show();
+			finish();
+		}
+		
 		@Override
 		protected Boolean doInBackground(AddressBook... ab) {
 			Gson gson = new Gson();
 			Log.i(TAG, "Got entries " + ab[0].getEntries().size());
 			
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(ENDPOINT);
+			HttpPost post = new HttpPost(AdvSoftEngApp1Activity.ENDPOINT+"/addressBook");
 
 			try {
 				HttpEntity ent = new StringEntity(gson.toJson(ab[0]));
 				post.setEntity(ent);
 				HttpResponse response = client.execute(post);
-				Log.i(TAG, "post to " + ENDPOINT + " done, response="+response.getStatusLine().getStatusCode());
+				Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
 			} catch (Exception e) {
 				Log.i(TAG, "post threw " + e);
 				e.printStackTrace();
@@ -370,8 +379,8 @@ public class AddressBookRipperActivity extends Activity {
 
 			protected void onPostExecute(Void result) {
 				finish();
-					Toast toast=Toast.makeText(getApplicationContext(), getString(R.string.unsubscribed), 2000);
-					toast.show();
+				Toast toast=Toast.makeText(getApplicationContext(), getString(R.string.unsubscribed), 2000);
+				toast.show();
 			}
 
 			/**
@@ -383,7 +392,7 @@ public class AddressBookRipperActivity extends Activity {
 				Log.i(TAG, System.currentTimeMillis() + " starting");
 				
 				HttpClient client = new DefaultHttpClient();
-				HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + AdvSoftEngApp1Activity.DEVICE_ID);
+				HttpPost post = new HttpPost(AdvSoftEngApp1Activity.ENDPOINT + "/unsubscribe/" + AdvSoftEngApp1Activity.DEVICE_ID);
 
 				try {
 					HttpResponse response = client.execute(post);
