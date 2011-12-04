@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+// ref: http://about-android.blogspot.com/2010/02/create-custom-dialog.html
+
 public class DialogBoxPermissions extends Dialog {
 
     public interface ReadyListener {
