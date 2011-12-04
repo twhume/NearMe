@@ -4,20 +4,22 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import com.google.gson.Gson;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,73 +43,86 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+
 public class AddressBookRipperActivity extends Activity {
-	
+
 	private static final String TAG = "Ripper"; 
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
+	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/addressBook";
 	private GatherContactsTask gatherer = null;
-	AddressEntryAdapter adaptor = null;
-	
+	private AddressEntryAdapter adaptor = null;
+	private SharedPreferences prefs = null;
+	DialogBoxPermissions myDialog = null;
+
 	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
 	private String ownNumber; /* Users own phone number */
 	private Button sendFriendList;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts);
-		
+
+		//TODO: delete when finished testing....
+		//Log.i("AddressBookRipperActivity","onCreate");
+
 		TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
 		countryCode = tm.getSimCountryIso();
 		ownNumber = tm.getLine1Number();
-		
+
+		prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
+
 		gatherer = new GatherContactsTask();
 		gatherer.execute();
 
 		sendFriendList = (Button) this.findViewById(R.id.btnSendFriends);
 		sendFriendList.setText(R.string.friends_loading);
 		sendFriendList.setEnabled(false);
-	
+
 		sendFriendList.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
 				uploadContacts(AdvSoftEngApp1Activity.globalAddressBook);
 			}
 		});
-				
+
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.addressbook, menu);
-	    return true;
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.addressbook, menu);
+		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-		    case R.id.unsubscribe:
-		    	unsubscribe();
-		        return true;
-		    default:
-		        return super.onOptionsItemSelected(item);
-	    }
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.unsubscribe:
+			unsubscribe();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
-	
+
 	private void unsubscribe() {
 		UnsubscribeTask unsubscriber = new UnsubscribeTask();
-    	unsubscriber.execute();
+		unsubscriber.execute();
 	}
-	
+
 	////////////////////////////////////////////
 
 	private void uploadContacts(AddressBook a) {
-    	UploadContactsTask uploader = new UploadContactsTask();
-    	uploader.execute(a);
-    }
-	
+		UploadContactsTask uploader = new UploadContactsTask();
+		uploader.execute(a);
+	}
+
 	/**
 	 * Turns a given MSISDN into a usable hash to identify the number. Does this by
 	 * rendering the number into a canonical international MSISDN, then putting
@@ -120,7 +135,7 @@ public class AddressBookRipperActivity extends Activity {
 		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 		String input = null;
 		PhoneNumber pn = null;
-		
+
 		try {
 			pn = phoneUtil.parse(s, countryCode.toUpperCase());
 			input = phoneUtil.format(pn,PhoneNumberFormat.E164);
@@ -131,7 +146,7 @@ public class AddressBookRipperActivity extends Activity {
 			return input;
 		}
 	}
-	
+
 	/**
 	 * Hash function, taken from http://stackoverflow.com/questions/4534370/how-to-hash-string-using-sha-1-with-key
 	 * 
@@ -158,55 +173,84 @@ public class AddressBookRipperActivity extends Activity {
 
 	}
 	////////////////////////////////////////////
-	
+
 	private class UploadContactsTask extends AsyncTask<AddressBook, Integer, Boolean> {
 
-		/**
-		 * Tell the user we've saved their address book, and exit the activity
-		 */
-		
-		protected void onPostExecute(Boolean result) {
-			int resource = result ? R.string.upload_ab_ok : R.string.upload_ab_failed;
-			Toast toast=Toast.makeText(getApplicationContext(), getString(resource), 2000);
-			toast.show();
-			finish();
-		}
-		
 		@Override
 		protected Boolean doInBackground(AddressBook... ab) {
+
+			SharedPreferences.Editor editor = prefs.edit();
+			boolean bContactsSaved = false;
+
+			// loop through addressBook looking for perms != 0...
+			for(int i = 0; i < AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++){
+
+				String name = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getName();
+				int perms = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission();
+
+				if(AddressBookEntry.PERM_HIDDEN != AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission()){
+
+					//TODO: delete log call when finished testing....
+					Log.i(TAG, name + " has perms = " + perms);
+
+					//then save the current entry's permission in prefs, using their name as their unique ID for retrieval.
+					editor.putInt(name, perms);
+
+					bContactsSaved = true; // set flag
+
+				}
+				else{
+					// we have a hidden perms... make sure its NOT in the prefs...
+					editor.remove(name);
+
+					//TODO: delete log call when finished testing....
+					Log.i(TAG, name + " has 0 permission. perms = " + perms);
+				}
+
+
+			}
+			editor.putBoolean("bContactsSaved", bContactsSaved); // set flag
+			editor.commit(); // write to prefs once done checking
+
+			//////////////////
 			Gson gson = new Gson();
 			Log.i(TAG, "Got entries " + ab[0].getEntries().size());
-			
+
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(AdvSoftEngApp1Activity.ENDPOINT+"/addressBook");
+			HttpPost post = new HttpPost(ENDPOINT);
 
 			try {
 				HttpEntity ent = new StringEntity(gson.toJson(ab[0]));
 				post.setEntity(ent);
 				HttpResponse response = client.execute(post);
-				Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
+				Log.i(TAG, "post to " + ENDPOINT + " done, response="+response.getStatusLine().getStatusCode());
 			} catch (Exception e) {
 				Log.i(TAG, "post threw " + e);
 				e.printStackTrace();
 				return false;
 			}
-			
+
 			return true;
 		}
 	}
-	
-	void CopyAddressBookEntry(AddressBookEntry originalAddBookEnt, AddressBookEntry copiedAddBookEnt ){
-		
-		copiedAddBookEnt.setHashes(originalAddBookEnt.getHashes());
-		copiedAddBookEnt.setId(originalAddBookEnt.getId());
-		copiedAddBookEnt.setName(originalAddBookEnt.getName());
-		copiedAddBookEnt.setOwner(originalAddBookEnt.getOwner());
-		copiedAddBookEnt.setPermission(originalAddBookEnt.getPermission());
-		
-		return;
+
+	/**
+	 * Private class to implement listener to deal with permissions dialog box.
+	 * Updates the AddressBookEntry with user-set permission, when dialog box is dismissed.
+	 */
+
+	private class OnReadyListener implements DialogBoxPermissions.ReadyListener {
+		@Override
+		public void ready(String name) {
+			//TODO: implement what happens here when you click OK btn.
+			int iPerms = myDialog.getFuzz();
+			int iPosition = myDialog.getContactEntryNumber();
+
+			AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(iPosition).setPermission(iPerms);
+
+		}
 	}
 
-	
 	/**
 	 * Private class to gather contacts from the on-phone address book and use
 	 * them to populate an AddressBook object in the background.
@@ -219,8 +263,12 @@ public class AddressBookRipperActivity extends Activity {
 
 		protected void onPostExecute(AddressBook result) {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
-			
+
 			AdvSoftEngApp1Activity.globalAddressBook = result;
+
+			//need to check that any local contacts have had their permissions saved previously in shared prefs.
+			FindSavedPermsInPrefs();
+
 			ListView list = (ListView)findViewById(R.id.friendslist);
 			adaptor = new AddressEntryAdapter();
 			list.setAdapter(adaptor);
@@ -233,7 +281,7 @@ public class AddressBookRipperActivity extends Activity {
 		 * contains a list of AddressBookEntries, which each contains a list of
 		 * hashes
 		 */
-		
+
 		@Override
 		protected AddressBook doInBackground(Void... params) {
 			Log.i(TAG, System.currentTimeMillis() + " starting");
@@ -260,7 +308,7 @@ public class AddressBookRipperActivity extends Activity {
 				lastId = managedCursor.getString(3);
 				AddressBookEntry abe = new AddressBookEntry();
 				abe.setName(managedCursor.getString(1));
-				
+
 				do {
 
 					if (!managedCursor.getString(3).equals(lastId)) {
@@ -277,7 +325,7 @@ public class AddressBookRipperActivity extends Activity {
 					lastId = managedCursor.getString(3);
 
 				} while (managedCursor.moveToNext());
-				
+
 				abe.setHashes(hashes);
 				entries.add(abe);
 
@@ -287,123 +335,224 @@ public class AddressBookRipperActivity extends Activity {
 
 			return a;
 		}
+
+
+		// finds any previously saved permissions data in shared prefs and retrieves it for our new AddressBook
+		private void FindSavedPermsInPrefs(){
+
+			//check that we have any contacts saved from last run...
+			boolean bFlag = false;
+
+			bFlag = prefs.getBoolean("bContactsSaved", bFlag);
+
+			//TODO: delete when finished testing....
+			//Log.i(TAG,"FindSavedPermsInPrefs");
+
+			if(bFlag){ // we have at least 1 contact's permission saved so, change the addressbook entry to that permission.
+				//TODO: delete when finished testing....
+				// Log.i(TAG,"bFlag = true");
+				String strName = null;
+
+				for(int i = 0; i< AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++){
+
+					strName = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getName();
+
+					// check if current name has been saved before in prefs...
+					if(prefs.contains(strName)){
+
+						//TODO: delete when finished testing....
+						// Log.i(TAG,"FindSavedPermsInPrefs and found a name with perms = " + strName);
+
+						int iPerm = 0;
+
+						iPerm = prefs.getInt(strName, iPerm);
+
+						// if its any value other than 0, then replace this saved value in addressbook
+						if(0 != iPerm){
+							AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).setPermission(iPerm);
+						}
+					}
+				}
+			}
+			else
+			{
+				//TODO: delete log call when finished testing....
+				Log.i(TAG,"bFlag = false");
+			}
+
+			return;
+
+		}
 	}
-	
+
 	/*
 	 * Private Class that deals with our addressbook UI
 	 * 
 	 */
-	 class AddressEntryAdapter extends ArrayAdapter<AddressBookEntry> {
-		 AddressEntryAdapter() {
-		      super(AddressBookRipperActivity.this, 
+	class AddressEntryAdapter extends ArrayAdapter<AddressBookEntry> {
+		AddressEntryAdapter() {
+			super(AddressBookRipperActivity.this, 
 					R.layout.row,  
 					AdvSoftEngApp1Activity.globalAddressBook.getEntries());
-		    }
-		 
-		 
-		 public View getView( int position, View convertView, ViewGroup parent){
-			 
-			 View row=convertView;
-			 AddressHolder holder = null;
-			 final AddressBookEntry currentEntry = ((AddressBookEntry)AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+		}
 
-			 if (row==null) { 
-				 LayoutInflater inflater=getLayoutInflater();
-			     row=inflater.inflate(R.layout.row, parent, false);
-			     holder=new AddressHolder(row);
-			     
-			     holder.friendCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-			    	 @Override
-                     public void onCheckedChanged(CompoundButton buttonView,
-                             boolean isChecked) {
-		    		 
-			    		 if(buttonView.isChecked())
-			    			 currentEntry.setPermission(AddressBookEntry.PERM_SHOWN);
-			    		 else
-			    			 currentEntry.setPermission(AddressBookEntry.PERM_HIDDEN);
-			    		 
-			    		 //Log.i(TAG, "Name = " + currentEntry.getName() + " Permission = " + currentEntry.getPermission());
-			    		 
-                     }
 
-			     });
-			     
-			     row.setTag(holder);
-				 
-			 }
-			 else{ // access existing row….
-				 holder=(AddressHolder)row.getTag();
-			 }
-			 holder.populateFrom(AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
-			 
-			 return(row);
-		 }
-		 
-	 }
+		public View getView( int position, View convertView, ViewGroup parent){
 
-	 // Loads addressBookEntries details into UI arrayAdaptor
-	 static class AddressHolder {
-		    private TextView name=null;
-		    private CheckBox friendCheckBox = null;
-		    private boolean bCheckBox = false;
-		    
-		    AddressHolder(View row) {
-		      name=(TextView)row.findViewById(R.id.row_name);
-		      friendCheckBox = (CheckBox)row.findViewById(R.id.row_checkbox);
-		      
-		    }
-		    
-		    void populateFrom(AddressBookEntry entry) {
-		    	
-		    	if(AddressBookEntry.PERM_SHOWN == entry.getPermission())
-		    		bCheckBox = true;
-		    	else
-		    		bCheckBox = false;
-		    	
-		        name.setText(entry.getName());
-		        friendCheckBox.setChecked(bCheckBox);
-		    
-		       
-		      }
 
-	 }
-	 
+			View row=convertView;
+			AddressHolder holder = null;
+			final AddressBookEntry currentEntry = ((AddressBookEntry)AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+			int iPermission = currentEntry.getPermission();
+			final int iPosition = position;
+
+			if (row==null) { // not drawn / created yet...
+				LayoutInflater inflater=getLayoutInflater();
+				row=inflater.inflate(R.layout.row, parent, false);
+				holder=new AddressHolder(row, iPermission);
+
+				holder.friendCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView,
+							boolean isChecked) {
+
+						if(isChecked){
+
+							//TODO: delete when finished testing....
+							// Log.i(TAG, "CLICKED!!!!!");
+
+							myDialog = new DialogBoxPermissions(AddressBookRipperActivity.this, 
+																	new OnReadyListener(), iPosition);
+							myDialog.show();
+
+							currentEntry.setPermission(AddressBookEntry.PERM_SHOWN);
+						}
+						else{
+							currentEntry.setPermission(AddressBookEntry.PERM_HIDDEN);
+							//TODO: delete log call when finished testing....
+							//Log.i(TAG, " not CLICKED!!!!!");
+						}
+						//TODO: delete when finished testing....
+						//Log.i(TAG, "Name = " + currentEntry.getName() + " Permission = " + currentEntry.getPermission());
+					}
+
+				});
+
+				row.setTag(holder);
+
+			}
+			else{ // access existing row….
+				holder=(AddressHolder)row.getTag();
+			}
+			holder.populateFrom(AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+
+			return(row);
+		}
+
+	}
+
+	// Loads addressBookEntries details into UI arrayAdaptor
+	static class AddressHolder {
+		private TextView name=null;
+		private CheckBox friendCheckBox = null;
+		private boolean bCheckBox = false;
+
+		AddressHolder(View row, int iPermission) {
+			name=(TextView)row.findViewById(R.id.row_name);
+			friendCheckBox = (CheckBox)row.findViewById(R.id.row_checkbox);
+
+			// if we have an entry that is not hidden, then check the box here...
+			if(AddressBookEntry.PERM_HIDDEN != iPermission)
+				friendCheckBox.setChecked(true);
+
+		}
+
+		void populateFrom(AddressBookEntry entry) {
+
+			if(AddressBookEntry.PERM_HIDDEN != entry.getPermission())
+				bCheckBox = true;
+			else
+				bCheckBox = false;
+
+			name.setText(entry.getName());
+			friendCheckBox.setChecked(bCheckBox);
+
+		}
+	}
+
+	/**
+	 * Fires off an HTTP request to unsubscribe this app from the service
+	 * 
+	 * @author twhume
+	 *
+	 */
+
+	private class UnsubscribeTask extends AsyncTask<Void, Integer, Void> {
+
+		protected void onPostExecute(Void result) {
+			finish();
+			Toast toast=Toast.makeText(getApplicationContext(), getString(R.string.unsubscribed), 2000);
+			toast.show();
+		}
+
 		/**
-		 * Fires off an HTTP request to unsubscribe this app from the service
-		 * 
-		 * @author twhume
-		 *
+		 * Fire off the "unsubscribe me from this service" HTTP request
 		 */
 
-		private class UnsubscribeTask extends AsyncTask<Void, Integer, Void> {
+		@Override
+		protected Void doInBackground(Void... params) {
+			Log.i(TAG, System.currentTimeMillis() + " starting");
 
-			protected void onPostExecute(Void result) {
-				finish();
-				Toast toast=Toast.makeText(getApplicationContext(), getString(R.string.unsubscribed), 2000);
-				toast.show();
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + AdvSoftEngApp1Activity.DEVICE_ID);
+
+			try {
+				HttpResponse response = client.execute(post);
+				Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
+			} catch (Exception e) {
+				Log.i(TAG, "post threw " + e);
+				e.printStackTrace();
 			}
 
-			/**
-			 * Fire off the "unsubscribe me from this service" HTTP request
-			 */
-			
-			@Override
-			protected Void doInBackground(Void... params) {
-				Log.i(TAG, System.currentTimeMillis() + " starting");
-				
-				HttpClient client = new DefaultHttpClient();
-				HttpPost post = new HttpPost(AdvSoftEngApp1Activity.ENDPOINT + "/unsubscribe/" + AdvSoftEngApp1Activity.DEVICE_ID);
-
-				try {
-					HttpResponse response = client.execute(post);
-					Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
-				} catch (Exception e) {
-					Log.i(TAG, "post threw " + e);
-					e.printStackTrace();
-				}
-				
-				return null;
-			}
+			return null;
 		}
+	}
+
+
+
+	protected void onStop() {
+		//TODO: delete when finished testing....
+		// Log.i("AddressBookRipperActivity","onStop");
+
+		SharedPreferences.Editor editor = prefs.edit();
+		boolean bContactsSaved = false;
+
+		// loop through addressBook looking for... 
+		for(int i = 0; i < AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++){
+
+			int perms = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission();
+			String name = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getName();
+
+			// ... non-hidden perms..
+			if(AddressBookEntry.PERM_HIDDEN != AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission()){
+
+				//then save the current entry's permission in prefs, using their name as their unique ID for retrieval.
+				editor.putInt(name, perms);
+
+				bContactsSaved = true; // set flag - we have at least 1 shown contact...
+
+			}
+			else{ // we have a a hidden perms... make sure its NOT in the prefs...
+				editor.remove(name);
+
+			}
+
+		}
+		editor.putBoolean("bContactsSaved", bContactsSaved); // set flag
+		editor.commit(); // write to prefs once done checking
+		super.onStop();
+
+	}
+
 
 }
