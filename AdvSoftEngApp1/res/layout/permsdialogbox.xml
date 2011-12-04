@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/textViewFuzz"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="...metres" >
+
+    </TextView>
+    
+    <SeekBar
+        android:id="@+id/seekBarPermsRadius"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content" 
+        android:layout_below = "@+id/textViewFuzz" />
+	
+	
+	<!-- 	<EditText android:id="@+id/EditText01" 
+	    android:layout_height="wrap_content"
+		android:text="Enter your name" 
+		android:layout_width="250dip" /> -->
+
+	<Button
+	    android:id="@+id/ButtonPermsOK"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignParentTop="true"
+	    android:text="OK" />
+
+</RelativeLayout>
