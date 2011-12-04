@@ -421,8 +421,8 @@ public class AddressBookRipperActivity extends Activity {
 							//TODO: delete when finished testing....
 							// Log.i(TAG, "CLICKED!!!!!");
 
-							myDialog = new DialogBoxPermissions(AddressBookRipperActivity.this, "",
-									new OnReadyListener(), iPosition);
+							myDialog = new DialogBoxPermissions(AddressBookRipperActivity.this, 
+																	new OnReadyListener(), iPosition);
 							myDialog.show();
 
 							currentEntry.setPermission(AddressBookEntry.PERM_SHOWN);

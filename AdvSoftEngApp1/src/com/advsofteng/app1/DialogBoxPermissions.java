@@ -16,7 +16,6 @@ public class DialogBoxPermissions extends Dialog {
         public void ready(String name);
     }
 
-    private String name;
     private ReadyListener readyListener;
     private SeekBar seekbar = null;
     private TextView tvPermsRadius = null;
@@ -24,10 +23,9 @@ public class DialogBoxPermissions extends Dialog {
     private int intFuzzRadius = AddressBookEntry.PERM_SHOWN; // set to default, which is just shown, with no "fuzz"
     private int iCurrentEntry = 0;
 
-    public DialogBoxPermissions(Context context, String name,
+    public DialogBoxPermissions(Context context,
             ReadyListener readyListener, int CurrentEntry) {
         super(context);
-        this.name = name;
         this.readyListener = readyListener;
         this.iCurrentEntry = CurrentEntry;
     }
@@ -55,7 +53,7 @@ public class DialogBoxPermissions extends Dialog {
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
 			intFuzzRadius = progress;
-			tvPermsRadius.setText(Integer.toString(progress) + " m");
+			tvPermsRadius.setText(Integer.toString(progress) + " metres");
 		}
 	};
 	//
@@ -66,7 +64,7 @@ public class DialogBoxPermissions extends Dialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.permsdialogbox);
         
-        setTitle("Radius around your exact location...");
+        setTitle("   Smudge my position by...");
         
         Button buttonOK = (Button) findViewById(R.id.ButtonPermsOK);
         buttonOK.setOnClickListener(new OKListener());
@@ -81,7 +79,7 @@ public class DialogBoxPermissions extends Dialog {
     private class OKListener implements android.view.View.OnClickListener {
         @Override
         public void onClick(View v) {
-            readyListener.ready("Test"/*String.valueOf(etName.getText())*/);
+            readyListener.ready("");
             DialogBoxPermissions.this.dismiss();
         }
     }
