@@ -113,7 +113,11 @@ public class GetPOIActivity extends Activity {
    					}
    					
   					HttpGet get = new HttpGet(myUrl);   					
-  					Log.d("GetPoiActivity", "get="+get.getURI());
+
+	   				Log.d("GetPoiActivity", "get="+get.getURI());
+
+  					// end of testing block to delete...
+
 
    					/* Create a new HTTPClient to do our POST for us */
    					HttpClient client = new DefaultHttpClient();
