@@ -2,12 +2,10 @@ package com.advsofteng.app1;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.Toast;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
@@ -19,17 +17,19 @@ public class map extends MapActivity {
 
 	private MapView mapView = null;
 	GeoPoint geopoint;  
-	private Drawable drawableicon; //variable for the image 
+	private Drawable drawableicon; //variable for the image of places
+	private Drawable drawableicon2; //variable for the image of friends
 	private List<Overlay> mapOverlays;
-	
-	
+	private PoiType type;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)  {
 		
 		super.onCreate(savedInstanceState); 
 		setContentView(R.layout.map_poi);
 		
-		drawableicon = this.getResources().getDrawable(R.drawable.gmap_blue_icon); //set the image
+		drawableicon = this.getResources().getDrawable(R.drawable.gmap_blue_icon); //set the image (blue)
+		drawableicon2 = this.getResources().getDrawable(R.drawable.google_streets_icon); //set the image (person)
 		
 		mapView = (MapView)findViewById(R.id.mapView);      		
 		
@@ -41,26 +41,47 @@ public class map extends MapActivity {
 	    mapView.getController().setZoom(4); // assign the initial zoom
 	    
 	    MyItemizedOverlay itemizedOverlay = new MyItemizedOverlay(drawableicon);
+	    MyItemizedOverlay itemizedOverlay2 = new MyItemizedOverlay(drawableicon2);
 	      
          mapOverlays = mapView.getOverlays();
   
-	      
-	   	      
+       	   	      
 		  for (int i = 0; i  < AdvSoftEngApp1Activity.poiArray.size() ; i++) { 
 			  
+			  type  = AdvSoftEngApp1Activity.poiArray.get(i).getType();
+			  
+			  if (type.getId() == 0) // check if is a place or a friend
+			  {
 			  double lat = AdvSoftEngApp1Activity.poiArray.get(i).getLatitude();  //get latitude
 			  double lng = AdvSoftEngApp1Activity.poiArray.get(i).getLongitude(); //get longitude
 			  
 			  geopoint = new GeoPoint((int)(lat*1E6), (int)(lng*1E6)); //set the GeoPoint for the map
 			  
 			 //add item to the map
-	          OverlayItem overlayitem = new OverlayItem(geopoint, " " , " "); // " " are the name and the description 
+	          OverlayItem overlayitem2 = new OverlayItem(geopoint, " " , " "); // " " are the name and the description 
 			  
-			  itemizedOverlay.addOverlay(overlayitem);
+			  itemizedOverlay2.addOverlay(overlayitem2); //add friends into a list 2
 			  
+			  }else
+			  { 
+				  
+				  double lat = AdvSoftEngApp1Activity.poiArray.get(i).getLatitude();  //get latitude
+				  double lng = AdvSoftEngApp1Activity.poiArray.get(i).getLongitude(); //get longitude
+				  
+				  geopoint = new GeoPoint((int)(lat*1E6), (int)(lng*1E6)); //set the GeoPoint for the map
+				  
+				 //add item to the map
+		          OverlayItem overlayitem = new OverlayItem(geopoint, " " , " "); // " " are the name and the description 
+				  
+				  itemizedOverlay.addOverlay(overlayitem); //add places into a list 1
+			  }
+		  
+		  
 		  } //end for
 		  
-		  mapOverlays.add(itemizedOverlay); // add all the items to
+		  mapOverlays.add(itemizedOverlay); // add all the items (places- list 1)
+		  mapOverlays.add(itemizedOverlay2); // add all the items (friends-list2)
+
 		  mapView.invalidate();
 		
 	}

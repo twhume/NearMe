@@ -43,6 +43,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private Button button = null;				/* start/stop button */
 	private Button buttonGetPOI = null;			/* get POIs button*/
 	private Button buttonMap = null;         /* View Map POI Button*/
+	private Button buttonAdd = null;
 	
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	public static AddressBook globalAddressBook = new AddressBook();
@@ -103,7 +104,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 
 		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new AdvSoftEngLocationListener(this));
 		
-		
+	
 		
 	   //*************************************
         //Deal with view map button
