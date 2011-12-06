@@ -19,38 +19,33 @@ import android.view.View;
  * @author twhume
  * 
  */
-// handles user set POI data
-public class GetPOIActivity extends Activity {
 
-	// //// Member variables /////////
+public class PreferencesActivity extends Activity {
+
+	/* Maximum possible radius of interest */
+	private static final int MAX_RADIUS = 1000;	
+
 	// CheckBoxes that user selects to get data on from server
 	private CheckBox checkBox1, checkBox2, checkBox3, checkBox4;
-	private SeekBar seekBarRadius; // seekBar that user sets the radius of POIs
-									// nearby.
-	private TextView tvRadius; // displays the radius data
-	private Integer intRadius; // user set radius
-	private int intMaxRadius = 1000; // maximum radius in metres
-	private Button btnGetPOIdata; // button to save preferences
+	private SeekBar seekBarRadius; 		// slider to choose radius of interest
+	private TextView tvRadius; 			// textview displaying the current radius
+	private Integer intRadius; 			// current radius of interest
+	private Button savePrefsButton;
 	private SharedPreferences prefs;
 
 	// flag used in saving and loading app wide prefs.
-	// ref:
 	// http://sites.google.com/site/jalcomputing/home/mac-osx-android-programming-tutorial/saving-instance-state
 	private Boolean isSavedInstanceState = false;
 
 	// create and instantiate and override implemented seekbar methods...
 	private SeekBar.OnSeekBarChangeListener seekBarListen = new SeekBar.OnSeekBarChangeListener() {
 
-		public void onStopTrackingTouch(SeekBar seekBar) {
-		}
+		public void onStopTrackingTouch(SeekBar seekBar) {}
 
-		public void onStartTrackingTouch(SeekBar seekBar) {
-		}
+		public void onStartTrackingTouch(SeekBar seekBar) {}
 
-		public void onProgressChanged(SeekBar seekBar, int progress,
-				boolean fromUser) {
-
-			// update member variable and textview with new radius data...
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			/* update member variable and textview with new radius data */
 			intRadius = progress;
 			tvRadius = (TextView) findViewById(R.id.tvRadius);
 			tvRadius.setText(getResources().getText((R.string.tvRadiusText)) + " " + Integer.toString(intRadius) + "m");
@@ -63,9 +58,7 @@ public class GetPOIActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.get_poi);
-
-		prefs = getApplicationContext().getSharedPreferences(
-				AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
+		prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
 
 		/* If we've been soft-killed, retrieve saved state from the bundle */
 
@@ -84,18 +77,17 @@ public class GetPOIActivity extends Activity {
 			Log.i(AdvSoftEngApp1Activity.TAG, "gettingPrefs");
 		}
 
-		// initialise button to respond to clicks with correct action
-		btnGetPOIdata = (Button) findViewById(R.id.getPOIDataButton);
-		btnGetPOIdata.setOnClickListener(new View.OnClickListener() {
+		/* When the savePrefsButton is clicked, saved preferences and leave the Activity */
+		
+		savePrefsButton = (Button) findViewById(R.id.getPOIDataButton);
+		savePrefsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i(AdvSoftEngApp1Activity.TAG, "save POI preferences");
+				saveStateToPreferences(prefs);
 				finish();
 			}
-
 		});
 	}
-
-
 
 	/* Called after onCreate has finished, use to restore UI state */
 
@@ -118,17 +110,10 @@ public class GetPOIActivity extends Activity {
 		// seekBar and corresponding label set up
 		seekBarRadius = (SeekBar) findViewById(R.id.seekBarRadius);
 		seekBarRadius.setOnSeekBarChangeListener(seekBarListen);
-		seekBarRadius.setMax(intMaxRadius);
+		seekBarRadius.setMax(MAX_RADIUS);
 
-		/**
-		 * If we have no lastInstanceState, then get our state from
-		 * sharedpreferences
-		 */
-
-		if (null == lastInstanceState)
-			retrieveStateFromPreferences(prefs);
-		else
-			retrieveStateFromBundle(lastInstanceState);
+		if (null == lastInstanceState) retrieveStateFromPreferences(prefs);
+		else retrieveStateFromBundle(lastInstanceState);
 
 		// radius label
 		tvRadius = (TextView) findViewById(R.id.tvRadius);

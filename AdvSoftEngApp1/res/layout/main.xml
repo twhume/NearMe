@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:onClick="POIActivity"
-        android:text="Get POIs" />
+        android:text="@string/prefs_title" />
 
     <Button
         android:id="@+id/addButton"

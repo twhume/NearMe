@@ -9,8 +9,9 @@
     <string name="poi_checkbox2">Pubs</string>
     <string name="poi_checkbox3">Clubs</string>
     <string name="poi_checkbox4">Museum</string>
-    <string name="get_poi_label">Get POIs</string>
     <string name="map_poi_label">MAP POI</string>
+    <string name="label_prefsbutton">Save preferences</string>
+	<string name="prefs_title">Preferences</string>
     <string name="tvRadiusText">Look within </string>
     <string name="menu_help">Help</string>
     <string name="menu_add_poi">Add Place</string>

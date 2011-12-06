@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Get POI Data" />
+        android:text="@string/label_prefsbutton" />
 
     <SeekBar
         android:id="@+id/seekBarRadius"

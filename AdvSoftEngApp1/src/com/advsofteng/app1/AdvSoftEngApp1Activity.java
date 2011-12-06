@@ -128,7 +128,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 			public void onClick(View v) {
 
 				
-				Intent intentPOI = new Intent(AdvSoftEngApp1Activity.this, GetPOIActivity.class);
+				Intent intentPOI = new Intent(AdvSoftEngApp1Activity.this, PreferencesActivity.class);
 				
 				startActivity(intentPOI);
 				
