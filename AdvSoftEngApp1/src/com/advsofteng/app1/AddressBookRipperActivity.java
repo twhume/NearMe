@@ -445,7 +445,7 @@ public class AddressBookRipperActivity extends Activity {
 				row.setTag(holder);
 
 			}
-			else{ // access existing row….
+			else{ // access existing row
 				holder=(AddressHolder)row.getTag();
 			}
 			holder.populateFrom(NearMeActivity.globalAddressBook.getEntries().get(position));
