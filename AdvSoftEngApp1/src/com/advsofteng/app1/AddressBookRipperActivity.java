@@ -51,7 +51,7 @@ public class AddressBookRipperActivity extends Activity {
 
 	private static final String TAG = "Ripper"; 
 	private static final String KEY = "ASE-GROUP2";	/* Key used for SHA-1 encoding */
-	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/addressBook";
+	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/";
 	private GatherContactsTask gatherer = null;
 	private AddressEntryAdapter adaptor = null;
 	private SharedPreferences prefs = null;
@@ -217,7 +217,7 @@ public class AddressBookRipperActivity extends Activity {
 			Log.i(TAG, "Got entries " + ab[0].getEntries().size());
 
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(ENDPOINT);
+			HttpPost post = new HttpPost(ENDPOINT + "/addressBook");
 
 			try {
 				HttpEntity ent = new StringEntity(gson.toJson(ab[0]));
@@ -509,7 +509,7 @@ public class AddressBookRipperActivity extends Activity {
 
 			HttpClient client = new DefaultHttpClient();
 			HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + prefs.getString(PreferencesActivity.KEY_ID, ""));
-
+			Log.d(AdvSoftEngApp1Activity.TAG, "unsubscribing via " + post.getURI());
 			try {
 				HttpResponse response = client.execute(post);
 				Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
