@@ -72,7 +72,7 @@ public class PoiPoller extends BroadcastReceiver {
 			
    			/* types are an optional parameter */
    			
-   			if (types.length()>1) {
+   			if (types.length()>0) {
 				myUrl = myUrl + "?t=" + types;
    			}
 				
