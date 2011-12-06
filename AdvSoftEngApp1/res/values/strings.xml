@@ -23,5 +23,7 @@
     <string name="menu_unsubscribe">Unsubscribe</string>
     <string name="unsubscribed">You have been unsubscribed from NearMe.</string>
     <string name="upload_ab_ok">Thanks, we\'ve saved your address book.</string>
+    <string name="your_position">This is you!</string>
+    <string name="your_pos">(%1$f,%2$f)</string>
     <string name="upload_ab_failed">There was a problem saving your address book. Please try again later.</string>
 </resources>

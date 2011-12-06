@@ -21,12 +21,16 @@
         android:textSize="40dp"
   	    />
 
-    <Button
-        android:id="@+id/mapButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="View Map POI"
-        android:visibility="invisible" />
-
+    <com.google.android.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="fill_parent"
+        android:layout_height="355dp"
+        android:apiKey="0Ey-NKxG6fvVMFi4al0jvsayI2J40GBly-osuDA"
+        android:clickable="true"
+        android:enabled="true" />
+    
+    <!-- mariana's key = 0Ey-NKxG6fvVMFi4al0jvsayI2J40GBly-osuDA -->
+    <!-- Alans key: 0staPCb6rpYVTeuhJjCeveideNuwfn5ezXtKgYg -->
+    <!-- Tom's key: 0Ey-NKxG6fvVMFi4al0jvsayI2J40GBly-osuDA  -->
+    
 </LinearLayout>
