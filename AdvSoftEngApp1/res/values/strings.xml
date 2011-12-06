@@ -9,6 +9,8 @@
     <string name="poi_checkbox2">Pubs</string>
     <string name="poi_checkbox3">Clubs</string>
     <string name="poi_checkbox4">Museum</string>
+    <string name="delete_ok">OK, deleted that place</string>
+    <string name="delete_fail">Sorry, couldn\'t delete that place. Do try again.</string>
     <string name="map_poi_label">MAP POI</string>
     <string name="label_prefsbutton">Save preferences</string>
 	<string name="prefs_title">Preferences</string>
@@ -23,7 +25,9 @@
     <string name="menu_unsubscribe">Unsubscribe</string>
     <string name="unsubscribed">You have been unsubscribed from NearMe.</string>
     <string name="upload_ab_ok">Thanks, we\'ve saved your address book.</string>
+    <string name="ask_delete">Would you like to delete this place\?</string>
     <string name="your_position">This is you!</string>
+    <string name="for_info">Nice, eh\?</string>
     <string name="your_pos">(%1$f,%2$f)</string>
     <string name="upload_ab_failed">There was a problem saving your address book. Please try again later.</string>
 </resources>

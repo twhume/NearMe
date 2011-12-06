@@ -2,82 +2,57 @@ package com.nearme;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 
-import com.mysql.jdbc.Statement;
-
 /**
- * Servlet implementation class DeletePOIServlet
+ * Servlet to handle deletion of POIs from the database
+ * 
+ * TODO does no checking to ensure you can only delete your own POIs.
+ * Either a massive security flaw or a wikipedia-style "new model".
+ * 
  */
-public class DeletePOIServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	 
-	private int id;
-	static Connection conn = null;
-	static String bd = "nearme";
-	static String login = "nearme";
-	static String password = "nearme";
-	static String url = "jdbc:mysql://localhost/" + bd;
-	
+public class DeletePOIServlet extends GenericNearMeServlet {
+
+	private static final String DELETE_POI_SQL = "DELETE FROM poi WHERE id = ?";
+
 	private static Logger logger = Logger.getLogger(DeletePOIServlet.class);
-	
-	public static void main(String args[]) throws Exception {
-
-		Class.forName("com.mysql.jdbc.Driver").newInstance(); // load the driver of mysql
-		
-
-		
-	}
-	
-	public DeletePOIServlet() {
-        super();
-        
-    }
-
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doPost (request, response);
-		
-	}
-
+	private static final long serialVersionUID = -5719580871373727060L;
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		id = Integer.parseInt(request.getParameter("id")); //get the id of the poi that will be delete
-		System.out.println(id);	
+		String path = request.getPathInfo();
+		logger.debug("doPost() path="+path);
+		if (path.length()>1) path = path.substring(1, path.length());
+		int id = Integer.parseInt(path);
+
+		Connection conn = null;
+		PreparedStatement st = null;
 		try
 		  {
-			conn = DriverManager.getConnection(url, login, password); // connect with data base
-			Statement st = (Statement) conn.createStatement();
-            String sql = "Delete from poi Where Id =" + id;
-			st.executeUpdate(sql);
-
+			conn = datasource.getConnection();
+			st = conn.prepareStatement(DELETE_POI_SQL);
+			st.setInt(1, id);
+			st.executeUpdate();
 						
-			logger.info("Delete POI " + id);
-            st.close();
-			//System.out.println("POI Deleted");
-			conn.close();
-			
-		  }
-		  catch (SQLException e) {
+			logger.info("deleted poi " + id);
+			response.sendError(HttpServletResponse.SC_OK);
+		  } catch (SQLException e) {
+			  response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			  logger.error(e);
 			  e.printStackTrace(); 
+		  } finally {
+			  try {
+				  if (st!=null) st.close();
+				  if (conn!=null) conn.close();
+			  } catch (SQLException e) {
+				  e.printStackTrace();
+			  }
 		  }
-	
-		
-		response.setContentType("text/plain");
-		response.getOutputStream().println("OK");
-	
-	
 	}
 
 }

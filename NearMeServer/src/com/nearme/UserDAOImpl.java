@@ -217,6 +217,22 @@ public class UserDAOImpl implements UserDAO {
 
 			rs = pst.executeQuery();
 			while (rs.next()) {
+				
+				
+				/**
+				 * OK, this makes me feel dirty. For each result here we're going to look up the smudge factor they have given us, and apply it
+				 * to the location before sending out said location.
+				 * 
+				 * This is bad because it's inefficient: a nested query. In practice, for a project of this scale it'll be unnoticeable,
+				 * so in the interests of avoiding premature optimisation, I've done it.
+				 * 
+				 * Possible improvements:
+				 * 1. assume that most users won't have a smudge factor of >1, and do two queries: one to find the majority with permissions=1, and another to get the others
+				 * 2. do it all in SQL, somehow, which will mean passing a value from that subquery out to the outer query... brrr.
+				 */
+
+//				int smudgeFactor = lookupSmudgeFactorBetween(rs.getInt("ab.id"));
+				
 				Poi p = new Poi(rs.getString("ab.name"), rs.getDouble("u.latitude"), rs.getDouble("u.longitude"), PoiType.FRIEND, 0);
 				ret.add(p);
 			}
@@ -226,6 +242,19 @@ public class UserDAOImpl implements UserDAO {
 			if (c!=null) c.close();
 		}
 		return ret;
+	}
+	
+	/**
+	 * Look up by how much we should smudge the location of the user in the address book of user userId
+	 * with the addressBookId of abId
+	 * 
+	 * @param userId
+	 * @param abId
+	 * @return
+	 */
+	
+	private int getSmudgeFactorBetween(int abId) {
+		return 0;
 	}
 	
 	/**

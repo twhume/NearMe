@@ -65,6 +65,17 @@
     <url-pattern>/AddPOIServlet</url-pattern>
   </servlet-mapping>
   
+    <servlet>
+    <description></description>
+    <display-name>DeletePOIServlet</display-name>
+    <servlet-name>DeletePOIServlet</servlet-name>
+    <servlet-class>com.nearme.DeletePOIServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeletePOIServlet</servlet-name>
+    <url-pattern>/poi/delete/*</url-pattern>
+  </servlet-mapping>
+  
   <resource-ref> 
 	<description>DB Connection</description> 
 	<res-ref-name>jdbc/nearme</res-ref-name> 
