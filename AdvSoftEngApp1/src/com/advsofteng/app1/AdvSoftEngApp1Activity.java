@@ -189,6 +189,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 		/* Leaving the app, even briefly? Cancel any subsequent polls and reset button to start */
 
 		if (alarmIntent!=null) {
+			Log.i(TAG,"starting polling");
 			Context ctx = getApplicationContext();
 			AlarmManager am = (AlarmManager) ctx.getSystemService(Activity.ALARM_SERVICE);
 			am.cancel(alarmIntent);
@@ -205,7 +206,7 @@ public class AdvSoftEngApp1Activity extends Activity {
          */
 
 		if (alarmIntent==null) {
-			Log.i(TAG,"starting poll");
+			Log.i(TAG,"starting polling");
 			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
 	    	Calendar cal = Calendar.getInstance();
 			Intent intent = new Intent(getApplicationContext(), PoiPoller.class);
