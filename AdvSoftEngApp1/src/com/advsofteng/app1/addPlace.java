@@ -1,16 +1,12 @@
 package com.advsofteng.app1;
 
 import java.util.ArrayList;
-
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-
-
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
@@ -106,14 +102,13 @@ public class addPlace extends Activity {
 					{
 																	
 						ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-						params = null;						
 						params.add(new BasicNameValuePair("lat", Double.toString(lat))); 
 						params.add(new BasicNameValuePair("lng", Double.toString(lng))); 
 						params.add(new BasicNameValuePair("name", name.getText().toString()));
 						params.add(new BasicNameValuePair("type", type));
 						
 						post.setEntity(new UrlEncodedFormEntity(params));
-						HttpResponse response = client.execute(post);				
+						client.execute(post);				
 	   					
 						Toast.makeText(getApplicationContext(), "New POI has been saved", Toast.LENGTH_LONG).show();
 				

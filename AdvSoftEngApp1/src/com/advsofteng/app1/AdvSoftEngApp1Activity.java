@@ -42,7 +42,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
 	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
 	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
-	private Button button = null;				/* start/stop button */
 	private Button buttonGetPOI = null;			/* get POIs button*/
 	private Button buttonMap = null;         /* View Map POI Button*/
 
