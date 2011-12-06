@@ -7,6 +7,9 @@ package com.advsofteng.app1;
  * 
  */
 public class PoiType {
+	
+	public static final int FRIEND = 0;
+	
 	private int id;
 	private String name;
 
