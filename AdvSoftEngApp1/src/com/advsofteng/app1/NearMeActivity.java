@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -28,7 +26,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,12 +47,11 @@ public class NearMeActivity extends MapActivity {
 
 	/* useful shared objects */
 
-	private NearMeApplication app;
+	private NearMeApplication app;				/* used for sharing data between BroadcastReceivers and Activities */
 	private LocationManager manager;
-	private PendingIntent alarmIntent = null; /* Handle to the repeatedly called Intent for triggering polls */
-	private SharedPreferences prefs = null; /* used to share location & time between Activity and BroadcastReceiver */
+	private PendingIntent alarmIntent = null; 	/* Handle to the repeatedly called Intent for triggering polls */
+	private SharedPreferences prefs = null; 	/* used to share location & time between Activity and BroadcastReceiver */
 
-	public static ArrayList<Poi> poiArray = new ArrayList<Poi>();
 	public static AddressBook globalAddressBook = new AddressBook(); // TODO why is this global?
 
 	/* UI elements */
@@ -65,6 +61,7 @@ public class NearMeActivity extends MapActivity {
 	private List<Overlay> mapOverlays; 	/* List of overlays for the map, obviously */
 	private Drawable poiIcon; 			/* variable for the image of places */
 	private Drawable friendIcon; 		/* variable for the image of friends */
+	private Drawable meIcon; 			/* icon representing my position */
 
 	/*
 	 * Slightly fiddly bit here. We register a BroadcastReceiver so that the PoiPoller can tell
@@ -78,37 +75,6 @@ public class NearMeActivity extends MapActivity {
 		}
 	};
 	private IntentFilter refreshFilter = null;
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent nextIntent = null;
-
-		switch (item.getItemId()) {
-		case R.id.add_poi:
-			nextIntent = new Intent(NearMeActivity.this, addPlace.class);
-			break;
-		case R.id.upload_ab:
-			nextIntent = new Intent(NearMeActivity.this,
-					AddressBookRipperActivity.class);
-			break;
-		case R.id.poi_prefs:
-			nextIntent = new Intent(NearMeActivity.this,
-					PreferencesActivity.class);
-			break;
-		}
-		if (nextIntent != null) {
-			startActivity(nextIntent);
-			return true;
-		} else
-			return super.onOptionsItemSelected(item);
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -119,15 +85,18 @@ public class NearMeActivity extends MapActivity {
 		setContentView(R.layout.main);
 		tvGPS = (TextView) findViewById(R.id.textViewGPS);
 
+		/* map-related set-up */
+		
 		mapView = (MapView) findViewById(R.id.mapView);
-		mapView.setSatellite(true); // show Satellite view
-		mapView.setBuiltInZoomControls(true); // method to create the zoom controls of the map
-		mapView.getController().setZoom(4); // assign the initial zoom
-
+		mapView.setSatellite(true); 			// show Satellite view
+		mapView.setBuiltInZoomControls(true); 	// show zoom controls please
+		mapView.getController().setZoom(15); 	// zoom quite close: we're looking at street-level stuff
+		
 		poiIcon = getResources().getDrawable(R.drawable.gmap_blue_icon);
 		friendIcon = getResources().getDrawable(R.drawable.google_streets_icon);
+		meIcon = getResources().getDrawable(R.drawable.me);
 
-		/* Initialise shared preferences, where we store all sorts of stuff */
+		/* Initialise shared preferences, where we store all sorts of stuff permanently */
 
 		prefs = getSharedPreferences(TAG, Context.MODE_PRIVATE);
 		saveDeviceId();
@@ -147,36 +116,59 @@ public class NearMeActivity extends MapActivity {
 		
 		updateMapData();
 	}
+	
+	/**
+	 * This method handles taking the contents of app.getPois() and displaying it as corrently
+	 * positioned overlays on the map.
+	 */
 
 	private void updateMapData() {
 		Log.d(TAG, "NearMeActivity says app.getPois().size==" + app.getPois().size() + ",app="+app);
 
 		MyItemizedOverlay friends = new MyItemizedOverlay(friendIcon);
-		MyItemizedOverlay pois = new MyItemizedOverlay(poiIcon);
+		MyItemizedOverlay places = new MyItemizedOverlay(poiIcon);
+		MyItemizedOverlay me = new MyItemizedOverlay(meIcon);
 
 		mapOverlays = mapView.getOverlays();
 
+		/**
+		 * Work through all the POIs we know about, allocating them either to 
+		 * a friends list or a places list
+		 */
+		
 		for (Poi p : app.getPois()) {
 			double lat = p.getLatitude();
 			double lng = p.getLongitude();
 			GeoPoint geopoint = new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6));
-			OverlayItem oi = new OverlayItem(geopoint, " ", " "); // " " are the name and the description
+			OverlayItem oi = new OverlayItem(geopoint, p.getName(), " "); // " " are the name and the description
 			Log.d(TAG, "type="+p.getType());
 			if (p.getType().getId() == PoiType.FRIEND) {
 				friends.addOverlay(oi);
 			} else {
-				pois.addOverlay(oi);
+				places.addOverlay(oi);
 			}
 		}
+
 		mapOverlays.clear();
+
+		/* Add our own position to the map, if we know it */
+		
+		if (prefs.getString(PreferencesActivity.KEY_TIME, null)!=null) {
+			float lat = Float.parseFloat(prefs.getString(PreferencesActivity.KEY_LAT, ""));
+			float lng = Float.parseFloat(prefs.getString(PreferencesActivity.KEY_LNG, ""));
+			me.addOverlay(new OverlayItem( new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)), getString(R.string.your_position), ""));
+			mapOverlays.add(me);
+		}
+		
+		/* Add our new overlaps to the map */
+		
 		if (friends.size()>0) mapOverlays.add(friends);
-		if (pois.size()>0) mapOverlays.add(pois);
+		if (places.size()>0) mapOverlays.add(places);
 		mapView.invalidate();
-		Log.d(TAG, "updateMapData() added " + friends.size() + " friends and " + pois.size() + " pois");
 	}
 
 	/**
-	 * updates TextView tv text with location's longitude and latitude data.
+	 * Updates us with location's longitude and latitude data.
 	 * 
 	 * @param location
 	 * @param tv
@@ -304,20 +296,14 @@ public class NearMeActivity extends MapActivity {
 			return boundCenterBottom(marker);
 		}
 
-		public boolean onTouchEvent(MotionEvent event, MapView mapView) {
-			Log.d(TAG, "onTouchEvent start");
-			// ---when user lifts his finger---
-			if (event.getAction() == 1) {
-				GeoPoint p = mapView.getProjection().fromPixels(
-						(int) event.getX(), (int) event.getY());
-				Toast.makeText(
-						getBaseContext(),
-						p.getLatitudeE6() / 1E6 + "," + p.getLongitudeE6()
-								/ 1E6, Toast.LENGTH_SHORT).show();
-			}
-			Log.d(TAG, "onTouchEvent end");
-			return false;
+		
+		@Override
+		protected boolean onTap(int i) {
+			Toast.makeText(getBaseContext(), mOverlays.get(i).getTitle(), Toast.LENGTH_SHORT).show();
+			return true;
 		}
+
+
 
 	}
 
@@ -325,7 +311,45 @@ public class NearMeActivity extends MapActivity {
 	protected boolean isRouteDisplayed() {
 		return false;
 	}
+	
+	/**
+	 * Sets up the options menu on-screen
+	 */
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.options, menu);
+		return true;
+	}
 
+	/**
+	 * Handles clicks on options menu items
+	 */
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent nextIntent = null;
+
+		switch (item.getItemId()) {
+		case R.id.add_poi:
+			nextIntent = new Intent(NearMeActivity.this, addPlace.class);
+			break;
+		case R.id.upload_ab:
+			nextIntent = new Intent(NearMeActivity.this,
+					AddressBookRipperActivity.class);
+			break;
+		case R.id.poi_prefs:
+			nextIntent = new Intent(NearMeActivity.this,
+					PreferencesActivity.class);
+			break;
+		}
+		if (nextIntent != null) {
+			startActivity(nextIntent);
+			return true;
+		} else
+			return super.onOptionsItemSelected(item);
+	}
 
 }
 	
