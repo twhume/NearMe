@@ -167,6 +167,7 @@ public class PreferencesActivity extends Activity {
 		editor.putBoolean(getResources().getString(R.string.poi_checkbox4),
 				checkBox4.isChecked());
 		editor.putInt(KEY_RADIUS, intRadius);
+		editor.putString(KEY_TYPES, getTypesStringFromCheckboxes());
 		editor.commit();
 	}
 
@@ -180,6 +181,7 @@ public class PreferencesActivity extends Activity {
 				checkBox3.isChecked());
 		b.putBoolean(getResources().getString(R.string.poi_checkbox4),
 				checkBox4.isChecked());
+		b.putString(KEY_TYPES, getTypesStringFromCheckboxes());
 		b.putInt(KEY_RADIUS, intRadius);
 	}
 
@@ -209,5 +211,17 @@ public class PreferencesActivity extends Activity {
 				getResources().getString(R.string.poi_checkbox4), false));
 		intRadius = p.getInt(KEY_RADIUS, 0);
 		seekBarRadius.setProgress(intRadius);
+	}
+	
+	private String getTypesStringFromCheckboxes() {
+		String tmpStr = "";
+		if (checkBox1.isChecked() || checkBox2.isChecked() || checkBox3.isChecked() || checkBox4.isChecked()) {
+			if (checkBox1.isChecked()) tmpStr = tmpStr + "1,";
+			if (checkBox2.isChecked()) tmpStr = tmpStr + "2,";
+			if (checkBox3.isChecked()) tmpStr = tmpStr + "3,";
+			if (checkBox4.isChecked()) tmpStr = tmpStr + "4,";
+			tmpStr = tmpStr.substring(0, tmpStr.length()-1);
+		}
+		return tmpStr;	
 	}
 }

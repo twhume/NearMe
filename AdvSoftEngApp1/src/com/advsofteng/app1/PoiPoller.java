@@ -56,8 +56,7 @@ public class PoiPoller extends BroadcastReceiver {
 		double lat = Float.MIN_VALUE;
 		if (tmpStr!=null) lat = Double.parseDouble(tmpStr);
 
-		String types = prefs.getString("types", null);
-		//TODO make sure these are populated.
+		String types = prefs.getString("types", "");
 		
 		try {
 
@@ -73,7 +72,7 @@ public class PoiPoller extends BroadcastReceiver {
 			
    			/* types are an optional parameter */
    			
-   			if (types!=null) {
+   			if (types.length()>1) {
 				myUrl = myUrl + "?t=" + types;
    			}
 				
