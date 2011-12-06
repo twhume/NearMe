@@ -33,8 +33,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 	public static final int MAGIC_NUMBER = 12345;		/* used as a reference to an Alarm */
 	public static String DEVICE_ID = null;
 	
-	/* Interval between deliveries of location data to the server */
-	private static final int POLL_INTERVAL = (5 * 60 * 1000);
+
 	private LocationManager manager;
 	
 	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
@@ -43,8 +42,7 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private Button button = null;				/* start/stop button */
 	private Button buttonGetPOI = null;			/* get POIs button*/
 	private Button buttonMap = null;         /* View Map POI Button*/
-	private Button buttonAdd = null;
-	
+
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
 	public static AddressBook globalAddressBook = new AddressBook();
 	
