@@ -91,23 +91,26 @@ public class PoiPoller extends BroadcastReceiver {
 			 */
 				
 			Gson gson = new Gson();
-				
+
 			ArrayList<Poi> newPois = new ArrayList<Poi>();
 			boolean gotNewPoi = false;
 
 			Log.d(NearMeActivity.TAG, "received json="+responseBody);
 		    JsonParser parser = new JsonParser();
 		    JsonArray array = parser.parse(responseBody).getAsJsonArray();
+			NearMeApplication app = (NearMeApplication) context.getApplicationContext();
 		    
 		    for(JsonElement counter : array)
 		    {	
 		    	// run through the JsonArray converting each entry into an actual Poi object in the Poi ArrayList
 		    	Poi p = gson.fromJson(counter, Poi.class);
-		    	if (!NearMeActivity.poiArray.contains(p)) gotNewPoi = true;
+		    	if (!app.getPois().contains(p)) gotNewPoi = true;
 		    	newPois.add(p);
+		    	Log.d(NearMeActivity.TAG, "adding POI type " + p.getType());
 		    }
 		    
-		    NearMeActivity.poiArray = newPois;
+			app.setPois(newPois);
+		    Log.d(NearMeActivity.TAG, "PoiPoller says app.getPois().size==" + app.getPois().size() + ",app="+app);
 		    
 		    /*
 		     * If we received any new Pois as part of this update, then alert the user
@@ -116,8 +119,11 @@ public class PoiPoller extends BroadcastReceiver {
 		    if (gotNewPoi) {
 			  Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 			  vib.vibrate(300);
-			  //TODO put in an Android notification here?
+			  
 		    }
+		    Log.d(NearMeActivity.TAG, "trigger a refresh pls");
+		  Intent i = new Intent("refresh-map");
+		  context.sendBroadcast(i);
 			
 		} catch (Exception e) {
 			Log.i( NearMeActivity.TAG, "get to getPOI failed, " + e.getMessage());

@@ -1,18 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
-    <com.google.android.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="fill_parent"
-        android:layout_height="355dp"
-        android:apiKey="0staPCb6rpYVTeuhJjCeveideNuwfn5ezXtKgYg"
-        android:clickable="true"
-        android:enabled="true" />
-    
-    <!-- mariana's key = 0Ey-NKxG6fvVMFi4al0jvsayI2J40GBly-osuDA -->
-    <!-- Alans key: 0staPCb6rpYVTeuhJjCeveideNuwfn5ezXtKgYg -->
-    <!-- Tom's key: 0Ey-NKxG6fvVMFi4al0jvsayI2J40GBly-osuDA  -->
-    
-    </LinearLayout>
