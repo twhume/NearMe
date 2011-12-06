@@ -134,14 +134,16 @@ public class UserDAOImpl implements UserDAO {
 	public User readByDeviceId(String string) throws SQLException {
 		Connection c = null;
 		PreparedStatement pst = null;
+		ResultSet rs = null;
 		try {
 			c = dataSource.getConnection();
 			pst = c.prepareStatement(READ_DEVICE_SQL);
 			pst.setString(1, string);
-			ResultSet rs = pst.executeQuery();
+			rs = pst.executeQuery();
 			if (rs.next()) return userFrom(rs);
 			else return null;
 		} finally {
+			if (rs!=null) rs.close();
 			if (pst!=null) pst.close();
 			if (c!=null) c.close();
 		}
@@ -159,12 +161,13 @@ public class UserDAOImpl implements UserDAO {
 		
 		Connection c = null;
 		PreparedStatement pst = null;
+		ResultSet rs = null;
 		ArrayList<AddressBookEntry> ret = new ArrayList<AddressBookEntry>();
 		try {
 			c = dataSource.getConnection();
 			pst = c.prepareStatement(READ_AB_SQL);
 			pst.setInt(1, i);
-			ResultSet rs = pst.executeQuery();
+			rs = pst.executeQuery();
 			int lastId = -1;
 			AddressBookEntry abe = null;
 			ArrayList<IdentityHash> hashes = null;
@@ -182,6 +185,7 @@ public class UserDAOImpl implements UserDAO {
 				lastId = rs.getInt("ab.id");
 			}
 		} finally {
+			if (rs!=null) rs.close();
 			if (pst!=null) pst.close();
 			if (c!=null) c.close();
 		}
