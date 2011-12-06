@@ -292,11 +292,16 @@ public class UserDaoTest {
 		assertEquals(AddressBookEntry.PERM_HIDDEN, book.get(1).getPermission());	// Harry
 		assertEquals(AddressBookEntry.PERM_SHOWN, book.get(2).getPermission());		// Tom
 
-		// getpermissions should return their hashes
+		// getpermissions should return their hashes, but in any order
 		List<IdentityHash> hashes = uf.getPermissions(u);
 		assertEquals(2, hashes.size());
-		assertEquals(perms[1], hashes.get(0).getHash());
-		assertEquals(perms[0], hashes.get(1).getHash());
+		if (hashes.get(0).getHash().equals("hash-bbbbbbbbbb")) {
+			assertEquals(perms[1], hashes.get(0).getHash());
+			assertEquals(perms[0], hashes.get(1).getHash());
+		} else {
+			assertEquals(perms[1], hashes.get(1).getHash());
+			assertEquals(perms[0], hashes.get(0).getHash());
+		}
 	}
 
 	@Test
