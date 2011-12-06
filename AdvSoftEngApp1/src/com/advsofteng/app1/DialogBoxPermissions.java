@@ -42,13 +42,9 @@ public class DialogBoxPermissions extends Dialog {
 	// create, instantiate and override implemented seekbar methods...
 	private SeekBar.OnSeekBarChangeListener seekBarListen = new SeekBar.OnSeekBarChangeListener() {
 		
-		public void onStopTrackingTouch(SeekBar seekBar) {
-			// TODO Auto-generated method stub
-			}
+		public void onStopTrackingTouch(SeekBar seekBar) {}
 		
-		public void onStartTrackingTouch(SeekBar seekBar) {
-			// TODO Auto-generated method stub
-		}
+		public void onStartTrackingTouch(SeekBar seekBar) {}
 		
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {

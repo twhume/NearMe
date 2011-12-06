@@ -36,7 +36,7 @@ public class NearMeLocationListener implements LocationListener {
 	}
 	
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
+		// TODO put code here to deal with GPS being down...
 	}
 
 

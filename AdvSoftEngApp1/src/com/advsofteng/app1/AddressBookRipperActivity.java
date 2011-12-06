@@ -67,9 +67,6 @@ public class AddressBookRipperActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts);
 
-		//TODO: delete when finished testing....
-		//Log.i("AddressBookRipperActivity","onCreate");
-
 		TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
 		countryCode = tm.getSimCountryIso();
 		ownNumber = tm.getLine1Number();
@@ -190,21 +187,14 @@ public class AddressBookRipperActivity extends Activity {
 
 				if(AddressBookEntry.PERM_HIDDEN != NearMeActivity.globalAddressBook.getEntries().get(i).getPermission()){
 
-					//TODO: delete log call when finished testing....
-					Log.i(TAG, name + " has perms = " + perms);
-
 					//then save the current entry's permission in prefs, using their name as their unique ID for retrieval.
 					editor.putInt(name, perms);
-
 					bContactsSaved = true; // set flag
 
 				}
 				else{
 					// we have a hidden perms... make sure its NOT in the prefs...
 					editor.remove(name);
-
-					//TODO: delete log call when finished testing....
-					Log.i(TAG, name + " has 0 permission. perms = " + perms);
 				}
 
 
@@ -242,12 +232,9 @@ public class AddressBookRipperActivity extends Activity {
 	private class OnReadyListener implements DialogBoxPermissions.ReadyListener {
 		@Override
 		public void ready(String name) {
-			//TODO: implement what happens here when you click OK btn.
 			int iPerms = myDialog.getFuzz();
 			int iPosition = myDialog.getContactEntryNumber();
-
 			NearMeActivity.globalAddressBook.getEntries().get(iPosition).setPermission(iPerms);
-
 		}
 	}
 
@@ -353,8 +340,7 @@ public class AddressBookRipperActivity extends Activity {
 
 			if(bFlag && NearMeActivity.globalAddressBook!=null && NearMeActivity.globalAddressBook.getEntries()!=null) {
 				// we have at least 1 contact's permission saved so, change the addressbook entry to that permission.
-				//TODO: delete when finished testing....
-				// Log.i(TAG,"bFlag = true");
+
 				String strName = null;
 
 				for(int i = 0; i< NearMeActivity.globalAddressBook.getEntries().size(); i++){
@@ -363,9 +349,6 @@ public class AddressBookRipperActivity extends Activity {
 
 					// check if current name has been saved before in prefs...
 					if(prefs.contains(strName)){
-
-						//TODO: delete when finished testing....
-						// Log.i(TAG,"FindSavedPermsInPrefs and found a name with perms = " + strName);
 
 						int iPerm = 0;
 
@@ -377,11 +360,6 @@ public class AddressBookRipperActivity extends Activity {
 						}
 					}
 				}
-			}
-			else
-			{
-				//TODO: delete log call when finished testing....
-				Log.i(TAG,"bFlag = false");
 			}
 
 			return;
@@ -422,9 +400,6 @@ public class AddressBookRipperActivity extends Activity {
 
 						if(isChecked){
 
-							//TODO: delete when finished testing....
-							// Log.i(TAG, "CLICKED!!!!!");
-
 							myDialog = new DialogBoxPermissions(AddressBookRipperActivity.this, 
 																	new OnReadyListener(), iPosition);
 							myDialog.show();
@@ -433,11 +408,7 @@ public class AddressBookRipperActivity extends Activity {
 						}
 						else{
 							currentEntry.setPermission(AddressBookEntry.PERM_HIDDEN);
-							//TODO: delete log call when finished testing....
-							//Log.i(TAG, " not CLICKED!!!!!");
 						}
-						//TODO: delete when finished testing....
-						//Log.i(TAG, "Name = " + currentEntry.getName() + " Permission = " + currentEntry.getPermission());
 					}
 
 				});

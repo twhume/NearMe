@@ -75,20 +75,17 @@ public class UserDAODummyImpl implements UserDAO {
 
 	@Override
 	public List<IdentityHash> getPermissions(User u) throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean setPermissions(User u, String[] perms)
 			throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void deleteUser(User u) throws SQLException {
-		// TODO Auto-generated method stub
 	}
 	
 }
