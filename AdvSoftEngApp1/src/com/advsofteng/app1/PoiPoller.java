@@ -29,12 +29,8 @@ import android.widget.Toast;
 
 public class PoiPoller extends BroadcastReceiver {
 
-	/* Interval between deliveries of location data to the server */
-	private static final int POLL_INTERVAL = (5 * 60 * 1000);
-	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i(AdvSoftEngApp1Activity.TAG, "poll triggered");
 
 		/* Last-reported locations live in SharedPreferences, so they can be shared between
 		 * Activities and BroadcastReceivers. If there's nothing there, don't do a post and
@@ -42,6 +38,7 @@ public class PoiPoller extends BroadcastReceiver {
 		 */
 		
 		SharedPreferences prefs = context.getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
+		Log.i(AdvSoftEngApp1Activity.TAG, "poll triggered for " + prefs.getString(PreferencesActivity.KEY_ID, null));
 		if (prefs.getString("time", null)==null) {
 			Log.i(AdvSoftEngApp1Activity.TAG, "no GPS yet, don't report");
 			Toast toast=Toast.makeText(context, context.getString(R.string.no_gps_error), 2000);
@@ -50,16 +47,23 @@ public class PoiPoller extends BroadcastReceiver {
 			return;
 		}
 
-		int radius = prefs.getInt("radius", 0);
-		double lng = prefs.getInt("longitude", 0);
-		double lat = prefs.getInt("latitude", 0);
+		int radius = prefs.getInt(PreferencesActivity.KEY_RADIUS, 0);
+		String tmpStr = prefs.getString(PreferencesActivity.KEY_LNG,null);
+		double lng = Float.MIN_VALUE;
+		if (tmpStr!=null) lng = Double.parseDouble(tmpStr);
+
+		tmpStr = prefs.getString(PreferencesActivity.KEY_LAT,null);
+		double lat = Float.MIN_VALUE;
+		if (tmpStr!=null) lat = Double.parseDouble(tmpStr);
+
 		String types = prefs.getString("types", null);
+		//TODO make sure these are populated.
 		
 		try {
 
    			String myUrl = AdvSoftEngApp1Activity.ENDPOINT
    					+ "/nearme/"
-   					+ AdvSoftEngApp1Activity.DEVICE_ID
+   					+ prefs.getString(PreferencesActivity.KEY_ID, "")
    					+ "/"
    					+ lat
    					+ "/"

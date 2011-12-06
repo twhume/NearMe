@@ -296,7 +296,7 @@ public class AddressBookRipperActivity extends Activity {
 					Phone.DISPLAY_NAME + " ASC");
 
 			AddressBook a = new AddressBook();
-			a.setDeviceId(AdvSoftEngApp1Activity.DEVICE_ID);
+			a.setDeviceId(prefs.getString(PreferencesActivity.KEY_ID, null));
 			a.setOwnerHash(hashMsisdn(ownNumber));
 			ArrayList<AddressBookEntry> entries = new ArrayList<AddressBookEntry>();
 			ArrayList<String> hashes = new ArrayList<String>();
@@ -504,7 +504,7 @@ public class AddressBookRipperActivity extends Activity {
 			Log.i(TAG, System.currentTimeMillis() + " starting");
 
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + AdvSoftEngApp1Activity.DEVICE_ID);
+			HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + prefs.getString(PreferencesActivity.KEY_ID, ""));
 
 			try {
 				HttpResponse response = client.execute(post);

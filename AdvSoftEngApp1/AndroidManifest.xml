@@ -42,7 +42,7 @@
         <activity
             android:name=".addPlace">            
         </activity>
-        <receiver  android:process=":remote" android:name="LocationPoster"></receiver>
+        <receiver  android:process=":remote" android:name="PoiPoller"></receiver>
     </application>
 
 </manifest>

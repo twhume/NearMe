@@ -24,6 +24,18 @@ public class PreferencesActivity extends Activity {
 
 	/* Maximum possible radius of interest */
 	private static final int MAX_RADIUS = 1000;	
+	
+	/* These are keys used to refer to values stored in shared preferences,
+	 * so that we don't misspell key names or use them inconsistently
+	 */
+	
+	public static final String KEY_TIME = "time";
+	public static final String KEY_LAT = "latitude";
+	public static final String KEY_LNG = "longitude";
+	public static final String KEY_RADIUS = "radius";
+	public static final String KEY_TYPES = "types";
+	public static final String KEY_ID = "device-id";
+	
 
 	// CheckBoxes that user selects to get data on from server
 	private CheckBox checkBox1, checkBox2, checkBox3, checkBox4;
@@ -154,8 +166,7 @@ public class PreferencesActivity extends Activity {
 				checkBox3.isChecked());
 		editor.putBoolean(getResources().getString(R.string.poi_checkbox4),
 				checkBox4.isChecked());
-		editor.putInt(getResources().getString(R.string.tvRadiusText),
-				intRadius);
+		editor.putInt(KEY_RADIUS, intRadius);
 		editor.commit();
 	}
 
@@ -169,7 +180,7 @@ public class PreferencesActivity extends Activity {
 				checkBox3.isChecked());
 		b.putBoolean(getResources().getString(R.string.poi_checkbox4),
 				checkBox4.isChecked());
-		b.putInt(getResources().getString(R.string.tvRadiusText), intRadius);
+		b.putInt(KEY_RADIUS, intRadius);
 	}
 
 	private void retrieveStateFromBundle(Bundle b) {
@@ -182,8 +193,7 @@ public class PreferencesActivity extends Activity {
 				getResources().getString(R.string.poi_checkbox3), false));
 		checkBox4.setChecked(b.getBoolean(
 				getResources().getString(R.string.poi_checkbox4), false));
-		intRadius = b
-				.getInt(getResources().getString(R.string.tvRadiusText), 0);
+		intRadius = b.getInt(KEY_RADIUS, 0);
 		seekBarRadius.setProgress(intRadius);
 	}
 
@@ -197,8 +207,7 @@ public class PreferencesActivity extends Activity {
 				getResources().getString(R.string.poi_checkbox3), false));
 		checkBox4.setChecked(p.getBoolean(
 				getResources().getString(R.string.poi_checkbox4), false));
-		intRadius = p
-				.getInt(getResources().getString(R.string.tvRadiusText), 0);
+		intRadius = p.getInt(KEY_RADIUS, 0);
 		seekBarRadius.setProgress(intRadius);
 	}
 }

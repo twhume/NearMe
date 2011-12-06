@@ -1,6 +1,7 @@
 package com.advsofteng.app1;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -28,10 +29,12 @@ import android.widget.TextView;
  */
 public class AdvSoftEngApp1Activity extends Activity {
 
+	/* Interval between deliveries of location data to the server */
+	private static final int POLL_INTERVAL = (10 * 1000);
+	
 	public static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer";
 	public static final String TAG = "LocationPoster";	/* used for logging purposes */
 	public static final int MAGIC_NUMBER = 12345;		/* used as a reference to an Alarm */
-	public static String DEVICE_ID = null;
 	
 
 	private LocationManager manager;
@@ -83,9 +86,8 @@ public class AdvSoftEngApp1Activity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        if (DEVICE_ID==null) DEVICE_ID = Secure.getString(getApplicationContext().getContentResolver(), Secure.ANDROID_ID);
-        
         setContentView(R.layout.main);
+
 
         /* get handles to the TextView where GPS position is displayed */
         
@@ -94,6 +96,8 @@ public class AdvSoftEngApp1Activity extends Activity {
         /* We may know a location even before we start; if so, use it. */
 
         prefs = getSharedPreferences(TAG, Context.MODE_PRIVATE);
+        saveDeviceId();
+
         manager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Location loc = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         setLocation(loc);
@@ -110,12 +114,9 @@ public class AdvSoftEngApp1Activity extends Activity {
        
        buttonMap=  (Button) findViewById(R.id.mapButton);
        buttonMap.setOnClickListener(new View.OnClickListener() {
-		
 		public void onClick(View v) {
 			Intent intentMAP = new Intent(AdvSoftEngApp1Activity.this, map.class);
-			
 			startActivity(intentMAP);
-			
 		}
        });
         
@@ -124,21 +125,13 @@ public class AdvSoftEngApp1Activity extends Activity {
         // deals with getPOI button.
         buttonGetPOI = (Button) findViewById(R.id.getPOIButton);
         buttonGetPOI.setOnClickListener(new View.OnClickListener() {
-			
 			public void onClick(View v) {
-
-				
 				Intent intentPOI = new Intent(AdvSoftEngApp1Activity.this, PreferencesActivity.class);
-				
 				startActivity(intentPOI);
-				
 				 buttonMap.setVisibility(0);
-				
 			} // end of onClickView(View v)
 			}//  end of View.OnClickListener
         ); // end of setOnClickListener
-     
-           
     }
     
 	/**
@@ -168,18 +161,24 @@ public class AdvSoftEngApp1Activity extends Activity {
 		// then slap it into those shared preferences so it gets sent up in a poll
 		
 		SharedPreferences.Editor edit = prefs.edit();
-		edit.putString("time", new Date().toString());
-		edit.putString("latitude", Double.toString(location.getLatitude()));
-		edit.putString("longitude", Double.toString(location.getLongitude()));
+		edit.putString(PreferencesActivity.KEY_TIME, new Date().toString());
+		edit.putString(PreferencesActivity.KEY_LAT, Double.toString(location.getLatitude()));
+		edit.putString(PreferencesActivity.KEY_LNG, Double.toString(location.getLongitude()));
+		edit.commit();
+    }
+    
+    private void saveDeviceId() {
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putString(PreferencesActivity.KEY_ID, Secure.getString(getApplicationContext().getContentResolver(), Secure.ANDROID_ID));
 		edit.commit();
     }
     
     private void emptyPrefs() {
 		Log.i(TAG, "emptyPrefs");
 		SharedPreferences.Editor edit = prefs.edit();
-		edit.remove("time");
-		edit.remove("latitude");
-		edit.remove("longitude");
+		edit.remove(PreferencesActivity.KEY_TIME);
+		edit.remove(PreferencesActivity.KEY_LAT);
+		edit.remove(PreferencesActivity.KEY_LNG);
 		edit.commit();
 		
     }
@@ -194,7 +193,24 @@ public class AdvSoftEngApp1Activity extends Activity {
 			AlarmManager am = (AlarmManager) ctx.getSystemService(Activity.ALARM_SERVICE);
 			am.cancel(alarmIntent);
 			alarmIntent = null;
-			button.setText(R.string.start_button_label);
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+        /*
+         * Start the regular polling for POIs
+         */
+
+		if (alarmIntent==null) {
+			Log.i(TAG,"starting poll");
+			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+	    	Calendar cal = Calendar.getInstance();
+			Intent intent = new Intent(getApplicationContext(), PoiPoller.class);
+			alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), MAGIC_NUMBER, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), POLL_INTERVAL , alarmIntent);
 		}
 	}
 	
