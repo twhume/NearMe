@@ -95,7 +95,7 @@ public class DatabasePoiFinder implements PoiFinder {
 		while (rs.next()) // Return false when there is not more data in the
 							// table
 		{
-			type = new PoiType("",rs.getInt("type"));
+			type = new PoiType("",rs.getInt("type")); //TODO ought to populate these with names too, by joining on types in the SQL query above
 			Poi newPoi = new Poi(rs.getString("name"),
 					rs.getDouble("latitude"), rs.getDouble("longitude"), type,
 					rs.getInt("Id"));
