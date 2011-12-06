@@ -113,6 +113,7 @@ public class PoiPoller extends BroadcastReceiver {
 		    /* Save our current set of POIs into the shared state of the app */
 		    
 			app.setPois(newPois);
+			Log.d(NearMeActivity.TAG,"PoiPoller received " + newPois.size() + " POIs");
 		    
 		    /* If we received any new Pois as part of this update, then alert the user
 		     * by vibrating, and signal the NearMeActivity to refresh its map view

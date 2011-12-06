@@ -188,8 +188,7 @@ public class NearMeActivity extends MapActivity {
 			return;
 		}
 
-		String strGPS = "Longitude = " + location.getLongitude() + "\n";
-		strGPS += "Latitude = " + location.getLatitude();
+		String strGPS = String.format(getString(R.string.your_pos), location.getLatitude(), location.getLongitude());
 		tvGPS.setText(strGPS);
 
 		// then slap it into those shared preferences so it gets sent up in a
