@@ -39,6 +39,9 @@ public class PoiPoller extends BroadcastReceiver {
 		
 		SharedPreferences prefs = context.getSharedPreferences(NearMeActivity.TAG, Context.MODE_PRIVATE);
 		Log.i(NearMeActivity.TAG, "poll triggered for " + prefs.getString(PreferencesActivity.KEY_ID, null));
+		
+		/* If we have no GPS, there's nothing we can usefully ask for - so tell the user and return */
+		
 		if (prefs.getString("time", null)==null) {
 			Log.i(NearMeActivity.TAG, "no GPS yet, don't report");
 			Toast toast=Toast.makeText(context, context.getString(R.string.no_gps_error), 2000);
@@ -46,6 +49,8 @@ public class PoiPoller extends BroadcastReceiver {
 			toast.show();
 			return;
 		}
+		
+		/* Pull variables we need to poll - lat, long and radius - out of shared preferences */
 
 		int radius = prefs.getInt(PreferencesActivity.KEY_RADIUS, 0);
 		String tmpStr = prefs.getString(PreferencesActivity.KEY_LNG,null);
@@ -85,17 +90,14 @@ public class PoiPoller extends BroadcastReceiver {
 			HttpResponse response = client.execute(get);
 			String responseBody = HttpHelper.getResponseBody(response);
 				
-
-			/* get the Poi objects out of the string returned
+			/* get the Poi objects out of the string returned using Gson to deserialise
 			 * ref: http://benjii.me/2010/04/deserializing-json-in-android-using-gson/
 			 */
 				
 			Gson gson = new Gson();
-
 			ArrayList<Poi> newPois = new ArrayList<Poi>();
-			boolean gotNewPoi = false;
+			boolean gotNewPoi = false; /* flag: did we get anything new this time around? */
 
-			Log.d(NearMeActivity.TAG, "received json="+responseBody);
 		    JsonParser parser = new JsonParser();
 		    JsonArray array = parser.parse(responseBody).getAsJsonArray();
 			NearMeApplication app = (NearMeApplication) context.getApplicationContext();
@@ -106,30 +108,26 @@ public class PoiPoller extends BroadcastReceiver {
 		    	Poi p = gson.fromJson(counter, Poi.class);
 		    	if (!app.getPois().contains(p)) gotNewPoi = true;
 		    	newPois.add(p);
-		    	Log.d(NearMeActivity.TAG, "adding POI type " + p.getType());
 		    }
+
+		    /* Save our current set of POIs into the shared state of the app */
 		    
 			app.setPois(newPois);
-		    Log.d(NearMeActivity.TAG, "PoiPoller says app.getPois().size==" + app.getPois().size() + ",app="+app);
 		    
-		    /*
-		     * If we received any new Pois as part of this update, then alert the user
+		    /* If we received any new Pois as part of this update, then alert the user
+		     * by vibrating, and signal the NearMeActivity to refresh its map view
 		     */
 		    
 		    if (gotNewPoi) {
-			  Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-			  vib.vibrate(300);
-			  
+		    	Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+		    	vib.vibrate(300);
+		    	Intent i = new Intent("refresh-map");
+		    	context.sendBroadcast(i);
 		    }
-		    Log.d(NearMeActivity.TAG, "trigger a refresh pls");
-		  Intent i = new Intent("refresh-map");
-		  context.sendBroadcast(i);
 			
 		} catch (Exception e) {
 			Log.i( NearMeActivity.TAG, "get to getPOI failed, " + e.getMessage());
-			
 		}
-
-		Log.i(NearMeActivity.TAG, "poll over");
+		Log.i(NearMeActivity.TAG, "poll done");
 	}
 }
