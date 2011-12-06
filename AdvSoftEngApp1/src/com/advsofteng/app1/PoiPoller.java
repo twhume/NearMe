@@ -110,6 +110,9 @@ public class PoiPoller extends BroadcastReceiver {
 		    	newPois.add(p);
 		    }
 
+		    // If there are less, or more... update the screen
+		    if (app.getPois().size()!=newPois.size()) gotNewPoi = true;
+
 		    /* Save our current set of POIs into the shared state of the app */
 		    
 			app.setPois(newPois);
