@@ -7,15 +7,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 public class UserDaoTest {
 	
-	private static Logger logger = Logger.getLogger(UserDaoTest.class);
+//	private static Logger logger = Logger.getLogger(UserDaoTest.class);
 	
 	private UserDAO uf = null;
 	private MysqlConnectionPoolDataSource dataSource = null;
@@ -323,7 +321,6 @@ public class UserDaoTest {
 	public void testSetPermissionsExistingUserUnlinkedHash() throws SQLException {
 		User u = uf.read(1);
 		// testGetPermissions() has already tested that user 1 has 1 permission in their address book
-		List<IdentityHash> perms = new ArrayList<IdentityHash>();
 		
 		assertFalse(uf.setPermissions(u, new String[]{"hash-1234567890"}));
 	}

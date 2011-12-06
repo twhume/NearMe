@@ -6,10 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
-
 import javax.sql.DataSource;
-
-import org.apache.log4j.Logger;
 
 /**
  * I got to the point in my tests where I was testing we're writing things in and out of a
@@ -23,7 +20,7 @@ import org.apache.log4j.Logger;
 
 public class ArbitrarySQLRunner {
 
-	private Logger logger = Logger.getLogger(ArbitrarySQLRunner.class);
+//	private Logger logger = Logger.getLogger(ArbitrarySQLRunner.class);
 	
 	private DataSource dataSource = null;
 	

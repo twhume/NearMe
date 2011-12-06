@@ -253,9 +253,9 @@ public class UserDAOImpl implements UserDAO {
 	 * @return
 	 */
 	
-	private int getSmudgeFactorBetween(int abId) {
-		return 0;
-	}
+//	private int getSmudgeFactorBetween(int abId) {
+//		return 0;
+//	}
 	
 	/**
 	 * Writes the given User into the database, either inserting or updating, depending on whether a
