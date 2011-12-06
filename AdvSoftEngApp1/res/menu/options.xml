@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/poi_prefs"
+          android:icon="@drawable/ic_menu_equalizer"
+          android:title="@string/menu_poi_prefs" />
     <item android:id="@+id/add_poi"
           android:icon="@drawable/ic_menu_love"
           android:title="@string/menu_add_poi" />

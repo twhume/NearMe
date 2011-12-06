@@ -42,7 +42,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 	private PendingIntent alarmIntent = null;	/* Handle to the repeatedly called Intent for triggering polls */
 	private TextView tvGPS = null;				/* TextView to show GPS location on-screen */
 	private SharedPreferences prefs = null;		/* used to share location & time between Activity and BroadcastReceiver */
-	private Button buttonGetPOI = null;			/* get POIs button*/
 	private Button buttonMap = null;         /* View Map POI Button*/
 
 	public static ArrayList<Poi>  poiArray = new ArrayList<Poi>(); 
@@ -57,36 +56,33 @@ public class AdvSoftEngApp1Activity extends Activity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
+		Intent nextIntent = null;
+		
 	    switch (item.getItemId()) {
 		    case R.id.add_poi:
-		        addPlace();
-		        return true;
+		    	nextIntent = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
+		    	break;
 		    case R.id.upload_ab:
-		    	manageAddressBook();
-		    	return true;
-		    default:
-		        return super.onOptionsItemSelected(item);
+				nextIntent = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
+				break;
+		    case R.id.poi_prefs:
+				nextIntent = new Intent(AdvSoftEngApp1Activity.this, PreferencesActivity.class);
+				break;
 	    }
+	    if (nextIntent!=null) {
+	    	startActivity(nextIntent);
+	    	return true;
+	    } else
+	    	return super.onOptionsItemSelected(item);
 	}
 	
-	private void addPlace() {
-		Intent intentAdd = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
-		startActivity(intentAdd);
-	}
-	
-	private void manageAddressBook() {
-		Intent intentAddressRip = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
-		Log.i(TAG, "ManageAddressBook");
-		startActivity(intentAddressRip);
-	}
+
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.main);
-
 
         /* get handles to the TextView where GPS position is displayed */
         
@@ -118,19 +114,6 @@ public class AdvSoftEngApp1Activity extends Activity {
 			startActivity(intentMAP);
 		}
        });
-        
- 
-        //////////////////////////////////////////
-        // deals with getPOI button.
-        buttonGetPOI = (Button) findViewById(R.id.getPOIButton);
-        buttonGetPOI.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent intentPOI = new Intent(AdvSoftEngApp1Activity.this, PreferencesActivity.class);
-				startActivity(intentPOI);
-				 buttonMap.setVisibility(0);
-			} // end of onClickView(View v)
-			}//  end of View.OnClickListener
-        ); // end of setOnClickListener
     }
     
 	/**

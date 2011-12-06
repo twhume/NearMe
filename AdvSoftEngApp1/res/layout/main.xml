@@ -22,21 +22,6 @@
   	    />
 
     <Button
-        android:id="@+id/getPOIButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:onClick="POIActivity"
-        android:text="@string/prefs_title" />
-
-    <Button
-        android:id="@+id/addButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center" 
-        android:text="Add Favourite Place" />
-    
-    <Button
         android:id="@+id/mapButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
