@@ -13,6 +13,8 @@ public class Poi {
 	private PoiType type;
 	private int id;
 	
+	public Poi() {};
+	
 	public Poi(String n, double la, double lo, PoiType t, int i) {
 		this.name = n;
 		this.latitude = la;

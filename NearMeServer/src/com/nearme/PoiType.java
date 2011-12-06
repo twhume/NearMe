@@ -12,6 +12,8 @@ public class PoiType {
 	
 	public static final PoiType FRIEND = new PoiType("Friends", 0);
 	
+	public PoiType() {};
+	
 	public PoiType(String n, int i) {
 		this.name = n;
 		this.id = i;

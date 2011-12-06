@@ -95,6 +95,7 @@ public class DatabasePoiFinder implements PoiFinder {
 		while (rs.next()) // Return false when there is not more data in the
 							// table
 		{
+			type = new PoiType("",rs.getInt("type"));
 			Poi newPoi = new Poi(rs.getString("name"),
 					rs.getDouble("latitude"), rs.getDouble("longitude"), type,
 					rs.getInt("Id"));
