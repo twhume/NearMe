@@ -27,7 +27,7 @@ import android.widget.Toast;
  *
  */
 
-public class PoiPollingService extends BroadcastReceiver {
+public class PoiPoller extends BroadcastReceiver {
 
 	/* Interval between deliveries of location data to the server */
 	private static final int POLL_INTERVAL = (5 * 60 * 1000);
