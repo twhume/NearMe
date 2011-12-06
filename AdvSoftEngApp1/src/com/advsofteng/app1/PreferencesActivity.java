@@ -43,13 +43,17 @@ public class PreferencesActivity extends Activity {
 	private TextView tvRadius; 			// textview displaying the current radius
 	private Integer intRadius; 			// current radius of interest
 	private Button savePrefsButton;
+	
 	private SharedPreferences prefs;
 
 	// flag used in saving and loading app wide prefs.
 	// http://sites.google.com/site/jalcomputing/home/mac-osx-android-programming-tutorial/saving-instance-state
 	private Boolean isSavedInstanceState = false;
 
-	// create and instantiate and override implemented seekbar methods...
+	/* We have an on-screen slider which lets you choose the radius you're interested in;
+	 * this is where it's initialised.
+	 */
+	
 	private SeekBar.OnSeekBarChangeListener seekBarListen = new SeekBar.OnSeekBarChangeListener() {
 
 		public void onStopTrackingTouch(SeekBar seekBar) {}
@@ -64,11 +68,9 @@ public class PreferencesActivity extends Activity {
 		}
 	};
 	
-	// Called at the start of the full lifetime.
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.get_poi);
 		prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
 
