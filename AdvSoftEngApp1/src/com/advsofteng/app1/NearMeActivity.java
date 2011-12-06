@@ -156,8 +156,10 @@ public class NearMeActivity extends MapActivity {
 		if (prefs.getString(PreferencesActivity.KEY_TIME, null)!=null) {
 			float lat = Float.parseFloat(prefs.getString(PreferencesActivity.KEY_LAT, ""));
 			float lng = Float.parseFloat(prefs.getString(PreferencesActivity.KEY_LNG, ""));
-			me.addOverlay(new OverlayItem( new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6)), getString(R.string.your_position), ""));
+			GeoPoint myPosition = new GeoPoint((int) (lat * 1E6), (int) (lng * 1E6));
+			me.addOverlay(new OverlayItem(myPosition, getString(R.string.your_position), ""));
 			mapOverlays.add(me);
+			mapView.getController().animateTo(myPosition);
 		}
 		
 		/* Add our new overlaps to the map */
