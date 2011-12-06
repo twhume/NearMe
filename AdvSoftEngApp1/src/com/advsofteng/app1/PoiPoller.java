@@ -37,10 +37,10 @@ public class PoiPoller extends BroadcastReceiver {
 		 * tell the user we couldn't report in
 		 */
 		
-		SharedPreferences prefs = context.getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
-		Log.i(AdvSoftEngApp1Activity.TAG, "poll triggered for " + prefs.getString(PreferencesActivity.KEY_ID, null));
+		SharedPreferences prefs = context.getSharedPreferences(NearMeActivity.TAG, Context.MODE_PRIVATE);
+		Log.i(NearMeActivity.TAG, "poll triggered for " + prefs.getString(PreferencesActivity.KEY_ID, null));
 		if (prefs.getString("time", null)==null) {
-			Log.i(AdvSoftEngApp1Activity.TAG, "no GPS yet, don't report");
+			Log.i(NearMeActivity.TAG, "no GPS yet, don't report");
 			Toast toast=Toast.makeText(context, context.getString(R.string.no_gps_error), 2000);
 			toast.setGravity(Gravity.TOP, -30, 50);
 			toast.show();
@@ -60,7 +60,7 @@ public class PoiPoller extends BroadcastReceiver {
 		
 		try {
 
-   			String myUrl = AdvSoftEngApp1Activity.ENDPOINT
+   			String myUrl = NearMeActivity.ENDPOINT
    					+ "/nearme/"
    					+ prefs.getString(PreferencesActivity.KEY_ID, "")
    					+ "/"
@@ -76,7 +76,7 @@ public class PoiPoller extends BroadcastReceiver {
 				myUrl = myUrl + "?t=" + types;
    			}
 				
-			Log.d(AdvSoftEngApp1Activity.TAG, "get="+myUrl);
+			Log.d(NearMeActivity.TAG, "get="+myUrl);
 
 			/* Create a new HTTPClient to do our GET for us */
 
@@ -95,7 +95,7 @@ public class PoiPoller extends BroadcastReceiver {
 			ArrayList<Poi> newPois = new ArrayList<Poi>();
 			boolean gotNewPoi = false;
 
-			Log.d(AdvSoftEngApp1Activity.TAG, "received json="+responseBody);
+			Log.d(NearMeActivity.TAG, "received json="+responseBody);
 		    JsonParser parser = new JsonParser();
 		    JsonArray array = parser.parse(responseBody).getAsJsonArray();
 		    
@@ -103,11 +103,11 @@ public class PoiPoller extends BroadcastReceiver {
 		    {	
 		    	// run through the JsonArray converting each entry into an actual Poi object in the Poi ArrayList
 		    	Poi p = gson.fromJson(counter, Poi.class);
-		    	if (!AdvSoftEngApp1Activity.poiArray.contains(p)) gotNewPoi = true;
+		    	if (!NearMeActivity.poiArray.contains(p)) gotNewPoi = true;
 		    	newPois.add(p);
 		    }
 		    
-		    AdvSoftEngApp1Activity.poiArray = newPois;
+		    NearMeActivity.poiArray = newPois;
 		    
 		    /*
 		     * If we received any new Pois as part of this update, then alert the user
@@ -120,10 +120,10 @@ public class PoiPoller extends BroadcastReceiver {
 		    }
 			
 		} catch (Exception e) {
-			Log.i( AdvSoftEngApp1Activity.TAG, "get to getPOI failed, " + e.getMessage());
+			Log.i( NearMeActivity.TAG, "get to getPOI failed, " + e.getMessage());
 			
 		}
 
-		Log.i(AdvSoftEngApp1Activity.TAG, "poll over");
+		Log.i(NearMeActivity.TAG, "poll over");
 	}
 }

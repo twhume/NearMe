@@ -6,19 +6,19 @@ import android.location.LocationProvider;
 import android.os.Bundle;
 import android.util.Log;
 
-public class AdvSoftEngLocationListener implements LocationListener {
+public class NearMeLocationListener implements LocationListener {
 
-	private AdvSoftEngApp1Activity locationActivity = null;
+	private NearMeActivity locationActivity = null;
 			
-	public AdvSoftEngLocationListener(AdvSoftEngApp1Activity locationActivity) {
+	public NearMeLocationListener(NearMeActivity locationActivity) {
 		this.locationActivity = locationActivity;
 	}
 
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		Log.i(AdvSoftEngApp1Activity.TAG,"onStatusChanged");
+		Log.i(NearMeActivity.TAG,"onStatusChanged");
 		if((LocationProvider.OUT_OF_SERVICE == status)||(LocationProvider.TEMPORARILY_UNAVAILABLE == status)) 
 		{	
-			Log.i(AdvSoftEngApp1Activity.TAG,"onStatusChanged out of service");
+			Log.i(NearMeActivity.TAG,"onStatusChanged out of service");
 			locationActivity.setLocation(null);
 		}
 	}

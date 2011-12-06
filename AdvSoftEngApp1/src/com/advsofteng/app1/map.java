@@ -46,14 +46,14 @@ public class map extends MapActivity {
          mapOverlays = mapView.getOverlays();
   
        	   	      
-		  for (int i = 0; i  < AdvSoftEngApp1Activity.poiArray.size() ; i++) { 
+		  for (int i = 0; i  < NearMeActivity.poiArray.size() ; i++) { 
 			  
-			  type  = AdvSoftEngApp1Activity.poiArray.get(i).getType();
+			  type  = NearMeActivity.poiArray.get(i).getType();
 			  
 			  if (type.getId() == 0) // check if is a place or a friend
 			  {
-			  double lat = AdvSoftEngApp1Activity.poiArray.get(i).getLatitude();  //get latitude
-			  double lng = AdvSoftEngApp1Activity.poiArray.get(i).getLongitude(); //get longitude
+			  double lat = NearMeActivity.poiArray.get(i).getLatitude();  //get latitude
+			  double lng = NearMeActivity.poiArray.get(i).getLongitude(); //get longitude
 			  
 			  geopoint = new GeoPoint((int)(lat*1E6), (int)(lng*1E6)); //set the GeoPoint for the map
 			  
@@ -65,8 +65,8 @@ public class map extends MapActivity {
 			  }else
 			  { 
 				  
-				  double lat = AdvSoftEngApp1Activity.poiArray.get(i).getLatitude();  //get latitude
-				  double lng = AdvSoftEngApp1Activity.poiArray.get(i).getLongitude(); //get longitude
+				  double lat = NearMeActivity.poiArray.get(i).getLatitude();  //get latitude
+				  double lng = NearMeActivity.poiArray.get(i).getLongitude(); //get longitude
 				  
 				  geopoint = new GeoPoint((int)(lat*1E6), (int)(lng*1E6)); //set the GeoPoint for the map
 				  

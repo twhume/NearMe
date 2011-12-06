@@ -27,7 +27,7 @@ import android.widget.TextView;
  * if GPS data is unavailable, it displays "GPS not available".
  * 
  */
-public class AdvSoftEngApp1Activity extends Activity {
+public class NearMeActivity extends Activity {
 
 	/* Interval between deliveries of location data to the server */
 	private static final int POLL_INTERVAL = (10 * 1000);
@@ -60,13 +60,13 @@ public class AdvSoftEngApp1Activity extends Activity {
 		
 	    switch (item.getItemId()) {
 		    case R.id.add_poi:
-		    	nextIntent = new Intent(AdvSoftEngApp1Activity.this, addPlace.class);
+		    	nextIntent = new Intent(NearMeActivity.this, addPlace.class);
 		    	break;
 		    case R.id.upload_ab:
-				nextIntent = new Intent(AdvSoftEngApp1Activity.this, AddressBookRipperActivity.class);
+				nextIntent = new Intent(NearMeActivity.this, AddressBookRipperActivity.class);
 				break;
 		    case R.id.poi_prefs:
-				nextIntent = new Intent(AdvSoftEngApp1Activity.this, PreferencesActivity.class);
+				nextIntent = new Intent(NearMeActivity.this, PreferencesActivity.class);
 				break;
 	    }
 	    if (nextIntent!=null) {
@@ -100,7 +100,7 @@ public class AdvSoftEngApp1Activity extends Activity {
       
 		/* connect the listener object to receive GPS updates */
 
-		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new AdvSoftEngLocationListener(this));
+		manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new NearMeLocationListener(this));
 		
 	
 		
@@ -110,7 +110,7 @@ public class AdvSoftEngApp1Activity extends Activity {
        buttonMap=  (Button) findViewById(R.id.mapButton);
        buttonMap.setOnClickListener(new View.OnClickListener() {
 		public void onClick(View v) {
-			Intent intentMAP = new Intent(AdvSoftEngApp1Activity.this, map.class);
+			Intent intentMAP = new Intent(NearMeActivity.this, map.class);
 			startActivity(intentMAP);
 		}
        });

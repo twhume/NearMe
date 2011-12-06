@@ -74,7 +74,7 @@ public class AddressBookRipperActivity extends Activity {
 		countryCode = tm.getSimCountryIso();
 		ownNumber = tm.getLine1Number();
 
-		prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
+		prefs = getApplicationContext().getSharedPreferences(NearMeActivity.TAG, Context.MODE_PRIVATE);
 
 		gatherer = new GatherContactsTask();
 		gatherer.execute();
@@ -86,7 +86,7 @@ public class AddressBookRipperActivity extends Activity {
 		sendFriendList.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
 				finish();
-				uploadContacts(AdvSoftEngApp1Activity.globalAddressBook);
+				uploadContacts(NearMeActivity.globalAddressBook);
 			}
 		});
 
@@ -183,12 +183,12 @@ public class AddressBookRipperActivity extends Activity {
 			boolean bContactsSaved = false;
 
 			// loop through addressBook looking for perms != 0...
-			for(int i = 0; i < AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++){
+			for(int i = 0; i < NearMeActivity.globalAddressBook.getEntries().size(); i++){
 
-				String name = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getName();
-				int perms = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission();
+				String name = NearMeActivity.globalAddressBook.getEntries().get(i).getName();
+				int perms = NearMeActivity.globalAddressBook.getEntries().get(i).getPermission();
 
-				if(AddressBookEntry.PERM_HIDDEN != AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission()){
+				if(AddressBookEntry.PERM_HIDDEN != NearMeActivity.globalAddressBook.getEntries().get(i).getPermission()){
 
 					//TODO: delete log call when finished testing....
 					Log.i(TAG, name + " has perms = " + perms);
@@ -246,7 +246,7 @@ public class AddressBookRipperActivity extends Activity {
 			int iPerms = myDialog.getFuzz();
 			int iPosition = myDialog.getContactEntryNumber();
 
-			AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(iPosition).setPermission(iPerms);
+			NearMeActivity.globalAddressBook.getEntries().get(iPosition).setPermission(iPerms);
 
 		}
 	}
@@ -264,7 +264,7 @@ public class AddressBookRipperActivity extends Activity {
 		protected void onPostExecute(AddressBook result) {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
 
-			AdvSoftEngApp1Activity.globalAddressBook = result;
+			NearMeActivity.globalAddressBook = result;
 
 			//need to check that any local contacts have had their permissions saved previously in shared prefs.
 			FindSavedPermsInPrefs();
@@ -351,15 +351,15 @@ public class AddressBookRipperActivity extends Activity {
 			bFlag = prefs.getBoolean("bContactsSaved", bFlag);
 
 
-			if(bFlag && AdvSoftEngApp1Activity.globalAddressBook!=null && AdvSoftEngApp1Activity.globalAddressBook.getEntries()!=null) {
+			if(bFlag && NearMeActivity.globalAddressBook!=null && NearMeActivity.globalAddressBook.getEntries()!=null) {
 				// we have at least 1 contact's permission saved so, change the addressbook entry to that permission.
 				//TODO: delete when finished testing....
 				// Log.i(TAG,"bFlag = true");
 				String strName = null;
 
-				for(int i = 0; i< AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++){
+				for(int i = 0; i< NearMeActivity.globalAddressBook.getEntries().size(); i++){
 
-					strName = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getName();
+					strName = NearMeActivity.globalAddressBook.getEntries().get(i).getName();
 
 					// check if current name has been saved before in prefs...
 					if(prefs.contains(strName)){
@@ -373,7 +373,7 @@ public class AddressBookRipperActivity extends Activity {
 
 						// if its any value other than 0, then replace this saved value in addressbook
 						if(0 != iPerm){
-							AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).setPermission(iPerm);
+							NearMeActivity.globalAddressBook.getEntries().get(i).setPermission(iPerm);
 						}
 					}
 				}
@@ -397,7 +397,7 @@ public class AddressBookRipperActivity extends Activity {
 		AddressEntryAdapter() {
 			super(AddressBookRipperActivity.this, 
 					R.layout.row,  
-					AdvSoftEngApp1Activity.globalAddressBook.getEntries());
+					NearMeActivity.globalAddressBook.getEntries());
 		}
 
 
@@ -406,7 +406,7 @@ public class AddressBookRipperActivity extends Activity {
 
 			View row=convertView;
 			AddressHolder holder = null;
-			final AddressBookEntry currentEntry = ((AddressBookEntry)AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+			final AddressBookEntry currentEntry = ((AddressBookEntry)NearMeActivity.globalAddressBook.getEntries().get(position));
 			int iPermission = currentEntry.getPermission();
 			final int iPosition = position;
 
@@ -448,7 +448,7 @@ public class AddressBookRipperActivity extends Activity {
 			else{ // access existing rowÉ.
 				holder=(AddressHolder)row.getTag();
 			}
-			holder.populateFrom(AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(position));
+			holder.populateFrom(NearMeActivity.globalAddressBook.getEntries().get(position));
 
 			return(row);
 		}
@@ -509,7 +509,7 @@ public class AddressBookRipperActivity extends Activity {
 
 			HttpClient client = new DefaultHttpClient();
 			HttpPost post = new HttpPost(ENDPOINT + "/unsubscribe/" + prefs.getString(PreferencesActivity.KEY_ID, ""));
-			Log.d(AdvSoftEngApp1Activity.TAG, "unsubscribing via " + post.getURI());
+			Log.d(NearMeActivity.TAG, "unsubscribing via " + post.getURI());
 			try {
 				HttpResponse response = client.execute(post);
 				Log.i(TAG, "post to " + post.getURI() + " done, response="+response.getStatusLine().getStatusCode());
@@ -526,17 +526,17 @@ public class AddressBookRipperActivity extends Activity {
 
 	protected void onStop() {
 
-		if (AdvSoftEngApp1Activity.globalAddressBook!=null && AdvSoftEngApp1Activity.globalAddressBook.getEntries()!=null) {
+		if (NearMeActivity.globalAddressBook!=null && NearMeActivity.globalAddressBook.getEntries()!=null) {
 			SharedPreferences.Editor editor = prefs.edit();
 			boolean bContactsSaved = false;
 			// loop through addressBook looking for... 
-			for(int i = 0; i < AdvSoftEngApp1Activity.globalAddressBook.getEntries().size(); i++){
+			for(int i = 0; i < NearMeActivity.globalAddressBook.getEntries().size(); i++){
 	
-				int perms = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission();
-				String name = AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getName();
+				int perms = NearMeActivity.globalAddressBook.getEntries().get(i).getPermission();
+				String name = NearMeActivity.globalAddressBook.getEntries().get(i).getName();
 	
 				// ... non-hidden perms..
-				if(AddressBookEntry.PERM_HIDDEN != AdvSoftEngApp1Activity.globalAddressBook.getEntries().get(i).getPermission()){
+				if(AddressBookEntry.PERM_HIDDEN != NearMeActivity.globalAddressBook.getEntries().get(i).getPermission()){
 	
 					//then save the current entry's permission in prefs, using their name as their unique ID for retrieval.
 					editor.putInt(name, perms);

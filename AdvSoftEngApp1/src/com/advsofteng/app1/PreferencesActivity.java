@@ -72,23 +72,23 @@ public class PreferencesActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.get_poi);
-		prefs = getApplicationContext().getSharedPreferences(AdvSoftEngApp1Activity.TAG, Context.MODE_PRIVATE);
+		prefs = getApplicationContext().getSharedPreferences(NearMeActivity.TAG, Context.MODE_PRIVATE);
 
 		/* If we've been soft-killed, retrieve saved state from the bundle */
 
 		if (null != savedInstanceState) {
 			try {
 				InitialiseCheckBoxsAndBtns(savedInstanceState);
-				Log.i(AdvSoftEngApp1Activity.TAG, "RestoredState.");
+				Log.i(NearMeActivity.TAG, "RestoredState.");
 			} catch (Exception e) {
-				Log.i(AdvSoftEngApp1Activity.TAG, "FailedToRestoreState", e);
+				Log.i(NearMeActivity.TAG, "FailedToRestoreState", e);
 			}
 		} else { /*
 				 * get saved state from preferences on first pass after a hard
 				 * kill
 				 */
 			InitialiseCheckBoxsAndBtns(null);
-			Log.i(AdvSoftEngApp1Activity.TAG, "gettingPrefs");
+			Log.i(NearMeActivity.TAG, "gettingPrefs");
 		}
 
 		/* When the savePrefsButton is clicked, saved preferences and leave the Activity */
@@ -96,7 +96,7 @@ public class PreferencesActivity extends Activity {
 		savePrefsButton = (Button) findViewById(R.id.getPOIDataButton);
 		savePrefsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i(AdvSoftEngApp1Activity.TAG, "save POI preferences");
+				Log.i(NearMeActivity.TAG, "save POI preferences");
 				saveStateToPreferences(prefs);
 				finish();
 			}
@@ -158,7 +158,7 @@ public class PreferencesActivity extends Activity {
 	}
 
 	private void saveStateToPreferences(SharedPreferences p) {
-		Log.d(AdvSoftEngApp1Activity.TAG, "saveStateToPreferences()");
+		Log.d(NearMeActivity.TAG, "saveStateToPreferences()");
 		SharedPreferences.Editor editor = p.edit();
 		editor.putBoolean(getResources().getString(R.string.poi_checkbox1),
 				checkBox1.isChecked());
@@ -174,7 +174,7 @@ public class PreferencesActivity extends Activity {
 	}
 
 	private void saveStateToBundle(Bundle b) {
-		Log.d(AdvSoftEngApp1Activity.TAG, "saveStateToBundle()");
+		Log.d(NearMeActivity.TAG, "saveStateToBundle()");
 		b.putBoolean(getResources().getString(R.string.poi_checkbox1),
 				checkBox1.isChecked());
 		b.putBoolean(getResources().getString(R.string.poi_checkbox2),
@@ -188,7 +188,7 @@ public class PreferencesActivity extends Activity {
 	}
 
 	private void retrieveStateFromBundle(Bundle b) {
-		Log.d(AdvSoftEngApp1Activity.TAG, "retrieveStateFromBundle() b="+b);
+		Log.d(NearMeActivity.TAG, "retrieveStateFromBundle() b="+b);
 		checkBox1.setChecked(b.getBoolean(
 				getResources().getString(R.string.poi_checkbox1), false));
 		checkBox2.setChecked(b.getBoolean(
@@ -202,7 +202,7 @@ public class PreferencesActivity extends Activity {
 	}
 
 	private void retrieveStateFromPreferences(SharedPreferences p) {
-		Log.d(AdvSoftEngApp1Activity.TAG, "retrieveStateFromPreferences() p="+p);
+		Log.d(NearMeActivity.TAG, "retrieveStateFromPreferences() p="+p);
 		checkBox1.setChecked(p.getBoolean(
 				getResources().getString(R.string.poi_checkbox1), false));
 		checkBox2.setChecked(p.getBoolean(
