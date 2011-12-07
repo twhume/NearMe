@@ -102,8 +102,8 @@ public class NearMeActivity extends MapActivity {
 		mapView.getController().setZoom(15); 	// zoom quite close: we're looking at street-level stuff
 		
 		poiIcon = getResources().getDrawable(R.drawable.gmap_blue_icon);
-		friendIcon = getResources().getDrawable(R.drawable.google_streets_icon);
-		meIcon = getResources().getDrawable(R.drawable.me);
+		friendIcon = getResources().getDrawable(R.drawable.me);
+		meIcon = getResources().getDrawable(R.drawable.google_streets_icon); // 
 
 		/* Initialise shared preferences, where we store all sorts of stuff permanently */
 
