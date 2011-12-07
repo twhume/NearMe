@@ -41,7 +41,7 @@
             android:name=".AddressBookRipperActivity">
         </activity>
         <activity
-            android:name=".addPlace">            
+            android:name=".AddPlaceActivity">            
         </activity>
         <receiver android:name="PoiPoller"></receiver>
 	</application>

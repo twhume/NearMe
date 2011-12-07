@@ -23,7 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class addPlace extends Activity {
+public class AddPlaceActivity extends Activity {
 	
 	/* Endpoint to which HTTP POSTs should go */
 	private static final String ENDPOINT = "http://nearme.tomhume.org:8080/NearMeServer/AddPOIServlet";

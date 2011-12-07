@@ -386,7 +386,7 @@ public class NearMeActivity extends MapActivity {
 
 		switch (item.getItemId()) {
 		case R.id.add_poi:
-			nextIntent = new Intent(NearMeActivity.this, addPlace.class);
+			nextIntent = new Intent(NearMeActivity.this, AddPlaceActivity.class);
 			break;
 		case R.id.upload_ab:
 			nextIntent = new Intent(NearMeActivity.this, AddressBookRipperActivity.class);
