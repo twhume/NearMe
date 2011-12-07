@@ -369,23 +369,26 @@ public class AddressBookRipperActivity extends Activity {
 					  myAddressBook.getEntries());
 		}
 
-
+		//ref: http://www.vogella.de/articles/AndroidListView/article.html
 		public View getView( int position, View convertView, ViewGroup parent){
 
-			//TODO Alan to add reference for where this code came from
+			
 			View row=convertView;
-			AddressHolder holder = null;
+			AddressHolder holder = null; // used to neatly fill row view of scroll list.
 			final AddressBookEntry currentEntry = ((AddressBookEntry)  myAddressBook.getEntries().get(position));
 			int iPermission = currentEntry.getPermission();
 			final int iPosition = position;
 
 			if (row==null) { // not drawn / created yet...
 				LayoutInflater inflater=getLayoutInflater();
-				row=inflater.inflate(R.layout.row, parent, false);
-				holder=new AddressHolder(row, iPermission);
+				row=inflater.inflate(R.layout.row, parent, false); // create view from row layout
+				holder=new AddressHolder(row, iPermission); 
 
 				
-			//TODO add some comments around here
+			// sets up callback function for current row's checkbox. Creates and shows new permissions dialog box.
+				//	and sets the current entry's permission based on if box is checked or not. Subsequent changes in perms in dialog box is caught in 
+				// dialog box's OnReadyListener callback function
+				
 				holder.friendCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 					@Override
 					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
