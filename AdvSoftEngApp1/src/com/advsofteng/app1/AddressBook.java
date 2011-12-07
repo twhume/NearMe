@@ -6,7 +6,7 @@ public class AddressBook {
 	private String deviceId;
 	private String msisdnHash;
 	private List<AddressBookEntry> entries = null;
-	
+
 	public String getDeviceId() {
 		return deviceId;
 	}

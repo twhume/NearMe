@@ -12,7 +12,7 @@ public class AddressBookEntry {
 	private String name; /* Name in address-book of this entry */
 	private int permission = PERM_HIDDEN; /* Permission granted to this entry */
 	private List<String> hashes; /* List of Hashes associated with this AddressBookEntry */
-	
+
 	public AddressBookEntry(int i, User u, String n, int p, List<String> h) {
 		this(n,h,p);
 		this.id = i;

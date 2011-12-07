@@ -16,7 +16,7 @@ public class DialogBoxPermissions extends Dialog {
         public void ready(String name);
     }
 
-    private ReadyListener readyListener;
+    private ReadyListener readyListener = null;
     private SeekBar seekbar = null;
     private TextView tvPermsRadius = null;
     private int intMaxRadius = 100; // max "fuzz" in metres around your exact location...
@@ -60,6 +60,7 @@ public class DialogBoxPermissions extends Dialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.permsdialogbox);
         
+        //TODO externalise strings
         setTitle("   Smudge my position by...");
         
         Button buttonOK = (Button) findViewById(R.id.ButtonPermsOK);

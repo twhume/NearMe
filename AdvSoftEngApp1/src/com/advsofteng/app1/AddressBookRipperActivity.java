@@ -4,17 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,7 +38,6 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
@@ -57,9 +53,9 @@ public class AddressBookRipperActivity extends Activity {
 	private SharedPreferences prefs = null;
 	DialogBoxPermissions myDialog = null;
 
-	private String countryCode;	/* ISO Country Code to be used for canonicalising MSISDNS */
-	private String ownNumber; /* Users own phone number */
-	private Button sendFriendList;
+	private String countryCode = null;	/* ISO Country Code to be used for canonicalising MSISDNS */
+	private String ownNumber = null; /* Users own phone number */
+	private Button sendFriendList = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -83,7 +79,8 @@ public class AddressBookRipperActivity extends Activity {
 		sendFriendList.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
 				finish();
-				uploadContacts(NearMeActivity.globalAddressBook);
+				UploadContactsTask uploader = new UploadContactsTask();
+				uploader.execute(NearMeActivity.globalAddressBook);
 			}
 		});
 
@@ -101,23 +98,12 @@ public class AddressBookRipperActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.unsubscribe:
-			unsubscribe();
+			UnsubscribeTask unsubscriber = new UnsubscribeTask();
+			unsubscriber.execute();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	private void unsubscribe() {
-		UnsubscribeTask unsubscriber = new UnsubscribeTask();
-		unsubscriber.execute();
-	}
-
-	////////////////////////////////////////////
-
-	private void uploadContacts(AddressBook a) {
-		UploadContactsTask uploader = new UploadContactsTask();
-		uploader.execute(a);
 	}
 
 	/**
@@ -163,11 +149,8 @@ public class AddressBookRipperActivity extends Activity {
 				"HmacSHA1");
 		Mac mac = Mac.getInstance("HmacSHA1");
 		mac.init(key);
-
 		byte[] bytes = mac.doFinal(s.getBytes("UTF-8"));
-
 		return new String(Base64.encode(bytes, 0));
-
 	}
 	////////////////////////////////////////////
 
@@ -196,8 +179,6 @@ public class AddressBookRipperActivity extends Activity {
 					// we have a hidden perms... make sure its NOT in the prefs...
 					editor.remove(name);
 				}
-
-
 			}
 			editor.putBoolean("bContactsSaved", bContactsSaved); // set flag
 			editor.commit(); // write to prefs once done checking
@@ -230,6 +211,12 @@ public class AddressBookRipperActivity extends Activity {
 	 */
 
 	private class OnReadyListener implements DialogBoxPermissions.ReadyListener {
+
+		/**
+		 * When the user clicks OK in the dialog box, save the fudge factor
+		 * for the selected contact.
+		 */
+		
 		@Override
 		public void ready(String name) {
 			int iPerms = myDialog.getFuzz();
@@ -348,6 +335,7 @@ public class AddressBookRipperActivity extends Activity {
 					strName = NearMeActivity.globalAddressBook.getEntries().get(i).getName();
 
 					// check if current name has been saved before in prefs...
+					//TODO consider the case when someone has a name which conflict with a key used to store datq in prefs
 					if(prefs.contains(strName)){
 
 						int iPerm = 0;
@@ -381,7 +369,7 @@ public class AddressBookRipperActivity extends Activity {
 
 		public View getView( int position, View convertView, ViewGroup parent){
 
-
+			//TODO Alan to add reference for where this code came from
 			View row=convertView;
 			AddressHolder holder = null;
 			final AddressBookEntry currentEntry = ((AddressBookEntry)NearMeActivity.globalAddressBook.getEntries().get(position));
@@ -393,17 +381,14 @@ public class AddressBookRipperActivity extends Activity {
 				row=inflater.inflate(R.layout.row, parent, false);
 				holder=new AddressHolder(row, iPermission);
 
+				
+			//TODO add some comments around here
 				holder.friendCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 					@Override
-					public void onCheckedChanged(CompoundButton buttonView,
-							boolean isChecked) {
-
+					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 						if(isChecked){
-
-							myDialog = new DialogBoxPermissions(AddressBookRipperActivity.this, 
-																	new OnReadyListener(), iPosition);
+							myDialog = new DialogBoxPermissions(AddressBookRipperActivity.this, new OnReadyListener(), iPosition);
 							myDialog.show();
-
 							currentEntry.setPermission(AddressBookEntry.PERM_SHOWN);
 						}
 						else{

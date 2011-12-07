@@ -212,6 +212,7 @@ public class NearMeActivity extends MapActivity {
 		edit.putString(PreferencesActivity.KEY_LNG,
 				Double.toString(location.getLongitude()));
 		edit.commit();
+		updateMapData();
 	}
 
 	private void saveDeviceId() {
