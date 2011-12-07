@@ -61,7 +61,7 @@ public class NearMeActivity extends MapActivity {
 	private PendingIntent alarmIntent = null; 	/* Handle to the repeatedly called Intent for triggering polls */
 	private SharedPreferences prefs = null; 	/* used to share location & time between Activity and BroadcastReceiver */
 	MyItemizedOverlay friends, places, me;		/* overlays for the map */
-	public static AddressBook globalAddressBook = new AddressBook(); // TODO why is this global?
+	
 
 	/* UI elements */
 

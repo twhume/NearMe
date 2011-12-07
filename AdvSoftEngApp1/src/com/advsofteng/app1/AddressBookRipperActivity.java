@@ -56,6 +56,9 @@ public class AddressBookRipperActivity extends Activity {
 	private String countryCode = null;	/* ISO Country Code to be used for canonicalising MSISDNS */
 	private String ownNumber = null; /* Users own phone number */
 	private Button sendFriendList = null;
+	
+	private AddressBook myAddressBook = new AddressBook(); 
+	
 
 	/** Called when the activity is first created. */
 	@Override
@@ -80,7 +83,7 @@ public class AddressBookRipperActivity extends Activity {
 			public void onClick(View v) {
 				finish();
 				UploadContactsTask uploader = new UploadContactsTask();
-				uploader.execute(NearMeActivity.globalAddressBook);
+				uploader.execute( myAddressBook);
 			}
 		});
 
@@ -163,12 +166,12 @@ public class AddressBookRipperActivity extends Activity {
 			boolean bContactsSaved = false;
 
 			// loop through addressBook looking for perms != 0...
-			for(int i = 0; i < NearMeActivity.globalAddressBook.getEntries().size(); i++){
+			for(int i = 0; i <  myAddressBook.getEntries().size(); i++){
 
-				String name = NearMeActivity.globalAddressBook.getEntries().get(i).getName();
-				int perms = NearMeActivity.globalAddressBook.getEntries().get(i).getPermission();
+				String name =  myAddressBook.getEntries().get(i).getName();
+				int perms =  myAddressBook.getEntries().get(i).getPermission();
 
-				if(AddressBookEntry.PERM_HIDDEN != NearMeActivity.globalAddressBook.getEntries().get(i).getPermission()){
+				if(AddressBookEntry.PERM_HIDDEN !=   myAddressBook.getEntries().get(i).getPermission()){
 
 					//then save the current entry's permission in prefs, using their name as their unique ID for retrieval.
 					editor.putInt(name, perms);
@@ -221,7 +224,7 @@ public class AddressBookRipperActivity extends Activity {
 		public void ready(String name) {
 			int iPerms = myDialog.getFuzz();
 			int iPosition = myDialog.getContactEntryNumber();
-			NearMeActivity.globalAddressBook.getEntries().get(iPosition).setPermission(iPerms);
+			  myAddressBook.getEntries().get(iPosition).setPermission(iPerms);
 		}
 	}
 
@@ -238,7 +241,7 @@ public class AddressBookRipperActivity extends Activity {
 		protected void onPostExecute(AddressBook result) {
 			Log.i(TAG, System.currentTimeMillis() + " done, result= " + result);
 
-			NearMeActivity.globalAddressBook = result;
+			  myAddressBook = result;
 
 			//need to check that any local contacts have had their permissions saved previously in shared prefs.
 			FindSavedPermsInPrefs();
@@ -325,14 +328,14 @@ public class AddressBookRipperActivity extends Activity {
 			bFlag = prefs.getBoolean("bContactsSaved", bFlag);
 
 
-			if(bFlag && NearMeActivity.globalAddressBook!=null && NearMeActivity.globalAddressBook.getEntries()!=null) {
+			if(bFlag &&   myAddressBook!=null &&   myAddressBook.getEntries()!=null) {
 				// we have at least 1 contact's permission saved so, change the addressbook entry to that permission.
 
 				String strName = null;
 
-				for(int i = 0; i< NearMeActivity.globalAddressBook.getEntries().size(); i++){
+				for(int i = 0; i<   myAddressBook.getEntries().size(); i++){
 
-					strName = NearMeActivity.globalAddressBook.getEntries().get(i).getName();
+					strName =   myAddressBook.getEntries().get(i).getName();
 
 					// check if current name has been saved before in prefs...
 					//TODO consider the case when someone has a name which conflict with a key used to store datq in prefs
@@ -344,7 +347,7 @@ public class AddressBookRipperActivity extends Activity {
 
 						// if its any value other than 0, then replace this saved value in addressbook
 						if(0 != iPerm){
-							NearMeActivity.globalAddressBook.getEntries().get(i).setPermission(iPerm);
+							  myAddressBook.getEntries().get(i).setPermission(iPerm);
 						}
 					}
 				}
@@ -363,7 +366,7 @@ public class AddressBookRipperActivity extends Activity {
 		AddressEntryAdapter() {
 			super(AddressBookRipperActivity.this, 
 					R.layout.row,  
-					NearMeActivity.globalAddressBook.getEntries());
+					  myAddressBook.getEntries());
 		}
 
 
@@ -372,7 +375,7 @@ public class AddressBookRipperActivity extends Activity {
 			//TODO Alan to add reference for where this code came from
 			View row=convertView;
 			AddressHolder holder = null;
-			final AddressBookEntry currentEntry = ((AddressBookEntry)NearMeActivity.globalAddressBook.getEntries().get(position));
+			final AddressBookEntry currentEntry = ((AddressBookEntry)  myAddressBook.getEntries().get(position));
 			int iPermission = currentEntry.getPermission();
 			final int iPosition = position;
 
@@ -404,7 +407,7 @@ public class AddressBookRipperActivity extends Activity {
 			else{ // access existing row
 				holder=(AddressHolder)row.getTag();
 			}
-			holder.populateFrom(NearMeActivity.globalAddressBook.getEntries().get(position));
+			holder.populateFrom(  myAddressBook.getEntries().get(position));
 
 			return(row);
 		}
@@ -482,17 +485,17 @@ public class AddressBookRipperActivity extends Activity {
 
 	protected void onStop() {
 
-		if (NearMeActivity.globalAddressBook!=null && NearMeActivity.globalAddressBook.getEntries()!=null) {
+		if (  myAddressBook!=null &&   myAddressBook.getEntries()!=null) {
 			SharedPreferences.Editor editor = prefs.edit();
 			boolean bContactsSaved = false;
 			// loop through addressBook looking for... 
-			for(int i = 0; i < NearMeActivity.globalAddressBook.getEntries().size(); i++){
+			for(int i = 0; i <   myAddressBook.getEntries().size(); i++){
 	
-				int perms = NearMeActivity.globalAddressBook.getEntries().get(i).getPermission();
-				String name = NearMeActivity.globalAddressBook.getEntries().get(i).getName();
+				int perms =   myAddressBook.getEntries().get(i).getPermission();
+				String name =   myAddressBook.getEntries().get(i).getName();
 	
 				// ... non-hidden perms..
-				if(AddressBookEntry.PERM_HIDDEN != NearMeActivity.globalAddressBook.getEntries().get(i).getPermission()){
+				if(AddressBookEntry.PERM_HIDDEN !=   myAddressBook.getEntries().get(i).getPermission()){
 	
 					//then save the current entry's permission in prefs, using their name as their unique ID for retrieval.
 					editor.putInt(name, perms);
