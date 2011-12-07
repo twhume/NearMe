@@ -73,6 +73,7 @@ public class AddPOIServlet extends HttpServlet {
 		
 		try
 		  {
+			//TODO take datasource from the servlet, not these variables
 			conn = DriverManager.getConnection(url, login, password); // connect with data base
 			//System.out.println("try 2");
 			ResultSet rs = null;

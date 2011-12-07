@@ -23,6 +23,8 @@ public class DeletePOIServlet extends GenericNearMeServlet {
 	private static Logger logger = Logger.getLogger(DeletePOIServlet.class);
 	private static final long serialVersionUID = -5719580871373727060L;
 	
+	//TODO move the database related code into DatabasePoiFinder
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String path = request.getPathInfo();

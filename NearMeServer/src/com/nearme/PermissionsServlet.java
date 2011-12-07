@@ -16,6 +16,8 @@ import com.google.gson.Gson;
  *
  */
 
+//TODO delete this, it's no longer used or necessary
+
 public class PermissionsServlet extends GenericNearMeServlet {
 
 	private static final long serialVersionUID = -3524933138212544815L;
