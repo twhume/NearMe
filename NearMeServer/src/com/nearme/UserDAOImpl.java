@@ -30,7 +30,7 @@ public class UserDAOImpl implements UserDAO {
 	private static final String READ_HASH_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE idHash.hash = ? AND idHash.id = user.hashId";
 	private static final String READ_DEVICE_SQL = "SELECT user.*, idHash.hash FROM user,idHash WHERE user.deviceId = ? AND idHash.id = user.hashId";
 	private static final String READ_AB_SQL = "SELECT ab.id, ab.name, ab.permission, ih.id, ih.hash FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ab.ownerId = ? AND abhm.addressBookId = ab.id AND abhm.hashId = ih.id ORDER BY ab.name";
-	private static final String NEAREST_SQL = "SELECT u.id, ab.name, u.latitude, u.longitude, ( 6371 * acos( cos( radians(?) ) * cos( radians( u.latitude ) ) * cos( radians( u.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( u.latitude ) ) ) ) AS distance, abhm.* FROM user u, addressBook ab, addressBookHashMatcher abhm WHERE ab.ownerId = ? AND abhm.addressBookId = ab.id AND abhm.hashId = u.hashId AND u.id IN (/* All those who have user with the supplied hash in their address book with permission > 0 */ SELECT distinct ab.ownerId FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ih.hash = ? AND abhm.hashId = ih.id AND abhm.addressBookId = ab.id AND ab.permission > 0 ) HAVING distance < ? ORDER BY distance";
+	private static final String NEAREST_SQL = "SELECT u.id, ab.name, u.latitude, u.longitude, ( 6371 * acos( cos( radians(?) ) * cos( radians( u.latitude ) ) * cos( radians( u.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( u.latitude ) ) ) ) AS distance, abhm.*, ih.* FROM user u, addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ab.ownerId = ? AND abhm.addressBookId = ab.id AND abhm.hashId = u.hashId AND abhm.hashId = ih.id AND u.id IN (/* All those who have user with the supplied hash in their address book with permission > 0 */ SELECT distinct ab.ownerId FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ih.hash = ? AND abhm.hashId = ih.id AND abhm.addressBookId = ab.id AND ab.permission > 0 ) HAVING distance < ? ORDER BY distance";
 
 	private static final String USER_INSERT_SQL = "INSERT INTO user (deviceId, hashId, latitude, longitude, lastReport) VALUES (?,?,?,?,?)";
 	private static final String USER_UPDATE_POSITION_SQL = "UPDATE user SET latitude = ?, longitude = ?, lastReport = ? WHERE id = ?";
@@ -50,11 +50,14 @@ public class UserDAOImpl implements UserDAO {
 	private static final String PERMS_UPDATE_SQL = "UPDATE addressBook ab SET permission = ? WHERE ownerID = ? AND id IN (SELECT abhm.addressBookId FROM addressBookHashMatcher abhm, idHash h WHERE abhm.hashId = h.id AND h.hash IN (?,?,?,?,?,?,?,?,?,?))";
 	
 	private static final String USER_DELETE_SQL = "DELETE FROM user WHERE id = ?";
-	
+
+	private static final String READ_PERMS_SQL = "SELECT ab.permission FROM addressBook ab, addressBookHashMatcher abhm, idHash ih WHERE ab.id = abhm.addressBookId AND abhm.hashId = ih.id AND ih.hash = ? AND ab.ownerId = ?";
+
 	/* See the comment for setPermissions() to understand what this is, and why it needs to match the 
 	 * number of question-marks in the subquery of PERMS_UPDATE_SQL
 	 */
 	private static final int PERM_UPDATE_COUNT = 10;
+
 	
 	private DataSource dataSource = null;
 	
@@ -235,7 +238,12 @@ public class UserDAOImpl implements UserDAO {
 				 * 2. do it all in SQL, somehow, which will mean passing a value from that subquery out to the outer query... brrr.
 				 */
 
-//				int smudgeFactor = lookupSmudgeFactorBetween(rs.getInt("ab.id"));
+				logger.debug("returning the entry in the address book with a hash of " + rs.getString("ih.hash"));
+				User otherUser = this.readByHash(rs.getString("ih.hash"));
+				if (otherUser!=null) {
+					int smudgeFactor = getSmudgeFactorBetween(otherUser.getId(), u.getMsisdnHash());
+					logger.debug("Applying a smudge factor of " + smudgeFactor + " between " + otherUser.getId() + " and " + u.getId());
+				}
 				
 				Poi p = new Poi(rs.getString("ab.name"), rs.getDouble("u.latitude"), rs.getDouble("u.longitude"), PoiType.FRIEND, 0);
 				ret.add(p);
@@ -257,9 +265,32 @@ public class UserDAOImpl implements UserDAO {
 	 * @return
 	 */
 	
-//	private int getSmudgeFactorBetween(int abId) {
-//		return 0;
-//	}
+	private int getSmudgeFactorBetween(int addressBookOwnerUserId, String hashOfUserToLookUp) throws SQLException {
+		// Who is the user being looked up? ("me")
+		// Who is the user doing the looking up (the one referred to in the address book entry)
+		// look up me in their address book, and get the value of the permissions
+		
+		Connection c = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			c = dataSource.getConnection();
+			pst = c.prepareStatement(READ_PERMS_SQL);
+			pst.setString(1, hashOfUserToLookUp);
+			pst.setInt(2, addressBookOwnerUserId);
+			rs = pst.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1);
+			} else
+				return 0;
+		} finally {
+			if (rs!=null) rs.close();
+			if (pst!=null) pst.close();
+			if (c!=null) c.close();
+		}
+		
+	}
 	
 	/**
 	 * Writes the given User into the database, either inserting or updating, depending on whether a

@@ -54,4 +54,16 @@ public class Util {
 	    return new Scanner(is).useDelimiter("\\A").next();
 	}
 
+	/**
+	 * Applies a randomised "smudging" to the input position of "metres" metres
+	 * 
+	 * @param in
+	 * @param metres
+	 * @return
+	 */
+	
+	public static Position smudge(Position in, int metres) {
+		return in;
+	}
+	
 }
