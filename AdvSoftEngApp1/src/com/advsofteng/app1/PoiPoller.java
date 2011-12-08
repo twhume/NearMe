@@ -100,7 +100,7 @@ public class PoiPoller extends BroadcastReceiver {
 		    {	
 		    	// run through the JsonArray converting each entry into an actual Poi object in the Poi ArrayList
 		    	Poi p = gson.fromJson(counter, Poi.class);
-		    	if (!app.getPois().contains(p)) gotNewPoi = true;
+		    	if (!app.poisContains(p)) gotNewPoi = true;
 		    	newPois.add(p);
 		    }
 

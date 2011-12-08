@@ -16,5 +16,11 @@ public class NearMeApplication extends Application {
 		this.pois = pois;
 	}
 	
+	public boolean poisContains(Poi p) {
+		for (Poi q: pois) {
+			if (q.getId()==p.getId() && (q.getType().getId()==p.getType().getId())) return true;
+		}
+		return false;
+	}
 	
 }
