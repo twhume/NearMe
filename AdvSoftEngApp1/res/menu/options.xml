@@ -9,7 +9,4 @@
     <item android:id="@+id/upload_ab"
           android:icon="@drawable/ic_menu_link"
           android:title="@string/menu_upload_ab" />
-    <item android:id="@+id/help"
-          android:icon="@drawable/gmap_blue_icon"
-          android:title="@string/menu_help" />
 </menu>
