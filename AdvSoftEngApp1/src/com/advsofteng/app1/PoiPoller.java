@@ -1,25 +1,20 @@
 package com.advsofteng.app1;
 
 import java.util.ArrayList;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.Toast;
 
 /**
  * A class to poll in the  background at regular intervals, looking for points of interest
@@ -40,13 +35,12 @@ public class PoiPoller extends BroadcastReceiver {
 		SharedPreferences prefs = context.getSharedPreferences(NearMeActivity.TAG, Context.MODE_PRIVATE);
 		Log.i(NearMeActivity.TAG, "poll triggered for " + prefs.getString(PreferencesActivity.KEY_ID, null));
 		
-		/* If we have no GPS, there's nothing we can usefully ask for - so tell the user and return */
+		/* If we have no GPS, there's nothing we can usefully ask for - so just return.
+		 * There's also no point telling the user; they will see it at the top of their screen
+		 */
 		
 		if (prefs.getString("time", null)==null) {
 			Log.i(NearMeActivity.TAG, "no GPS yet, don't report");
-			Toast toast=Toast.makeText(context, context.getString(R.string.no_gps_error), 2000);
-			toast.setGravity(Gravity.TOP, -30, 50);
-			toast.show();
 			return;
 		}
 		
