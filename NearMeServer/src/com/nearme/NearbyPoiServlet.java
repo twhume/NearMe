@@ -38,8 +38,10 @@ public class NearbyPoiServlet extends GenericNearMeServlet {
 	
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
 		res.setContentType("application/json");
-		logger.debug("url=" + req.getPathInfo() + "?" + req.getQueryString());
-		PoiQuery pq = new PoiQuery(req.getPathInfo() + "?" + req.getQueryString());
+		String inPath = req.getPathInfo();
+		if (req.getQueryString()!=null) inPath += ("?" + req.getQueryString());
+ 		logger.debug("url=" +inPath);
+		PoiQuery pq = new PoiQuery(inPath);
 
 		try {
 			PoiFinder pf = new DatabasePoiFinder(datasource);
