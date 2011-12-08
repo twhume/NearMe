@@ -31,12 +31,11 @@ public class NearMeLocationListener implements LocationListener {
 		locationActivity.setLocation(location);		
 	}
 
-	public void onProviderEnabled(String provider) {
-		// TODO put code here to deal with GPS being down...
-	}
+	public void onProviderEnabled(String provider) {}
 	
 	public void onProviderDisabled(String provider) {
-		// TODO put code here to deal with GPS being down...
+		/* Turn off the display of location information */
+		locationActivity.setLocation(null);
 	}
 
 
