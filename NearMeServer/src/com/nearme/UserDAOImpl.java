@@ -238,14 +238,17 @@ public class UserDAOImpl implements UserDAO {
 				 * 2. do it all in SQL, somehow, which will mean passing a value from that subquery out to the outer query... brrr.
 				 */
 
+				Poi p = null;
 				logger.debug("returning the entry in the address book with a hash of " + rs.getString("ih.hash"));
 				User otherUser = this.readByHash(rs.getString("ih.hash"));
 				if (otherUser!=null) {
 					int smudgeFactor = getSmudgeFactorBetween(otherUser.getId(), u.getMsisdnHash());
+					Position beforeSmudge = new Position(rs.getDouble("u.latitude"), rs.getDouble("u.longitude"));
+					Position afterSmudge = Util.smudgeRandomly(beforeSmudge, smudgeFactor);
+					logger.debug("before="+beforeSmudge+",after="+afterSmudge);
+					p = new Poi(rs.getString("ab.name"), afterSmudge.getLatitude(), afterSmudge.getLongitude(), PoiType.FRIEND, 0);
 					logger.debug("Applying a smudge factor of " + smudgeFactor + " between " + otherUser.getId() + " and " + u.getId());
-				}
-				
-				Poi p = new Poi(rs.getString("ab.name"), rs.getDouble("u.latitude"), rs.getDouble("u.longitude"), PoiType.FRIEND, 0);
+				} else p = new Poi(rs.getString("ab.name"), rs.getDouble("u.latitude"), rs.getDouble("u.longitude"), PoiType.FRIEND, 0);
 				ret.add(p);
 			}
 		} finally {

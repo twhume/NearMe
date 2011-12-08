@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/gson-1.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.14-bin.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jcoord-1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
