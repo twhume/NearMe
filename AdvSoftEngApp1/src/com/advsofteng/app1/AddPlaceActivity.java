@@ -9,6 +9,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -32,11 +33,11 @@ public class AddPlaceActivity extends Activity {
 
 	private TextView latitudeField;
 	private TextView longitudeField;
-	private LocationManager locationManager;
-	private LocationListener locationListener;
 	private double lat;
 	private double lng;
 
+	private SharedPreferences prefs;
+	
 	private EditText name;
 
 	private Button Add = null;
@@ -59,16 +60,12 @@ public class AddPlaceActivity extends Activity {
 		longitudeField = (TextView) findViewById(R.id.TextViewLON); // textView for longitude 
 		name = (EditText) findViewById(R.id.editText1);
 
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);  
-		locationListener = new MyLocationListener();
-
-		//calling the method and expect location updates multiple times
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,locationListener);
-
 		//call the function that get the value of EditText
 		spinner.setOnItemSelectedListener(new MyOnItemSelectedListener()); 
 
+		prefs = getSharedPreferences(NearMeActivity.TAG, Context.MODE_PRIVATE);
 
+		
 		// Deal with the button add
 		Add = (Button) findViewById(R.id.button_add);
 		Add.setOnClickListener(new View.OnClickListener() {
@@ -158,37 +155,26 @@ public class AddPlaceActivity extends Activity {
 	}
 
 
-	/*
-	 * Implements class MyLocationListener
-	 */
-	private class MyLocationListener implements LocationListener 
-	{ 
 
-		public void onLocationChanged(Location location) {
-			if (location != null) {
-				lat = (double) (location.getLatitude());  
-				lng = (double) (location.getLongitude()); 
-				latitudeField.setText(String.valueOf(lat)); //assign the value of latitude at text field
-				longitudeField.setText(String.valueOf(lng)); //assign the value of longitude at text field
+	@Override
+	protected void onResume() {
+		Log.d(NearMeActivity.TAG, "resuming");
+		if (prefs.getString(PreferencesActivity.KEY_TIME, null)!=null) {
+			lat = Double.parseDouble(prefs.getString(PreferencesActivity.KEY_LAT, ""));
+			lng = Double.parseDouble(prefs.getString(PreferencesActivity.KEY_LNG, ""));
+			latitudeField.setText(""+lat);
+			longitudeField.setText("" +lng);
+		} else {
+			lat = 0;
+			lng = 0;
+			latitudeField.setText("unknown");
+			longitudeField.setText("unknown");
+			//FIXME these are valid lats and longs, should be fixed
+		}
+		Log.d(NearMeActivity.TAG, "resuming, coords="+lat+","+lng);
+		super.onResume();
+	}
 
-			}//end if
-		}//end void
-
-		public void onProviderDisabled(String provider) 
-		{ 
-			Toast.makeText( getApplicationContext(), "Gps Disabled",Toast.LENGTH_SHORT ).show(); 
-		}  
-
-		public void onProviderEnabled(String provider) 
-		{ 
-			Toast.makeText( getApplicationContext(), "Gps Enabled",Toast.LENGTH_SHORT).show(); 
-		} 
-
-		public void onStatusChanged(String provider, int status, Bundle extras) 
-		{ 
-		} 
-
-	}//end class
 
 
 } //end addPlace
